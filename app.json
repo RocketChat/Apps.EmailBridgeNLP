@@ -1,0 +1,16 @@
+{
+    "id": "15d4a933-fd32-4c28-9ef5-eed8ed462a55",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.44.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Priyanshu Harshbodhi",
+        "homepage": "https://github.com/RocketChat/Apps.EmailBridgeNLP",
+        "support": "https://github.com/RocketChat/Apps.EmailBridgeNLP"
+    },
+    "name": "EmailBridgeNLP",
+    "nameSlug": "emailbridgenlp",
+    "classFile": "EmailBridgeNlpApp.ts",
+    "description": "Natural Language Bridge to Legacy Email System for Rocket Chat Powered by Modern LLMs",
+    "implements": []
+}
