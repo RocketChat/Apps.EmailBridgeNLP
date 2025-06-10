@@ -12,5 +12,22 @@
     "nameSlug": "emailbridgenlp",
     "classFile": "EmailBridgeNlpApp.ts",
     "description": "Natural Language Bridge to Legacy Email System for Rocket Chat Powered by Modern LLMs",
-    "implements": []
+    "implements": [],
+    "permissions": [
+        {
+            "name": "slashcommand"
+        },
+        {
+            "name": "room.read"
+        },
+        {
+            "name": "user.read"
+        },
+        {
+            "name": "message.read"
+        },
+        {
+            "name": "message.write"
+        }
+    ]
 }
