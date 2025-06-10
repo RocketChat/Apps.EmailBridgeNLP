@@ -42,6 +42,20 @@ export class Handler implements IHandler {
         this.language = params.language || 'en';
     }
 
+    /**
+     * Helper function to properly capitalize provider names
+     */
+    private getProviderDisplayName(provider: EmailProviders): string {
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                return 'Gmail';
+            case EmailProviders.OUTLOOK:
+                return 'Outlook';
+            default:
+                return provider;
+        }
+    }
+
     public async Help(): Promise<void> {
         await sendHelperNotification(
             this.read,
@@ -77,7 +91,7 @@ export class Handler implements IHandler {
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                const providerName = emailSettings.provider.toUpperCase();
+                const providerName = this.getProviderDisplayName(emailSettings.provider);
                 let message: string;
                 
                 if (emailSettings.provider === EmailProviders.OUTLOOK) {
@@ -112,7 +126,7 @@ export class Handler implements IHandler {
                     this.app.getLogger()
                 );
                 messageBuilder.setText(
-                    `✅ You are already logged in with **${emailSettings.provider.toUpperCase()}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
+                    `✅ You are already logged in with **${this.getProviderDisplayName(emailSettings.provider)}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
                 );
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -132,7 +146,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔐 **Connect your ${emailSettings.provider.toUpperCase()} account to Rocket Chat**`
+                    `🔐 **Connect your ${this.getProviderDisplayName(emailSettings.provider)} account to Rocket Chat**`
                 ),
             });
 
@@ -140,7 +154,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: "email_login_action",
-                        text: block.newPlainTextObject(`🔑 Login with ${emailSettings.provider.toUpperCase()}`),
+                        text: block.newPlainTextObject(`🔑 Login with ${this.getProviderDisplayName(emailSettings.provider)}`),
                         url: authUrl,
                         style: ButtonStyle.PRIMARY,
                     }),
@@ -175,7 +189,7 @@ export class Handler implements IHandler {
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                const providerName = emailSettings.provider.toUpperCase();
+                const providerName = this.getProviderDisplayName(emailSettings.provider);
                 let message: string;
                 
                 if (emailSettings.provider === EmailProviders.OUTLOOK) {
@@ -199,7 +213,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(`❌ You are not currently authenticated with ${emailSettings.provider.toUpperCase()}. Use \`/email login\` to login.`);
+                messageBuilder.setText(`❌ You are not currently authenticated with ${this.getProviderDisplayName(emailSettings.provider)}. Use \`/email login\` to login.`);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -218,7 +232,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${emailSettings.provider.toUpperCase()}** account **${userInfo.email}**?`
+                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${this.getProviderDisplayName(emailSettings.provider)}** account **${userInfo.email}**?`
                 ),
             });
 
