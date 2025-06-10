@@ -18,6 +18,7 @@ export interface IHandlerParams {
     persis: IPersistence;
     triggerId?: string;
     threadId?: string;
+    language?: string;
 }
 
 export interface IHandler {
@@ -30,6 +31,7 @@ export interface IHandler {
     persis: IPersistence;
     triggerId?: string;
     threadId?: string;
+    language?: string;
     Help(): Promise<void>;
     sendDefault(): Promise<void>;
     Login(): Promise<void>;
