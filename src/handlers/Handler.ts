@@ -12,6 +12,10 @@ import {
     sendDefaultNotification,
     sendHelperNotification,
 } from '../helper/notification';
+import { EmailServiceFactory } from '../services/EmailServiceFactory';
+import { getEmailSettings } from '../config/SettingsManager';
+import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
+import { EmailProviders } from '../enums/EmailProviders';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -23,6 +27,7 @@ export class Handler implements IHandler {
     public persis: IPersistence;
     public triggerId?: string;
     public threadId?: string;
+    public language?: string;
 
     constructor(params: IHandlerParams) {
         this.app = params.app;
@@ -34,6 +39,7 @@ export class Handler implements IHandler {
         this.persis = params.persis;
         this.triggerId = params.triggerId;
         this.threadId = params.threadId;
+        this.language = params.language || 'en';
     }
 
     public async Help(): Promise<void> {
@@ -53,5 +59,187 @@ export class Handler implements IHandler {
             this.sender,
             this.room,
         );
+    }
+
+    public async Login(): Promise<void> {
+        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+
+        const messageBuilder = this.modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(this.room)
+            .setGroupable(false);
+
+        try {
+            // Get email settings to determine provider
+            const emailSettings = await getEmailSettings(this.read.getEnvironmentReader().getSettings());
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
+                const providerName = emailSettings.provider.toUpperCase();
+                let message: string;
+                
+                if (emailSettings.provider === EmailProviders.OUTLOOK) {
+                    message = `🚧 **Outlook authentication is coming soon!**\n\n` +
+                             `For now, please use **Gmail** for email authentication.\n\n`;
+                } else {
+                    message = `❌ **${providerName} authentication is not yet implemented.**\n\n` +
+                             `Currently only **Gmail** is supported for authentication.\n\n`;
+                }
+                
+                messageBuilder.setText(message);
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Check if user is already authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailSettings.provider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (isAuthenticated) {
+                const userInfo = await EmailServiceFactory.getUserInfo(
+                    emailSettings.provider,
+                    this.sender.id,
+                    this.http,
+                    this.persis,
+                    this.read,
+                    this.app.getLogger()
+                );
+                messageBuilder.setText(
+                    `✅ You are already logged in with **${emailSettings.provider.toUpperCase()}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
+                );
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Generate the authorization URL
+            const authUrl = await EmailServiceFactory.getAuthenticationUrl(
+                emailSettings.provider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Create a UI block with a button
+            const block = this.modify.getCreator().getBlockBuilder();
+
+            block.addSectionBlock({
+                text: block.newMarkdownTextObject(
+                    `🔐 **Connect your ${emailSettings.provider.toUpperCase()} account to EmailBridge NLP**\n\nClick the button below to securely authenticate with ${emailSettings.provider.toUpperCase()} and start using email features.`
+                ),
+            });
+
+            block.addActionsBlock({
+                elements: [
+                    block.newButtonElement({
+                        actionId: "email_login_action",
+                        text: block.newPlainTextObject(`🔑 Login with ${emailSettings.provider.toUpperCase()}`),
+                        url: authUrl,
+                        style: ButtonStyle.PRIMARY,
+                    }),
+                ],
+            });
+
+            messageBuilder.setBlocks(block.getBlocks());
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
+        } catch (error) {
+            this.app.getLogger().error("Error in login:", error);
+            messageBuilder.setText(
+                `❌ Error processing login: ${error.message}`
+            );
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async Logout(): Promise<void> {
+        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+
+        const messageBuilder = this.modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(this.room)
+            .setGroupable(false);
+
+        try {
+            // Get email settings to determine provider
+            const emailSettings = await getEmailSettings(this.read.getEnvironmentReader().getSettings());
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
+                const providerName = emailSettings.provider.toUpperCase();
+                let message: string;
+                
+                if (emailSettings.provider === EmailProviders.OUTLOOK) {
+                    message = `🚧 **Outlook authentication is coming soon!** Only Gmail is currently supported for logout.`;
+                } else {
+                    message = `❌ **${providerName} is not supported.** Only Gmail authentication is currently available.`;
+                }
+                
+                messageBuilder.setText(message);
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Check if user is authenticated first
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailSettings.provider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                messageBuilder.setText(`❌ You are not currently authenticated with ${emailSettings.provider.toUpperCase()}. Use \`/email login\` to login.`);
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Get user info to show in confirmation message
+            const userInfo = await EmailServiceFactory.getUserInfo(
+                emailSettings.provider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Create a UI block with a confirmation button
+            const block = this.modify.getCreator().getBlockBuilder();
+
+            block.addSectionBlock({
+                text: block.newMarkdownTextObject(
+                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${emailSettings.provider.toUpperCase()}** account **${userInfo.email}**?\n\nThis will disconnect your email account from EmailBridge NLP.`
+                ),
+            });
+
+            block.addActionsBlock({
+                elements: [
+                    block.newButtonElement({
+                        actionId: "email_logout_action",
+                        text: block.newPlainTextObject("🔒 Confirm Logout"),
+                        style: ButtonStyle.DANGER,
+                    }),
+                ],
+            });
+
+            // Set the blocks in the message
+            messageBuilder.setBlocks(block.getBlocks());
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
+        } catch (error) {
+            this.app.getLogger().error("Error in logout:", error);
+            messageBuilder.setText(`❌ Error preparing logout: ${error.message}`);
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
     }
 } 

@@ -32,4 +32,6 @@ export interface IHandler {
     threadId?: string;
     Help(): Promise<void>;
     sendDefault(): Promise<void>;
+    Login(): Promise<void>;
+    Logout(): Promise<void>;
 } 

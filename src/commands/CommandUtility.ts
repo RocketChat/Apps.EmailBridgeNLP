@@ -72,6 +72,12 @@ export class CommandUtility implements ICommandUtility {
             case CommandParam.HELP:
                 await handler.Help();
                 break;
+            case CommandParam.LOGIN:
+                await handler.Login();
+                break;
+            case CommandParam.LOGOUT:
+                await handler.Logout();
+                break;
             default: {
                 await handler.sendDefault();
                 break;
