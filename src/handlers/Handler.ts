@@ -132,7 +132,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔐 **Connect your ${emailSettings.provider.toUpperCase()} account to EmailBridge NLP**\n\nClick the button below to securely authenticate with ${emailSettings.provider.toUpperCase()} and start using email features.`
+                    `🔐 **Connect your ${emailSettings.provider.toUpperCase()} account to Rocket Chat**`
                 ),
             });
 
@@ -218,7 +218,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${emailSettings.provider.toUpperCase()}** account **${userInfo.email}**?\n\nThis will disconnect your email account from EmailBridge NLP.`
+                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${emailSettings.provider.toUpperCase()}** account **${userInfo.email}**?`
                 ),
             });
 
