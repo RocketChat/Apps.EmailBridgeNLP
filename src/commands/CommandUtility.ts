@@ -7,7 +7,7 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { CommandParam } from '../enum/CommandParam';
+import { CommandParam } from '../enums/CommandParam';
 import { Handler } from '../handlers/Handler';
 import {
     ICommandUtility,
@@ -40,9 +40,6 @@ export class CommandUtility implements ICommandUtility {
     }
 
     public async resolveCommand(): Promise<void> {
-        // For now, default to English. In the future, this could be retrieved from user preferences
-        const language = 'en';
-
         const handler = new Handler({
             app: this.app,
             sender: this.sender,
@@ -53,7 +50,6 @@ export class CommandUtility implements ICommandUtility {
             persis: this.persis,
             triggerId: this.triggerId,
             threadId: this.threadId,
-            language,
         });
 
         switch (this.params.length) {
