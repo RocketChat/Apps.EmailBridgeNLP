@@ -115,18 +115,39 @@ export class Handler implements IHandler {
             );
 
             if (isAuthenticated) {
-                const userInfo = await EmailServiceFactory.getUserInfo(
-                    emailSettings.provider,
-                    this.sender.id,
-                    this.http,
-                    this.persis,
-                    this.read,
-                    this.app.getLogger()
-                );
-                messageBuilder.setText(
-                    `✅ You are already logged in with **${this.getProviderDisplayName(emailSettings.provider)}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
-                );
-                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                try {
+                    const userInfo = await EmailServiceFactory.getUserInfo(
+                        emailSettings.provider,
+                        this.sender.id,
+                        this.http,
+                        this.persis,
+                        this.read,
+                        this.app.getLogger()
+                    );
+                    messageBuilder.setText(
+                        `✅ You are already logged in with **${this.getProviderDisplayName(emailSettings.provider)}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
+                    );
+                    return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                } catch (error) {
+                    // If we can't get user info, the authentication might be stale or corrupted
+                    this.app.getLogger().warn(`Authentication check failed for user ${this.sender.id}: ${error.message}`);
+                    
+                    // Clear the corrupted authentication and proceed with fresh login
+                    try {
+                        await EmailServiceFactory.logoutUser(
+                            emailSettings.provider,
+                            this.sender.id,
+                            this.http,
+                            this.persis,
+                            this.read,
+                            this.app.getLogger()
+                        );
+                    } catch (logoutError) {
+                        this.app.getLogger().error(`Failed to clear corrupted authentication: ${logoutError.message}`);
+                    }
+                    
+                    // Fall through to show login button
+                }
             }
 
             // Generate the authorization URL
@@ -217,14 +238,21 @@ export class Handler implements IHandler {
             }
 
             // Get user info to show in confirmation message
-            const userInfo = await EmailServiceFactory.getUserInfo(
-                emailSettings.provider,
-                this.sender.id,
-                this.http,
-                this.persis,
-                this.read,
-                this.app.getLogger()
-            );
+            let userInfo;
+            try {
+                userInfo = await EmailServiceFactory.getUserInfo(
+                    emailSettings.provider,
+                    this.sender.id,
+                    this.http,
+                    this.persis,
+                    this.read,
+                    this.app.getLogger()
+                );
+            } catch (error) {
+                // If we can't get user info, use generic email
+                this.app.getLogger().warn(`Could not get user info for logout: ${error.message}`);
+                userInfo = { email: 'your account' };
+            }
 
             // Create a UI block with a confirmation button
             const block = this.modify.getCreator().getBlockBuilder();

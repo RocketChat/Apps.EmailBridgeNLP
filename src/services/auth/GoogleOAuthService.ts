@@ -159,7 +159,12 @@ export class GoogleOAuthService implements IOAuthService {
             // Get user info to get email
             const userInfo = await this.getUserInfoFromToken(data.access_token);
 
-            this.logger.debug('Successfully obtained tokens');
+            if (!userInfo || !userInfo.email) {
+                this.logger.error('Failed to get user email from token:', userInfo);
+                throw new Error('Failed to get user email from Google');
+            }
+
+            this.logger.debug('Successfully obtained tokens and user info');
 
             return {
                 access_token: data.access_token,
@@ -201,8 +206,19 @@ export class GoogleOAuthService implements IOAuthService {
      * Get user info using stored credentials
      */
     public async getUserInfo(userId: string): Promise<any> {
-        const accessToken = await this.getValidAccessToken(userId);
-        return await this.getUserInfoFromToken(accessToken);
+        try {
+            const accessToken = await this.getValidAccessToken(userId);
+            const userInfo = await this.getUserInfoFromToken(accessToken);
+            
+            if (!userInfo || !userInfo.email) {
+                throw new Error('User info incomplete or missing email');
+            }
+            
+            return userInfo;
+        } catch (error) {
+            this.logger.error(`Failed to get user info for user ${userId}:`, error);
+            throw new Error(`Failed to get user info: ${error.message}`);
+        }
     }
 
     /**
@@ -219,9 +235,11 @@ export class GoogleOAuthService implements IOAuthService {
      */
     public async getCredentials(userId: string): Promise<IOAuthCredentials | undefined> {
         try {
-            return await this.oauthStorage.getCredentials(userId);
+            const credentials = await this.oauthStorage.getCredentials(userId);
+            this.logger.debug(`Retrieved credentials for user ${userId}: ${credentials ? 'found' : 'not found'}`);
+            return credentials;
         } catch (error) {
-            this.logger.error('Error getting credentials:', error);
+            this.logger.error(`Error getting credentials for user ${userId}:`, error);
             return undefined;
         }
     }

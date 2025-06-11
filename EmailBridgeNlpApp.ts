@@ -59,21 +59,40 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify,
     ): Promise<IUIKitResponse> {
-        const { actionId } = context.getInteractionData();
+        try {
+            const { actionId } = context.getInteractionData();
 
-        if (actionId === 'email_logout_action') {
-            // Handle logout confirmation
-            const user = context.getInteractionData().user;
-            const room = context.getInteractionData().room;
+            if (actionId === 'email_logout_action') {
+                // Handle logout confirmation
+                const user = context.getInteractionData().user;
+                const room = context.getInteractionData().room;
 
-            if (user && room) {
-                await this.handleLogoutAction(user, room, read, modify, http, persistence);
+                if (user && room) {
+                    // Process logout asynchronously to avoid blocking the interaction response
+                    Promise.resolve().then(async () => {
+                        try {
+                            await this.handleLogoutAction(user, room, read, modify, http, persistence);
+                        } catch (error) {
+                            this.getLogger().error('Error in async logout action:', error);
+                        }
+                    });
+                }
+
+                // Return immediate success response to prevent UI timeout
+                return {
+                    success: true,
+                };
             }
-        }
 
-        return {
-            success: true,
-        };
+            return {
+                success: true,
+            };
+        } catch (error) {
+            this.getLogger().error('Error in executeBlockActionHandler:', error);
+            return {
+                success: true, // Still return success to prevent UI error
+            };
+        }
     }
 
     private async handleLogoutAction(
@@ -101,7 +120,8 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
                 messageBuilder.setText(
                     `❌ **${emailSettings.provider.toUpperCase()} is not supported.** Only Gmail authentication is currently available.`
                 );
-                return read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                return;
             }
 
             // Attempt to logout using the service factory
@@ -116,15 +136,17 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
 
             if (success) {
                 messageBuilder.setText(`✅ Successfully logged out from your ${emailSettings.provider.toUpperCase()} account.`);
-                return read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                return;
             } else {
                 messageBuilder.setText('❌ Error during logout process. Please try again.');
-                return read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+                return;
             }
         } catch (error) {
             this.getLogger().error('Error in logout action:', error);
             messageBuilder.setText(`❌ Error logging out: ${error.message}`);
-            return read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+            await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         }
     }
 
