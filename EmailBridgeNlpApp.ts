@@ -24,8 +24,11 @@ import {
     UIKitViewCloseInteractionContext,
     IUIKitInteractionHandler
 } from '@rocket.chat/apps-engine/definition/uikit';
-import { extendSettings, getEmailSettings } from './src/config/SettingsManager';
-import { EmailServiceFactory } from './src/services/auth/EmailServiceFactory';
+import { extendSettings } from './src/config/SettingsManager';
+import { ExecuteBlockActionHandler } from './src/handlers/ExecuteBlockActionHandler';
+import { ExecuteActionButtonHandler } from './src/handlers/ExecuteActionButtonHandler';
+import { ExecuteViewSubmitHandler } from './src/handlers/ExecuteViewSubmitHandler';
+import { ExecuteViewClosedHandler } from './src/handlers/ExecuteViewClosedHandler';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -59,95 +62,16 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify,
     ): Promise<IUIKitResponse> {
-        try {
-            const { actionId } = context.getInteractionData();
+        const handler = new ExecuteBlockActionHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context,
+        );
 
-            if (actionId === 'email_logout_action') {
-                // Handle logout confirmation
-                const user = context.getInteractionData().user;
-                const room = context.getInteractionData().room;
-
-                if (user && room) {
-                    // Process logout asynchronously to avoid blocking the interaction response
-                    Promise.resolve().then(async () => {
-                        try {
-                            await this.handleLogoutAction(user, room, read, modify, http, persistence);
-                        } catch (error) {
-                            this.getLogger().error('Error in async logout action:', error);
-                        }
-                    });
-                }
-
-                // Return immediate success response to prevent UI timeout
-                return {
-                    success: true,
-                };
-            }
-
-            return {
-                success: true,
-            };
-        } catch (error) {
-            this.getLogger().error('Error in executeBlockActionHandler:', error);
-            return {
-                success: true, // Still return success to prevent UI error
-            };
-        }
-    }
-
-    private async handleLogoutAction(
-        user: any,
-        room: any,
-        read: IRead,
-        modify: IModify,
-        http: IHttp,
-        persistence: IPersistence
-    ): Promise<void> {
-        const appUser = await read.getUserReader().getAppUser();
-        const messageBuilder = modify
-            .getCreator()
-            .startMessage()
-            .setSender(appUser!)
-            .setRoom(room)
-            .setGroupable(false);
-
-        try {
-            // Get email settings to determine provider
-            const emailSettings = await getEmailSettings(read.getEnvironmentReader().getSettings());
-
-            // Check if provider is supported
-            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                messageBuilder.setText(
-                    `❌ **${emailSettings.provider.toUpperCase()} is not supported.** Only Gmail authentication is currently available.`
-                );
-                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            }
-
-            // Attempt to logout using the service factory
-            const success = await EmailServiceFactory.logoutUser(
-                emailSettings.provider,
-                user.id,
-                http,
-                persistence,
-                read,
-                this.getLogger()
-            );
-
-            if (success) {
-                messageBuilder.setText(`✅ Successfully logged out from your ${emailSettings.provider.toUpperCase()} account.`);
-                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            } else {
-                messageBuilder.setText('❌ Error during logout process. Please try again.');
-                await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            }
-        } catch (error) {
-            this.getLogger().error('Error in logout action:', error);
-            messageBuilder.setText(`❌ Error logging out: ${error.message}`);
-            await read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-        }
+        return await handler.handleActions();
     }
 
     public async executeActionButtonHandler(
@@ -157,9 +81,16 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify,
     ): Promise<IUIKitResponse> {
-        return {
-            success: true,
-        };
+        const handler = new ExecuteActionButtonHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context,
+        );
+
+        return await handler.handleActions();
     }
 
     public async executeViewSubmitHandler(
@@ -169,9 +100,16 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify,
     ): Promise<IUIKitResponse> {
-        return {
-            success: true,
-        };
+        const handler = new ExecuteViewSubmitHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context,
+        );
+
+        return await handler.handleActions();
     }
 
     public async executeViewCloseHandler(
@@ -181,8 +119,15 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify,
     ): Promise<IUIKitResponse> {
-        return {
-            success: true,
-        };
+        const handler = new ExecuteViewClosedHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context,
+        );
+
+        return await handler.handleActions();
     }
 }
