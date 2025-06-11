@@ -11,7 +11,7 @@ import {
     IApiResponse,
 } from '@rocket.chat/apps-engine/definition/api';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
-import { GoogleOAuthService } from '../services/GoogleOAuthService';
+import { GoogleOAuthService } from '../services/auth/GoogleOAuthService';
 
 export class GoogleOAuthEndpoint implements IApiEndpoint {
     public path = 'oauth-callback';

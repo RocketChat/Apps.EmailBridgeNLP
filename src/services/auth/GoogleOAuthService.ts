@@ -1,8 +1,8 @@
 import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
-import { IOAuthCredentials } from '../interfaces/IOAuthCredentials';
-import { IOAuthService } from '../interfaces/IOAuthService';
-import { OAuthStorage } from '../storage/OAuthStorage';
+import { IOAuthCredentials } from '../../interfaces/IOAuthCredentials';
+import { IOAuthService } from '../../interfaces/IOAuthService';
+import { OAuthStorage } from '../../storage/OAuthStorage';
 
 export class GoogleOAuthService implements IOAuthService {
     private clientId: string = '';

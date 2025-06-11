@@ -12,7 +12,7 @@ import {
     sendDefaultNotification,
     sendHelperNotification,
 } from '../helper/notification';
-import { EmailServiceFactory } from '../services/EmailServiceFactory';
+import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { getEmailSettings } from '../config/SettingsManager';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { EmailProviders } from '../enums/EmailProviders';
@@ -27,7 +27,6 @@ export class Handler implements IHandler {
     public persis: IPersistence;
     public triggerId?: string;
     public threadId?: string;
-    public language?: string;
 
     constructor(params: IHandlerParams) {
         this.app = params.app;
@@ -39,7 +38,6 @@ export class Handler implements IHandler {
         this.persis = params.persis;
         this.triggerId = params.triggerId;
         this.threadId = params.threadId;
-        this.language = params.language || 'en';
     }
 
     /**
@@ -146,7 +144,8 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔐 **Connect your ${this.getProviderDisplayName(emailSettings.provider)} account to Rocket Chat**`
+                    `🔐 **Connect your ${this.getProviderDisplayName(emailSettings.provider)} account to Rocket Chat**
+                     If want to use Outlook account, please change the Email Provider from settings.`
                 ),
             });
 
@@ -193,7 +192,7 @@ export class Handler implements IHandler {
                 let message: string;
                 
                 if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = `🚧 **Outlook authentication is coming soon!** Only Gmail is currently supported for logout.`;
+                    message = `🚧 **Outlook authentication is coming soon!** Only Gmail is currently supported.`;
                 } else {
                     message = `❌ **${providerName} is not supported.** Only Gmail authentication is currently available.`;
                 }

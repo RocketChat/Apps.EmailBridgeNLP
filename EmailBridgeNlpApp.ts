@@ -25,7 +25,7 @@ import {
     IUIKitInteractionHandler
 } from '@rocket.chat/apps-engine/definition/uikit';
 import { extendSettings, getEmailSettings } from './src/config/SettingsManager';
-import { EmailServiceFactory } from './src/services/EmailServiceFactory';
+import { EmailServiceFactory } from './src/services/auth/EmailServiceFactory';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
