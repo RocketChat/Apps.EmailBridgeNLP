@@ -128,9 +128,44 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+#rules
+.cursorrules
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Resources
+resources/
+
+---
+
+# rc-apps package output
+dist/
+
+# JetBrains IDEs
+out/
+.idea/
+.idea_modules/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
