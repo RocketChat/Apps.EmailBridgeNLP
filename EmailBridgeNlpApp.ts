@@ -29,8 +29,14 @@ import { ExecuteBlockActionHandler } from './src/handlers/ExecuteBlockActionHand
 import { ExecuteActionButtonHandler } from './src/handlers/ExecuteActionButtonHandler';
 import { ExecuteViewSubmitHandler } from './src/handlers/ExecuteViewSubmitHandler';
 import { ExecuteViewClosedHandler } from './src/handlers/ExecuteViewClosedHandler';
+import { ElementBuilder } from './src/lib/ElementBuilder';
+import { BlockBuilder } from './src/lib/BlockBuilder';
+import { IAppUtils } from './src/interfaces/IAppUtils';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
+    private elementBuilder: ElementBuilder;
+    private blockBuilder: BlockBuilder;
+
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
     }
@@ -39,6 +45,10 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         configuration: IConfigurationExtend,
         _environmentRead: IEnvironmentRead,
     ): Promise<void> {
+        // Initialize UI builders
+        this.elementBuilder = new ElementBuilder(this.getID());
+        this.blockBuilder = new BlockBuilder(this.getID());
+
         // Register settings using the new settings manager
         await extendSettings(configuration.settings);
 
@@ -53,6 +63,13 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         await configuration.slashCommands.provideSlashCommand(
             new EmailCommand(this),
         );
+    }
+
+    public getUtils(): IAppUtils {
+        return {
+            elementBuilder: this.elementBuilder,
+            blockBuilder: this.blockBuilder,
+        };
     }
 
     public async executeBlockActionHandler(
