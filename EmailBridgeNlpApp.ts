@@ -31,7 +31,7 @@ import { ExecuteViewSubmitHandler } from './src/handlers/ExecuteViewSubmitHandle
 import { ExecuteViewClosedHandler } from './src/handlers/ExecuteViewClosedHandler';
 import { ElementBuilder } from './src/lib/ElementBuilder';
 import { BlockBuilder } from './src/lib/BlockBuilder';
-import { IAppUtils } from './src/interfaces/IAppUtils';
+import { IAppUtils } from './src/definition/lib/IAppUtils';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
     private elementBuilder: ElementBuilder;

@@ -7,7 +7,7 @@ import {
     RocketChatAssociationRecord,
 } from '@rocket.chat/apps-engine/definition/metadata';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
-import { IOAuthCredentials } from '../interfaces/IOAuthCredentials';
+import { IOAuthCredentials } from '../definition/lib/IOAuthCredentials';
 
 export class OAuthStorage {
     constructor(

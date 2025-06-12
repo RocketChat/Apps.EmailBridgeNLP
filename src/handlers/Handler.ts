@@ -7,7 +7,7 @@ import {
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
-import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
+import { IHandlerParams, IHandler } from '../definition/handler/IHandler';
 import {
     sendDefaultNotification,
     sendHelperNotification,
