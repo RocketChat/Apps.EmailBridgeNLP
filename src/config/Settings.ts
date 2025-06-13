@@ -1,10 +1,10 @@
 import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/settings';
 
 export enum SettingsIds {
-    EmailProvider = 'emailbridge_provider',
-    OAuthClientId = 'oauth_client_id',
-    OAuthClientSecret = 'oauth_client_secret',
-    OAuthRedirectUri = 'oauth_redirect_uri',
+    EmailProvider = 'provider',
+    OAuthClientId = 'client_id',
+    OAuthClientSecret = 'client_secret',
+    OAuthRedirectUri = 'redirect_uri',
 }
 
 export const settings: Array<ISetting> = [
