@@ -2,16 +2,17 @@ import {
     SectionBlock,
     LayoutBlockType,
     TextObjectType,
-    ContextBlock,
-    ActionsBlock,
-    DividerBlock,
     TextObject,
-    ButtonElement,
+    ContextBlock,
+    InputBlock,
+    DividerBlock,
+    ActionsBlock,
     StaticSelectElement,
-    OverflowElement,
+    ButtonElement,
     DatePickerElement,
     ImageElement,
     MultiStaticSelectElement,
+    OverflowElement,
 } from '@rocket.chat/ui-kit';
 
 type SectionAccessoryElement = ButtonElement | DatePickerElement | ImageElement | MultiStaticSelectElement | OverflowElement | StaticSelectElement;
@@ -33,6 +34,14 @@ export interface ContextBlockParam {
 export interface ActionBlockParam {
     elements: ActionElement[];
     blockId?: string;
+}
+
+export interface InputBlockParam {
+    text: string;
+    element: any;
+    blockId?: string;
+    hint?: any;
+    optional?: boolean;
 }
 
 export class BlockBuilder {
@@ -79,6 +88,26 @@ export class BlockBuilder {
         if (blockId) contextBlock.blockId = blockId;
 
         return contextBlock;
+    }
+
+    public createInputBlock(param: InputBlockParam): InputBlock {
+        const { text, element, blockId, hint, optional } = param;
+
+        const inputBlock: InputBlock = {
+            type: LayoutBlockType.INPUT,
+            label: {
+                type: TextObjectType.PLAIN_TEXT,
+                text,
+            },
+            appId: this.appId,
+            element,
+            optional,
+        };
+
+        if (blockId) inputBlock.blockId = blockId;
+        if (hint) inputBlock.hint = hint;
+
+        return inputBlock;
     }
 
     public createActionsBlock(param: ActionBlockParam): ActionsBlock {
