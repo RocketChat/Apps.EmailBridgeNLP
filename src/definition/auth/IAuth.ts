@@ -1,4 +1,4 @@
-import { EmailProviders } from '../enums/EmailProviders';
+import { EmailProviders } from '../../enums/EmailProviders';
 
 /**
  * OAuth credentials interface for token storage

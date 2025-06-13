@@ -1,5 +1,5 @@
-import { Language } from '../lib/Translation/translation';
-import { EmailProviders } from '../enums/EmailProviders';
+import { Language } from '../../lib/Translation/translation';
+import { EmailProviders } from '../../enums/EmailProviders';
 
 /**
  * User preference interface for storing individual user settings
