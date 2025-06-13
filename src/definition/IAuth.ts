@@ -1,5 +1,20 @@
-import { IOAuthCredentials } from './IOAuthCredentials';
+import { EmailProviders } from '../enums/EmailProviders';
 
+/**
+ * OAuth credentials interface for token storage
+ */
+export interface IOAuthCredentials {
+    access_token: string;
+    refresh_token?: string;
+    token_type: string;
+    expiry_date: number;
+    scope?: string;
+    email: string;
+}
+
+/**
+ * OAuth service interface for authentication operations
+ */
 export interface IOAuthService {
     initialize(): Promise<void>;
     isAuthenticated(userId: string): Promise<boolean>;
@@ -13,4 +28,12 @@ export interface IOAuthService {
     exchangeCodeForTokens(code: string): Promise<IOAuthCredentials>;
     validateState(state: string): Promise<{userId: string} | undefined>;
     refreshAccessToken(refreshToken: string): Promise<Partial<IOAuthCredentials>>;
+}
+
+/**
+ * Email settings interface for provider configuration
+ */
+export interface IEmailSettings {
+    email: string;
+    provider: EmailProviders;
 } 
