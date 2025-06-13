@@ -1,0 +1,75 @@
+export const pl = {
+    // Settings
+    Email_Provider_Label: "Dostawca poczty e-mail",
+    Email_Provider_Description: "Wybierz swojego dostawcę usług e-mail do uwierzytelniania",
+    Gmail_Label: "Gmail",
+    Outlook_Label: "Outlook/Hotmail",
+    Google_OAuth_Client_ID_Label: "ID klienta Google OAuth",
+    Google_OAuth_Client_ID_Description: "ID klienta OAuth do uwierzytelniania Google (tylko Gmail)",
+    Google_OAuth_Client_Secret_Label: "Sekret klienta Google OAuth",
+    Google_OAuth_Client_Secret_Description: "Sekret klienta OAuth do uwierzytelniania Google (tylko Gmail)",
+    OAuth_Redirect_URI_Label: "URI przekierowania OAuth",
+    OAuth_Redirect_URI_Description: "URI przekierowania OAuth - powinno kończyć się na /api/apps/public/[app-id]/oauth-callback",
+    
+    // Commands
+    Email_Command_Params: "połącz, status, rozłącz, pomoc",
+    Email_Command_Description: "Połącz i zarządzaj integracją swojego konta e-mail z pomocą AI.",
+    
+    // OAuth Pages
+    Authentication_Error_Title: "Błąd uwierzytelniania",
+    Authentication_Success_Title: "Uwierzytelnianie zakończone sukcesem!",
+    Connected_Account_Message: "Pomyślnie połączyłeś swoje konto Gmail:",
+    Try_Again_Message: "Spróbuj ponownie lub skontaktuj się z administratorem.",
+    Close_Window_Label: "Zamknij okno",
+    Features_Available_Message: "Możesz teraz używać funkcji EmailBridge NLP w Rocket.Chat!",
+    Safe_To_Close_Message: "Możesz bezpiecznie zamknąć to okno i wrócić do Rocket.Chat.",
+    
+    // Action Labels
+    Connect_Email_Action_Label: "🔗 Połącz konto e-mail",
+    Check_Status_Action_Label: "📊 Sprawdź status połączenia",
+    Disconnect_Email_Action_Label: "🔌 Rozłącz e-mail",
+    Send_Email_Action_Label: "📧 Wyślij e-mail",
+    View_Inbox_Action_Label: "📥 Zobacz skrzynkę odbiorczą",
+    
+    // Messages
+    OAuth_Connection_Success: "Pomyślnie połączono z kontem e-mail!",
+    OAuth_Connection_Failed: "Nie udało się połączyć z kontem e-mail. Spróbuj ponownie.",
+    Email_Not_Connected: "Brak połączonego konta e-mail. Najpierw połącz swoje konto.",
+    Invalid_Email_Provider: "Wybrano nieprawidłowego dostawcę e-mail. Sprawdź swoje ustawienia.",
+    Authentication_Required: "Wymagane uwierzytelnianie. Połącz swoje konto e-mail.",
+    Connection_Status_Connected: "✅ Konto e-mail jest połączone i gotowe do użycia.",
+    Connection_Status_Disconnected: "❌ Brak połączonego konta e-mail.",
+    Disconnect_Success: "Pomyślnie rozłączono konto e-mail.",
+    Disconnect_Failed: "Nie udało się rozłączyć konta e-mail.",
+    
+    // Handler messages
+    Already_Logged_In: "✅ Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
+    Outlook_Coming_Soon: "🚧 **Uwierzytelnianie Outlook już wkrótce!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
+    Provider_Not_Implemented: "❌ **Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwany do uwierzytelniania.\n\n",
+    Connect_Account_Message: "🔐 **Połącz swoje konto __provider__ z Rocket Chat**\nJeśli chcesz użyć konta Outlook, zmień Dostawcę E-mail w ustawieniach.",
+    Login_With_Provider: "🔑 Zaloguj się z __provider__",
+    Error_Processing_Login: "❌ Błąd przetwarzania logowania: __error__",
+    Not_Authenticated: "❌ Nie jesteś obecnie uwierzytelniony z __provider__. Użyj `/email login` aby się zalogować.",
+    Logout_Confirmation: "🔓 **Potwierdzenie wylogowania**\n\nCzy na pewno chcesz się wylogować z konta **__provider__** **__email__**?",
+    Confirm_Logout: "🔒 Potwierdź wylogowanie",
+    Error_Preparing_Logout: "❌ Błąd przygotowywania wylogowania: __error__",
+    
+    // Notification messages
+    Helper_Greeting: "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
+    Available_Commands: "",
+    Help_Command: "użyj `/email help` - Pokaż tę wiadomość pomocy",
+    Login_Command: "użyj `/email login` - Zaloguj się do swojego konta e-mail",
+    Logout_Command: "użyj `/email logout` - Wyloguj się z konta e-mail",
+    Default_Greeting: "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc Ci ze wszystkimi potrzebami e-mail.",
+    Use_Help_Command: "Użyj `/email help` aby dowiedzieć się o wszystkich dostępnych funkcjach i poleceniach.",
+    Login_Action_Text: "Zaloguj się do swojego konta e-mail",
+    
+    // Language names
+    Language: "Język",
+    Language_EN: "Angielski",
+    Language_ES: "Hiszpański",
+    Language_DE: "Niemiecki",
+    Language_PL: "Polski",
+    Language_PT: "Portugalski",
+    Language_RU: "Rosyjski",
+}; 
