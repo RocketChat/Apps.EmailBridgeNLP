@@ -7,7 +7,7 @@ import {
     RocketChatAssociationRecord,
 } from '@rocket.chat/apps-engine/definition/metadata';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
-import { IOAuthCredentials } from '../definition/lib/IOAuthCredentials';
+import { IOAuthCredentials } from '../definition/IAuth';
 
 export class OAuthStorage {
     constructor(
@@ -51,7 +51,6 @@ export class OAuthStorage {
             const associations = this.getCredentialsAssociations(userId);
             await this.persistence.updateByAssociations(associations, credentials, true);
         } catch (error) {
-            console.warn('Save OAuth Credentials Error:', error);
             throw new Error('Failed to save OAuth credentials');
         }
     }
@@ -65,7 +64,6 @@ export class OAuthStorage {
             const result = await this.persistenceRead.readByAssociations(associations);
             return result && result.length ? (result[0] as IOAuthCredentials) : undefined;
         } catch (error) {
-            console.warn('Get OAuth Credentials Error:', error);
             return undefined;
         }
     }
@@ -78,7 +76,6 @@ export class OAuthStorage {
             const associations = this.getCredentialsAssociations(userId);
             await this.persistence.removeByAssociations(associations);
         } catch (error) {
-            console.warn('Delete OAuth Credentials Error:', error);
             throw new Error('Failed to delete OAuth credentials');
         }
     }
@@ -103,7 +100,6 @@ export class OAuthStorage {
             };
             await this.persistence.updateByAssociations(associations, stateData, true);
         } catch (error) {
-            console.warn('Save OAuth State Error:', error);
             throw new Error('Failed to save OAuth state');
         }
     }
@@ -132,7 +128,6 @@ export class OAuthStorage {
 
             return { userId: stateData.userId };
         } catch (error) {
-            console.warn('Validate OAuth State Error:', error);
             return undefined;
         }
     }

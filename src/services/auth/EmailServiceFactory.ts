@@ -1,8 +1,7 @@
 import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
-import { IEmailSettings } from '../../definition/lib/IEmailSettings';
+import { IEmailSettings, IOAuthService } from '../../definition/IAuth';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { GoogleOAuthService } from '../auth/GoogleOAuthService';
-import { IOAuthService } from '../../definition/lib/IOAuthService';
 import { getGoogleOAuthSettings } from '../../config/SettingsManager';
 
 export class EmailServiceFactory {
@@ -84,7 +83,6 @@ export class EmailServiceFactory {
             const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
             return await oauthService.isAuthenticated(userId);
         } catch (error) {
-            logger.error('Error checking authentication status:', error);
             return false;
         }
     }
@@ -127,7 +125,6 @@ export class EmailServiceFactory {
             const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
             return await oauthService.revokeToken(userId);
         } catch (error) {
-            logger.error('Error during logout:', error);
             return false;
         }
     }

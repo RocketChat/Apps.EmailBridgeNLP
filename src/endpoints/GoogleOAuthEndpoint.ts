@@ -27,8 +27,6 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         http: IHttp,
         persistence: IPersistence
     ): Promise<IApiResponse> {
-        const logger = this.app.getLogger();
-
         try {
             // Initialize OAuth service
             const settings = {
@@ -38,7 +36,7 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
                 }
             };
 
-            const oauthService = new GoogleOAuthService(http, persistence, read, logger, settings);
+            const oauthService = new GoogleOAuthService(http, persistence, read, this.app.getLogger(), settings);
             await oauthService.initialize();
 
             // Get code and state from query
@@ -46,14 +44,12 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
             const state = request.query.state;
 
             if (!code || !state) {
-                logger.error('Missing code or state parameter');
                 return this.createErrorResponse('Missing required parameters (code or state)');
             }
 
             // Validate the state parameter and get user ID
             const stateInfo = await oauthService.validateState(state);
             if (!stateInfo) {
-                logger.error('Invalid or expired state parameter');
                 return this.createErrorResponse('Invalid or expired authorization request');
             }
 
@@ -63,16 +59,13 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
 
                 // Save credentials
                 await oauthService.saveCredentials(stateInfo.userId, credentials);
-                logger.info(`Credentials saved for user ${stateInfo.userId}`);
 
                 // Return success page
                 return this.createSuccessResponse(credentials.email);
             } catch (error) {
-                logger.error('Error exchanging code for tokens:', error);
                 return this.createErrorResponse(`Error obtaining access token: ${error.message}`);
             }
         } catch (error) {
-            logger.error('Error handling OAuth callback:', error);
             return this.createErrorResponse(`An error occurred: ${error.message}`);
         }
     }
