@@ -8,8 +8,8 @@
         "homepage": "https://github.com/RocketChat/Apps.EmailBridgeNLP",
         "support": "https://github.com/RocketChat/Apps.EmailBridgeNLP"
     },
-    "name": "EmailBridgeNLP",
-    "nameSlug": "emailbridgenlp",
+    "name": "Email Assistant",
+    "nameSlug": "email-assistant",
     "classFile": "EmailBridgeNlpApp.ts",
     "description": "Natural Language Bridge to Legacy Email System for Rocket Chat Powered by Modern LLMs",
     "implements": [
