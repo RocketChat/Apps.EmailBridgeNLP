@@ -2,20 +2,22 @@ import { IRead, IModify } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
+import { t, Language } from '../lib/Translation/translation';
 
 export async function sendHelperNotification(
     read: IRead,
     modify: IModify,
     user: IUser,
     room: IRoom,
+    language: Language = Language.en,
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
-    const message = `👋 Hey ${user.name}! I'm Email Bot 👋 Here are some quick tips to get you started!
+    const message = `${t('Helper_Greeting', language, { name: user.name })}
 
-**Available Commands:**
-• \`/email help\` - Show this help message
-• \`/email login\` - Login to your email account
-• \`/email logout\` - Logout from your email account
+${t('Available_Commands', language)}
+${t('Help_Command', language)}
+${t('Login_Command', language)}
+${t('Logout_Command', language)}
     `;
 
     const helperMessage = modify
@@ -35,12 +37,13 @@ export async function sendDefaultNotification(
     modify: IModify,
     user: IUser,
     room: IRoom,
+    language: Language = Language.en,
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
     
-    const message = `Hello ${user.name}! I'm Email Bot 👋 I can help you all your email needs.
+    const message = `${t('Default_Greeting', language, { name: user.name })}
 
-Use \`/email help\` to learn about all available features and commands.
+${t('Use_Help_Command', language)}
 
     `;
 

@@ -16,6 +16,7 @@ import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { getEmailSettings } from '../config/SettingsManager';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { EmailProviders } from '../enums/EmailProviders';
+import { t, Language } from '../lib/Translation/translation';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -27,6 +28,7 @@ export class Handler implements IHandler {
     public persis: IPersistence;
     public triggerId?: string;
     public threadId?: string;
+    public language: Language;
 
     constructor(params: IHandlerParams) {
         this.app = params.app;
@@ -38,6 +40,7 @@ export class Handler implements IHandler {
         this.persis = params.persis;
         this.triggerId = params.triggerId;
         this.threadId = params.threadId;
+        this.language = params.language;
     }
 
     /**
@@ -60,6 +63,7 @@ export class Handler implements IHandler {
             this.modify,
             this.sender,
             this.room,
+            this.language,
         );
     }
 
@@ -70,6 +74,7 @@ export class Handler implements IHandler {
             this.modify,
             this.sender,
             this.room,
+            this.language,
         );
     }
 
@@ -93,11 +98,9 @@ export class Handler implements IHandler {
                 let message: string;
                 
                 if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = `🚧 **Outlook authentication is coming soon!**\n\n` +
-                             `For now, please use **Gmail** for email authentication.\n\n`;
+                    message = t('Outlook_Coming_Soon', this.language);
                 } else {
-                    message = `❌ **${providerName} authentication is not yet implemented.**\n\n` +
-                             `Currently only **Gmail** is supported for authentication.\n\n`;
+                    message = t('Provider_Not_Implemented', this.language, { provider: providerName });
                 }
                 
                 messageBuilder.setText(message);
@@ -125,7 +128,10 @@ export class Handler implements IHandler {
                         this.app.getLogger()
                     );
                     messageBuilder.setText(
-                        `✅ You are already logged in with **${this.getProviderDisplayName(emailSettings.provider)}** as **${userInfo.email}**.\n\nIf you want to logout, use \`/email logout\`.`
+                        t('Already_Logged_In', this.language, { 
+                            provider: this.getProviderDisplayName(emailSettings.provider), 
+                            email: userInfo.email 
+                        })
                     );
                     return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
                 } catch (error) {
@@ -165,8 +171,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔐 **Connect your ${this.getProviderDisplayName(emailSettings.provider)} account to Rocket Chat**
-                     If want to use Outlook account, please change the Email Provider from settings.`
+                    t('Connect_Account_Message', this.language, { provider: this.getProviderDisplayName(emailSettings.provider) })
                 ),
             });
 
@@ -174,7 +179,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: "email_login_action",
-                        text: block.newPlainTextObject(`🔑 Login with ${this.getProviderDisplayName(emailSettings.provider)}`),
+                        text: block.newPlainTextObject(t('Login_With_Provider', this.language, { provider: this.getProviderDisplayName(emailSettings.provider) })),
                         url: authUrl,
                         style: ButtonStyle.PRIMARY,
                     }),
@@ -187,7 +192,7 @@ export class Handler implements IHandler {
         } catch (error) {
             this.app.getLogger().error("Error in login:", error);
             messageBuilder.setText(
-                `❌ Error processing login: ${error.message}`
+                t('Error_Processing_Login', this.language, { error: error.message })
             );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
@@ -213,9 +218,9 @@ export class Handler implements IHandler {
                 let message: string;
                 
                 if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = `🚧 **Outlook authentication is coming soon!** Only Gmail is currently supported.`;
+                    message = t('Outlook_Coming_Soon', this.language);
                 } else {
-                    message = `❌ **${providerName} is not supported.** Only Gmail authentication is currently available.`;
+                    message = t('Provider_Not_Implemented', this.language, { provider: providerName });
                 }
                 
                 messageBuilder.setText(message);
@@ -233,7 +238,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(`❌ You are not currently authenticated with ${this.getProviderDisplayName(emailSettings.provider)}. Use \`/email login\` to login.`);
+                messageBuilder.setText(t('Not_Authenticated', this.language, { provider: this.getProviderDisplayName(emailSettings.provider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -259,7 +264,10 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    `🔓 **Logout Confirmation**\n\nAre you sure you want to logout from **${this.getProviderDisplayName(emailSettings.provider)}** account **${userInfo.email}**?`
+                    t('Logout_Confirmation', this.language, { 
+                        provider: this.getProviderDisplayName(emailSettings.provider), 
+                        email: userInfo.email 
+                    })
                 ),
             });
 
@@ -267,7 +275,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: "email_logout_action",
-                        text: block.newPlainTextObject("🔒 Confirm Logout"),
+                        text: block.newPlainTextObject(t('Confirm_Logout', this.language)),
                         style: ButtonStyle.DANGER,
                     }),
                 ],
@@ -279,7 +287,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error("Error in logout:", error);
-            messageBuilder.setText(`❌ Error preparing logout: ${error.message}`);
+            messageBuilder.setText(t('Error_Preparing_Logout', this.language, { error: error.message }));
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }

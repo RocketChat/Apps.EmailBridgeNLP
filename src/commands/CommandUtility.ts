@@ -13,6 +13,7 @@ import {
     ICommandUtility,
     ICommandUtilityParams,
 } from '../definition/command/ICommandUtility';
+import { getUserPreferredLanguage } from '../helper/userPreference';
 
 export class CommandUtility implements ICommandUtility {
     public app: EmailBridgeNlpApp;
@@ -40,6 +41,12 @@ export class CommandUtility implements ICommandUtility {
     }
 
     public async resolveCommand(): Promise<void> {
+        const language = await getUserPreferredLanguage(
+            this.read.getPersistenceReader(),
+            this.persis,
+            this.sender.id,
+        );
+        
         const handler = new Handler({
             app: this.app,
             sender: this.sender,
@@ -50,6 +57,7 @@ export class CommandUtility implements ICommandUtility {
             persis: this.persis,
             triggerId: this.triggerId,
             threadId: this.threadId,
+            language,
         });
 
         switch (this.params.length) {

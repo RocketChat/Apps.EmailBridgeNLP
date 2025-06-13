@@ -14,16 +14,16 @@ export const settings: Array<ISetting> = [
         packageValue: 'gmail',
         required: true,
         public: true, // Visible to both admin and users
-        i18nLabel: 'Email Provider',
-        i18nDescription: 'Select your email service provider for authentication',
+        i18nLabel: 'Email_Provider_Label',
+        i18nDescription: 'Email_Provider_Description',
         values: [
             {
                 key: 'gmail',
-                i18nLabel: 'Gmail',
+                i18nLabel: 'Gmail_Label',
             },
             {
                 key: 'outlook',
-                i18nLabel: 'Outlook/Hotmail',
+                i18nLabel: 'Outlook_Label',
             },
         ],
     },
@@ -33,8 +33,8 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false, // Admin only
-        i18nLabel: 'Google OAuth Client ID',
-        i18nDescription: 'OAuth client ID for Google authentication (Gmail only)',
+        i18nLabel: 'Google_OAuth_Client_ID_Label',
+        i18nDescription: 'Google_OAuth_Client_ID_Description',
     },
     {
         id: SettingsIds.OAuthClientSecret,
@@ -42,8 +42,8 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false, // Admin only
-        i18nLabel: 'Google OAuth Client Secret',
-        i18nDescription: 'OAuth client secret for Google authentication (Gmail only)',
+        i18nLabel: 'Google_OAuth_Client_Secret_Label',
+        i18nDescription: 'Google_OAuth_Client_Secret_Description',
     },
     {
         id: SettingsIds.OAuthRedirectUri,
@@ -51,7 +51,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false, // Admin only
-        i18nLabel: 'OAuth Redirect URI',
-        i18nDescription: 'OAuth redirect URI - should end with /api/apps/public/[app-id]/oauth-callback',
+        i18nLabel: 'OAuth_Redirect_URI_Label',
+        i18nDescription: 'OAuth_Redirect_URI_Description',
     },
 ]; 
