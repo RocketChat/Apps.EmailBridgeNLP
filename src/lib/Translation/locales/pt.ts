@@ -54,6 +54,12 @@ export const pt = {
     Confirm_Logout: "🔒 Confirmar Logout",
     Error_Preparing_Logout: "❌ Erro ao preparar logout: __error__",
     
+    // Logout action messages
+    Provider_Not_Supported_Logout: "❌ **__provider__ não é suportado para logout.**\n\nEntre em contato com seu administrador para obter ajuda.",
+    Logout_Success: "✅ **Logout realizado com sucesso da sua conta __provider__.**\n\nAgora você pode fazer login com uma conta diferente, se necessário.",
+    Logout_Failed: "❌ **Falha ao fazer logout da sua conta de e-mail.**\n\nTente novamente ou entre em contato com seu administrador.",
+    Logout_Error: "❌ **Ocorreu um erro durante o processo de logout:**\n__error__\n\nTente novamente ou entre em contato com seu administrador.",
+    
     // Notification messages
     Helper_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Aqui estão algumas dicas rápidas para começar!",
     Available_Commands: "",
@@ -63,6 +69,16 @@ export const pt = {
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de e-mail.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
     Login_Action_Text: "Fazer login na sua conta de e-mail",
+    
+    // User Preference Modal
+    User_Preference_Title: "⚙️ Preferências do Usuário",
+    User_Preference_Button_Label: "⚙️ Preferências do Usuário",
+    User_Preference_Update_Button: "Atualizar Preferências",
+    User_Preference_Close_Button: "Fechar",
+    User_Preference_Success: "✅ **Preferências do usuário atualizadas com sucesso!**",
+    User_Preference_Error: "❌ **Erro ao atualizar as preferências do usuário:**\n__error__",
+    Email_Provider_Preference_Label: "Provedor de E-mail",
+    Email_Provider_Preference_Description: "Escolha seu provedor de e-mail preferido para autenticação",
     
     // Language names
     Language: "Idioma",

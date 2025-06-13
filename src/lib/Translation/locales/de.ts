@@ -42,6 +42,13 @@ export const de = {
     Logout_Confirmation: "🔓 **Abmelde-Bestätigung**\n\nSind Sie sicher, dass Sie sich vom **__provider__**-Konto **__email__** abmelden möchten?",
     Confirm_Logout: "🔒 Abmeldung bestätigen",
     Error_Preparing_Logout: "❌ Fehler beim Vorbereiten der Abmeldung: __error__",
+    
+    // Logout action messages
+    Provider_Not_Supported_Logout: "❌ **__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator um Hilfe.",
+    Logout_Success: "✅ **Erfolgreich von Ihrem __provider__-Konto abgemeldet.**\n\nSie können sich jetzt bei Bedarf mit einem anderen Konto anmelden.",
+    Logout_Failed: "❌ **Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    Logout_Error: "❌ **Ein Fehler ist während des Abmeldevorgangs aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    
     Helper_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Hier sind einige schnelle Tipps für den Einstieg!",
     Available_Commands: "",
     Help_Command: "verwende `/email help` - Diese Hilfenachricht anzeigen",
@@ -50,6 +57,17 @@ export const de = {
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um alle verfügbaren Funktionen und Befehle zu erfahren.",
     Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
+    
+    // User Preference Modal
+    User_Preference_Title: "⚙️ Benutzereinstellungen",
+    User_Preference_Button_Label: "⚙️ Benutzereinstellungen",
+    User_Preference_Update_Button: "Einstellungen aktualisieren",
+    User_Preference_Close_Button: "Schließen",
+    User_Preference_Success: "✅ **Benutzereinstellungen erfolgreich aktualisiert!**",
+    User_Preference_Error: "❌ **Fehler beim Aktualisieren der Benutzereinstellungen:**\n__error__",
+    Email_Provider_Preference_Label: "E-Mail-Anbieter",
+    Email_Provider_Preference_Description: "Wählen Sie Ihren bevorzugten E-Mail-Anbieter für die Authentifizierung",
+    
     Language: "Sprache",
     Language_EN: "Englisch",
     Language_ES: "Spanisch",
