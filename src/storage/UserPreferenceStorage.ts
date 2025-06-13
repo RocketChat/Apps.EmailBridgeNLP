@@ -6,9 +6,10 @@ import {
     IPersistence,
     IPersistenceRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { IUserPreferenceStorage } from '../definition/lib/IUserPreferenceStorage';
-import { IPreference } from '../definition/helper/userPreference';
+import { IUserPreferenceStorage } from '../definition/userPreferences';
+import { IPreference } from '../definition/userPreferences';
 import { Language } from '../lib/Translation/translation';
+import { EmailProviders } from '../enums/EmailProviders';
 
 export class UserPreferenceStorage implements IUserPreferenceStorage {
     private userId: string;
@@ -27,6 +28,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
         const updatedPreference: IPreference = {
             userId: this.userId,
             language: preference.language || currentPreference.language,
+            emailProvider: preference.emailProvider || currentPreference.emailProvider,
         };
 
         const association = new RocketChatAssociationRecord(
@@ -55,6 +57,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
             const preference: IPreference = {
                 userId: this.userId,
                 language: Language.en,
+                emailProvider: EmailProviders.GMAIL,
             };
             return preference;
         }

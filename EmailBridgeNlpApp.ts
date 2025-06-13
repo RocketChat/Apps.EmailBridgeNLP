@@ -31,7 +31,7 @@ import { ExecuteViewSubmitHandler } from './src/handlers/ExecuteViewSubmitHandle
 import { ExecuteViewClosedHandler } from './src/handlers/ExecuteViewClosedHandler';
 import { ElementBuilder } from './src/lib/ElementBuilder';
 import { BlockBuilder } from './src/lib/BlockBuilder';
-import { IAppUtils } from './src/definition/lib/IAppUtils';
+import { IAppUtils } from './src/definition/app';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
     private elementBuilder: ElementBuilder;
@@ -129,7 +129,7 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         return await handler.handleActions();
     }
 
-    public async executeViewCloseHandler(
+    public async executeViewClosedHandler(
         context: UIKitViewCloseInteractionContext,
         read: IRead,
         http: IHttp,
