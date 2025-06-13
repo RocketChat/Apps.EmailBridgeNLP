@@ -39,9 +39,7 @@ export class GoogleOAuthService implements IOAuthService {
             }
 
             this.initialized = true;
-            this.logger.debug('OAuth Service initialized successfully');
         } catch (error) {
-            this.logger.error('Failed to initialize OAuth Service:', error);
             throw new Error('Failed to initialize OAuth Service: ' + error.message);
         }
     }
@@ -58,9 +56,7 @@ export class GoogleOAuthService implements IOAuthService {
      * Save the OAuth state for a user
      */
     public async saveState(state: string, userId: string): Promise<void> {
-        this.logger.debug(`Saving OAuth state for user ${userId}`);
         await this.oauthStorage.saveState(state, userId);
-        this.logger.debug(`OAuth state saved successfully for user ${userId}`);
     }
 
     /**
@@ -70,12 +66,10 @@ export class GoogleOAuthService implements IOAuthService {
         try {
             const result = await this.oauthStorage.validateState(state);
             if (!result) {
-                this.logger.debug('OAuth state validation failed');
                 return undefined;
             }
             return result;
         } catch (error) {
-            this.logger.error('Error validating OAuth state:', error);
             return undefined;
         }
     }
@@ -84,7 +78,6 @@ export class GoogleOAuthService implements IOAuthService {
      * Generate OAuth authorization URL for the user
      */
     public async getAuthorizationUrl(userId: string): Promise<string> {
-        this.logger.debug(`Generating OAuth URL for user ${userId}`);
 
         // Generate a state parameter for security
         const state = this.generateState();
@@ -95,7 +88,6 @@ export class GoogleOAuthService implements IOAuthService {
         // Get the authorization URL with the state parameter
         const url = this.getAuthUrl(state);
 
-        this.logger.debug(`OAuth URL generated for user ${userId}`);
         return url;
     }
 
@@ -129,7 +121,6 @@ export class GoogleOAuthService implements IOAuthService {
      * Exchange authorization code for tokens
      */
     public async exchangeCodeForTokens(code: string): Promise<IOAuthCredentials> {
-        this.logger.debug('Exchanging authorization code for tokens');
 
         try {
             if (!this.initialized) {
@@ -145,14 +136,12 @@ export class GoogleOAuthService implements IOAuthService {
 
             if (response.statusCode !== 200) {
                 const errorContent = response.content || 'Unknown error';
-                this.logger.error(`Failed to exchange code for tokens: HTTP ${response.statusCode}:`, errorContent);
                 throw new Error(`Failed to exchange code for tokens: HTTP ${response.statusCode}`);
             }
 
             const data = JSON.parse(response.content || '{}');
 
             if (!data.access_token) {
-                this.logger.error('No access token in response:', data);
                 throw new Error('No access token received from OAuth provider');
             }
 
@@ -160,11 +149,8 @@ export class GoogleOAuthService implements IOAuthService {
             const userInfo = await this.getUserInfoFromToken(data.access_token);
 
             if (!userInfo || !userInfo.email) {
-                this.logger.error('Failed to get user email from token:', userInfo);
                 throw new Error('Failed to get user email from Google');
             }
-
-            this.logger.debug('Successfully obtained tokens and user info');
 
             return {
                 access_token: data.access_token,
@@ -175,7 +161,6 @@ export class GoogleOAuthService implements IOAuthService {
                 email: userInfo.email
             };
         } catch (error) {
-            this.logger.error('Error exchanging code for tokens:', error);
             throw new Error(`Failed to exchange code for tokens: ${error.message}`);
         }
     }
@@ -197,7 +182,6 @@ export class GoogleOAuthService implements IOAuthService {
 
             return JSON.parse(response.content || '{}');
         } catch (error) {
-            this.logger.error('Error getting user info:', error);
             throw new Error(`Failed to get user info: ${error.message}`);
         }
     }
@@ -216,7 +200,6 @@ export class GoogleOAuthService implements IOAuthService {
             
             return userInfo;
         } catch (error) {
-            this.logger.error(`Failed to get user info for user ${userId}:`, error);
             throw new Error(`Failed to get user info: ${error.message}`);
         }
     }
@@ -225,9 +208,7 @@ export class GoogleOAuthService implements IOAuthService {
      * Save OAuth credentials for a user
      */
     public async saveCredentials(userId: string, credentials: IOAuthCredentials): Promise<void> {
-        this.logger.debug(`Saving OAuth credentials for user ${userId}`);
         await this.oauthStorage.saveCredentials(userId, credentials);
-        this.logger.debug(`OAuth credentials saved for user ${userId}`);
     }
 
     /**
@@ -236,10 +217,8 @@ export class GoogleOAuthService implements IOAuthService {
     public async getCredentials(userId: string): Promise<IOAuthCredentials | undefined> {
         try {
             const credentials = await this.oauthStorage.getCredentials(userId);
-            this.logger.debug(`Retrieved credentials for user ${userId}: ${credentials ? 'found' : 'not found'}`);
             return credentials;
         } catch (error) {
-            this.logger.error(`Error getting credentials for user ${userId}:`, error);
             return undefined;
         }
     }
@@ -248,9 +227,7 @@ export class GoogleOAuthService implements IOAuthService {
      * Delete OAuth credentials for a user
      */
     public async deleteCredentials(userId: string): Promise<void> {
-        this.logger.debug(`Deleting OAuth credentials for user ${userId}`);
         await this.oauthStorage.deleteCredentials(userId);
-        this.logger.debug(`OAuth credentials deleted for user ${userId}`);
     }
 
     /**
@@ -274,14 +251,12 @@ export class GoogleOAuthService implements IOAuthService {
         const bufferTime = 5 * 60 * 1000; // 5 minutes
         if (credentials.expiry_date && (Date.now() + bufferTime) >= credentials.expiry_date) {
             if (credentials.refresh_token) {
-                this.logger.debug(`Access token expired for user ${userId}, refreshing...`);
                 try {
                     const refreshedCredentials = await this.refreshAccessToken(credentials.refresh_token);
                     const updatedCredentials = { ...credentials, ...refreshedCredentials };
                     await this.saveCredentials(userId, updatedCredentials);
                     return updatedCredentials.access_token;
                 } catch (error) {
-                    this.logger.error('Error refreshing access token:', error);
                     throw new Error('Your authentication has expired. Please use /email login to reconnect your account');
                 }
             } else {
@@ -296,7 +271,6 @@ export class GoogleOAuthService implements IOAuthService {
      * Refresh access token using refresh token
      */
     public async refreshAccessToken(refreshToken: string): Promise<Partial<IOAuthCredentials>> {
-        this.logger.debug('Refreshing access token');
 
         try {
             if (!this.initialized) {
@@ -323,7 +297,6 @@ export class GoogleOAuthService implements IOAuthService {
                 scope: data.scope,
             };
         } catch (error) {
-            this.logger.error('Error refreshing access token:', error);
             throw new Error(`Failed to refresh access token: ${error.message}`);
         }
     }
@@ -345,10 +318,8 @@ export class GoogleOAuthService implements IOAuthService {
 
             // Delete stored credentials
             await this.deleteCredentials(userId);
-            this.logger.debug(`Token revoked for user ${userId}`);
             return true;
         } catch (error) {
-            this.logger.error('Error revoking token:', error);
             // Even if revoking fails, delete local credentials
             await this.deleteCredentials(userId);
             return true;

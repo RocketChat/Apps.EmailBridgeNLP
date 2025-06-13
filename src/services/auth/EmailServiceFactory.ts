@@ -16,7 +16,6 @@ export class EmailServiceFactory {
         read: IRead,
         logger: ILogger
     ): Promise<IOAuthService> {
-        logger.debug('EmailServiceFactory.createOAuthService -> Creating OAuth service for provider:', provider);
 
         switch (provider) {
             case EmailProviders.GMAIL:

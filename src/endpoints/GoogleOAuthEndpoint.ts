@@ -28,7 +28,6 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         persistence: IPersistence
     ): Promise<IApiResponse> {
         const logger = this.app.getLogger();
-        logger.debug('OAuth callback received', request.query);
 
         try {
             // Initialize OAuth service
@@ -46,8 +45,6 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
             const code = request.query.code;
             const state = request.query.state;
 
-            logger.debug('OAuth callback parameters', { code: !!code, state });
-
             if (!code || !state) {
                 logger.error('Missing code or state parameter');
                 return this.createErrorResponse('Missing required parameters (code or state)');
@@ -59,8 +56,6 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
                 logger.error('Invalid or expired state parameter');
                 return this.createErrorResponse('Invalid or expired authorization request');
             }
-
-            logger.debug('State validated, user ID:', stateInfo.userId);
 
             // Exchange code for tokens
             try {
