@@ -14,7 +14,6 @@ export async function sendHelperNotification(
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
     const message = `${t('Helper_Greeting', language, { name: user.name })}
 
-${t('Available_Commands', language)}
 ${t('Help_Command', language)}
 ${t('Login_Command', language)}
 ${t('Logout_Command', language)}

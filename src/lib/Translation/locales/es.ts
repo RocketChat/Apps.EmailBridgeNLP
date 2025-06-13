@@ -55,13 +55,14 @@ export const es = {
     Error_Preparing_Logout: "❌ Error al preparar el cierre de sesión: __error__",
     
     // Notification messages
-    Helper_Greeting: "¡Hola __name__! Soy Email Bot. ¡Aquí tienes algunos consejos rápidos para empezar!",
-    Available_Commands: "**Comandos Disponibles:**",
-    Help_Command: "• `/email help` - Mostrar este mensaje de ayuda",
-    Login_Command: "• `/email login` - Iniciar sesión en su cuenta de correo",
-    Logout_Command: "• `/email logout` - Cerrar sesión de su cuenta de correo",
-    Default_Greeting: "¡Hola __name__! Soy Email Bot. Puedo ayudarte con todas tus necesidades de correo electrónico.",
+    Helper_Greeting: "¡Hola __name__! Soy Email Bot 👋. ¡Aquí tienes algunos consejos rápidos para empezar!",
+    Available_Commands: "",
+    Help_Command: "usa `/email help` - Mostrar este mensaje de ayuda",
+    Login_Command: "usa `/email login` - Iniciar sesión en su cuenta de correo",
+    Logout_Command: "usa `/email logout` - Cerrar sesión de su cuenta de correo",
+    Default_Greeting: "¡Hola __name__! Soy Email Bot 👋. Puedo ayudarte con todas tus necesidades de correo electrónico.",
     Use_Help_Command: "Use `/email help` para conocer todas las funciones y comandos disponibles.",
+    Login_Action_Text: "Iniciar sesión en su cuenta de correo",
     
     // Language names
     Language: "Idioma",

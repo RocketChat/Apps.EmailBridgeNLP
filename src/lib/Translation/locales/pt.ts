@@ -55,13 +55,14 @@ export const pt = {
     Error_Preparing_Logout: "❌ Erro ao preparar logout: __error__",
     
     // Notification messages
-    Helper_Greeting: "Olá __name__! Eu sou o Email Bot. Aqui estão algumas dicas rápidas para começar!",
-    Available_Commands: "**Comandos Disponíveis:**",
-    Help_Command: "• `/email help` - Mostrar esta mensagem de ajuda",
-    Login_Command: "• `/email login` - Fazer login na sua conta de e-mail",
-    Logout_Command: "• `/email logout` - Fazer logout da conta de e-mail",
-    Default_Greeting: "Olá __name__! Eu sou o Email Bot. Posso ajudá-lo com todas as suas necessidades de e-mail.",
+    Helper_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Aqui estão algumas dicas rápidas para começar!",
+    Available_Commands: "",
+    Help_Command: "use `/email help` - Mostrar esta mensagem de ajuda",
+    Login_Command: "use `/email login` - Fazer login na sua conta de e-mail",
+    Logout_Command: "use `/email logout` - Fazer logout da conta de e-mail",
+    Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de e-mail.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
+    Login_Action_Text: "Fazer login na sua conta de e-mail",
     
     // Language names
     Language: "Idioma",
