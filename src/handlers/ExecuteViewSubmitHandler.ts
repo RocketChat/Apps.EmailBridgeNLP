@@ -15,7 +15,7 @@ import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
-import { IPreference } from '../definition/userPreferences';
+import { IPreference } from '../definition/lib/IUserPreferences';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;

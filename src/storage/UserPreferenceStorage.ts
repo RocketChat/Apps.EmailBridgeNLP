@@ -6,8 +6,8 @@ import {
     IPersistence,
     IPersistenceRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { IUserPreferenceStorage } from '../definition/userPreferences';
-import { IPreference } from '../definition/userPreferences';
+import { IUserPreferenceStorage } from '../definition/lib/IUserPreferences';
+import { IPreference } from '../definition/lib/IUserPreferences';
 import { Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 

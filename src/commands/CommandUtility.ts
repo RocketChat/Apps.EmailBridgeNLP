@@ -12,7 +12,7 @@ import { Handler } from '../handlers/Handler';
 import {
     ICommandUtility,
     ICommandUtilityParams,
-} from '../definition/app';
+} from '../definition/command/ICommandUtility';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 
 export class CommandUtility implements ICommandUtility {

@@ -13,7 +13,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.SELECT,
         packageValue: 'gmail',
         required: true,
-        public: true, // Visible to both admin and users
+        public: false, //Admin only
         i18nLabel: 'Email_Provider_Label',
         i18nDescription: 'Email_Provider_Description',
         values: [

@@ -10,7 +10,7 @@ import {
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { CommandUtility } from './CommandUtility';
-import { ICommandUtilityParams } from '../definition/app';
+import { ICommandUtilityParams } from '../definition/command/ICommandUtility';
 
 export class EmailCommand implements ISlashCommand {
     constructor(private readonly app: EmailBridgeNlpApp) {}

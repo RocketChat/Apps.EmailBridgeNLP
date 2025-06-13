@@ -1,5 +1,5 @@
 import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
-import { IEmailSettings, IOAuthService } from '../../definition/IAuth';
+import { IEmailSettings, IOAuthService } from '../../definition/auth/IAuth';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { GoogleOAuthService } from '../auth/GoogleOAuthService';
 import { getGoogleOAuthSettings } from '../../config/SettingsManager';
