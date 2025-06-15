@@ -13,7 +13,6 @@ import {
     sendHelperNotification,
 } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
-import { getEmailSettings } from '../config/SettingsManager';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { EmailProviders } from '../enums/EmailProviders';
 import { t, Language } from '../lib/Translation/translation';
@@ -107,19 +106,19 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
-            // Get email settings to determine provider
-            const emailSettings = await getEmailSettings(this.read.getEnvironmentReader().getSettings());
+            // Get user's preferred email provider from their personal settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
 
             // Check if provider is supported
-            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                const providerName = getProviderDisplayName(emailSettings.provider);
-                let message: string;
-                
-                if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = t('Outlook_Coming_Soon', this.language);
-                } else {
-                    message = t('Provider_Not_Implemented', this.language, { provider: providerName });
-                }
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t('Provider_Not_Implemented', this.language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -127,7 +126,7 @@ export class Handler implements IHandler {
 
             // Check if user is already authenticated
             const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
-                emailSettings.provider,
+                emailProvider,
                 this.sender.id,
                 this.http,
                 this.persis,
@@ -138,7 +137,7 @@ export class Handler implements IHandler {
             if (isAuthenticated) {
                 try {
                     const userInfo = await EmailServiceFactory.getUserInfo(
-                        emailSettings.provider,
+                        emailProvider,
                         this.sender.id,
                         this.http,
                         this.persis,
@@ -147,7 +146,7 @@ export class Handler implements IHandler {
                     );
                     messageBuilder.setText(
                         t('Already_Logged_In', this.language, { 
-                            provider: getProviderDisplayName(emailSettings.provider), 
+                            provider: getProviderDisplayName(emailProvider), 
                             email: userInfo.email 
                         })
                     );
@@ -157,7 +156,7 @@ export class Handler implements IHandler {
                     // Clear the corrupted authentication and proceed with fresh login
                     try {
                         await EmailServiceFactory.logoutUser(
-                            emailSettings.provider,
+                            emailProvider,
                             this.sender.id,
                             this.http,
                             this.persis,
@@ -174,7 +173,7 @@ export class Handler implements IHandler {
 
             // Generate the authorization URL
             const authUrl = await EmailServiceFactory.getAuthenticationUrl(
-                emailSettings.provider,
+                emailProvider,
                 this.sender.id,
                 this.http,
                 this.persis,
@@ -187,7 +186,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    t('Connect_Account_Message', this.language, { provider: getProviderDisplayName(emailSettings.provider) })
+                    t('Connect_Account_Message', this.language, { provider: getProviderDisplayName(emailProvider) })
                 ),
             });
 
@@ -195,7 +194,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                        text: block.newPlainTextObject(t('Login_With_Provider', this.language, { provider: getProviderDisplayName(emailSettings.provider) })),
+                        text: block.newPlainTextObject(t('Login_With_Provider', this.language, { provider: getProviderDisplayName(emailProvider) })),
                         url: authUrl,
                         style: ButtonStyle.PRIMARY,
                     }),
@@ -224,19 +223,19 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
-            // Get email settings to determine provider
-            const emailSettings = await getEmailSettings(this.read.getEnvironmentReader().getSettings());
+            // Get user's preferred email provider from their personal settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
 
             // Check if provider is supported
-            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                const providerName = getProviderDisplayName(emailSettings.provider);
-                let message: string;
-                
-                if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = t('Outlook_Coming_Soon', this.language);
-                } else {
-                    message = t('Provider_Not_Implemented', this.language, { provider: providerName });
-                }
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t('Provider_Not_Implemented', this.language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -244,7 +243,7 @@ export class Handler implements IHandler {
 
             // Check if user is authenticated first
             const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
-                emailSettings.provider,
+                emailProvider,
                 this.sender.id,
                 this.http,
                 this.persis,
@@ -253,7 +252,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(t('Not_Authenticated', this.language, { provider: getProviderDisplayName(emailSettings.provider) }));
+                messageBuilder.setText(t('Not_Authenticated', this.language, { provider: getProviderDisplayName(emailProvider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -261,7 +260,7 @@ export class Handler implements IHandler {
             let userInfo;
             try {
                 userInfo = await EmailServiceFactory.getUserInfo(
-                    emailSettings.provider,
+                    emailProvider,
                     this.sender.id,
                     this.http,
                     this.persis,
@@ -279,7 +278,7 @@ export class Handler implements IHandler {
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
                     t('Logout_Confirmation', this.language, { 
-                        provider: getProviderDisplayName(emailSettings.provider), 
+                        provider: getProviderDisplayName(emailProvider), 
                         email: userInfo.email 
                     })
                 ),
