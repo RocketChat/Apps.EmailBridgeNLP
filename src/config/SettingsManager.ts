@@ -46,4 +46,15 @@ export async function getGoogleOAuthSettings(settingsReader: ISettingRead): Prom
         oauth_client_secret: await settingsReader.getValueById(SettingsIds.OAuthClientSecret) as string,
         oauth_redirect_uri: await settingsReader.getValueById(SettingsIds.OAuthRedirectUri) as string,
     };
+}
+
+/**
+ * Get OAuth settings for Outlook 
+ */
+export async function getOutlookOAuthSettings(settingsReader: ISettingRead): Promise<{[key: string]: string}> {
+    return {
+        outlook_client_id: await settingsReader.getValueById(SettingsIds.OutlookClientId) as string,
+        outlook_client_secret: await settingsReader.getValueById(SettingsIds.OutlookClientSecret) as string,
+        outlook_redirect_uri: await settingsReader.getValueById(SettingsIds.OutlookRedirectUri) as string,
+    };
 } 

@@ -5,6 +5,9 @@ export enum SettingsIds {
     OAuthClientId = 'client_id',
     OAuthClientSecret = 'client_secret',
     OAuthRedirectUri = 'redirect_uri',
+    OutlookClientId = 'outlook_client_id',
+    OutlookClientSecret = 'outlook_client_secret',
+    OutlookRedirectUri = 'outlook_redirect_uri',
 }
 
 export const settings: Array<ISetting> = [
@@ -53,5 +56,32 @@ export const settings: Array<ISetting> = [
         public: false, // Admin only
         i18nLabel: 'OAuth_Redirect_URI_Label',
         i18nDescription: 'OAuth_Redirect_URI_Description',
+    },
+    {
+        id: SettingsIds.OutlookClientId,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: true,
+        public: false, // Admin only
+        i18nLabel: 'Outlook_OAuth_Client_ID_Label',
+        i18nDescription: 'Outlook_OAuth_Client_ID_Description',
+    },
+    {
+        id: SettingsIds.OutlookClientSecret,
+        type: SettingType.PASSWORD,
+        packageValue: '',
+        required: true,
+        public: false, // Admin only
+        i18nLabel: 'Outlook_OAuth_Client_Secret_Label',
+        i18nDescription: 'Outlook_OAuth_Client_Secret_Description',
+    },
+    {
+        id: SettingsIds.OutlookRedirectUri,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: true,
+        public: false, // Admin only
+        i18nLabel: 'Outlook_OAuth_Redirect_URI_Label',
+        i18nDescription: 'Outlook_OAuth_Redirect_URI_Description',
     },
 ]; 

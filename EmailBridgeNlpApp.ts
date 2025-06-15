@@ -16,6 +16,7 @@ import {
     ApiVisibility,
 } from '@rocket.chat/apps-engine/definition/api';
 import { GoogleOAuthEndpoint } from './src/endpoints/GoogleOAuthEndpoint';
+import { OutlookOAuthEndpoint } from './src/endpoints/OutlookOAuthEndpoint';
 import {
     IUIKitResponse,
     UIKitBlockInteractionContext,
@@ -56,7 +57,10 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         await configuration.api.provideApi({
             visibility: ApiVisibility.PUBLIC,
             security: ApiSecurity.UNSECURE,
-            endpoints: [new GoogleOAuthEndpoint(this)],
+            endpoints: [
+                new GoogleOAuthEndpoint(this),
+                new OutlookOAuthEndpoint(this)
+            ],
         });
 
         // Register slash commands
