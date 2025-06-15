@@ -17,6 +17,7 @@ import { t } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
@@ -56,7 +57,16 @@ export class ExecuteBlockActionHandler {
         }
 
         if (actionId === ActionIds.USER_PREFERENCE_ACTION) {
-            if (user && triggerId) {
+            if (user && triggerId && room) {
+                // Store room ID for later use in ExecuteViewSubmitHandler
+                const roomInteractionStorage = new RoomInteractionStorage(
+                    this.persistence,
+                    this.read.getPersistenceReader(),
+                    user.id,
+                );
+                
+                await roomInteractionStorage.storeInteractionRoomId(room.id);
+                
                 // Process user preference action asynchronously
                 Promise.resolve().then(async () => {
                     try {

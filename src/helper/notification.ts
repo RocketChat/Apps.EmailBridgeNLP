@@ -39,7 +39,7 @@ export async function sendDefaultNotification(
     language: Language = Language.en,
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
-    
+
     const message = `${t('Default_Greeting', language, { name: user.name })}
 
 ${t('Use_Help_Command', language)}
@@ -55,4 +55,29 @@ ${t('Use_Help_Command', language)}
         .setGroupable(false);
 
     return read.getNotifier().notifyUser(user, helperMessage.getMessage());
+}
+
+export async function sendNotification(
+    read: IRead,
+    modify: IModify,
+    user: IUser,
+    room: IRoom,
+    content: { message?: string },
+): Promise<void> {
+    const appUser = (await read.getUserReader().getAppUser()) as IUser;
+    const { message } = content;
+
+    if (!appUser || !message) {
+        return;
+    }
+
+    const messageBuilder = modify
+        .getCreator()
+        .startMessage()
+        .setSender(appUser)
+        .setRoom(room)
+        .setGroupable(false)
+        .setText(message);
+
+    return read.getNotifier().notifyUser(user, messageBuilder.getMessage());
 } 

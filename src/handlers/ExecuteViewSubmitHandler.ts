@@ -12,10 +12,12 @@ import {
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { IPreference } from '../definition/lib/IUserPreferences';
+import { sendNotification } from '../helper/notification';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -43,8 +45,21 @@ export class ExecuteViewSubmitHandler {
 
     private async handleUserPreferenceSubmit(user: any, view: any): Promise<IUIKitResponse> {
         try {
-            // Get the room from interaction context if available
-            const { room } = this.context.getInteractionData();
+            // Get the room from stored interaction context (QuickReplies approach)
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            let room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
+            
+            // Fallback: Try to get room from interaction context if storage failed
+            if (!room) {
+                const { room: contextRoom } = this.context.getInteractionData();
+                room = contextRoom;
+            }
             
             // Get user's current language for messages
             const currentLanguage = await getUserPreferredLanguage(
@@ -71,47 +86,20 @@ export class ExecuteViewSubmitHandler {
                 emailProvider: selectedEmailProvider,
             };
 
-            // Save the preference
+            // Get current preferences to compare changes
             const userPreference = new UserPreferenceStorage(
                 this.persistence,
                 this.read.getPersistenceReader(),
                 user.id,
             );
             
+            const currentPreference = await userPreference.getUserPreference();
+            
+            // Save the new preference
             await userPreference.storeUserPreference(preference);
 
-            // Send success notification to user as a direct message
-            const appUser = await this.read.getUserReader().getAppUser();
-            if (appUser) {
-                const messageBuilder = this.modify
-                    .getCreator()
-                    .startMessage()
-                    .setSender(appUser)
-                    .setGroupable(false)
-                    .setText(t('User_Preference_Success', selectedLanguage));
-
-                try {
-                    // Try direct user notification first
-                    await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                } catch (error) {
-                    // Try alternative approach - send to a room if available from context
-                    if (room) {
-                        try {
-                            const roomMessageBuilder = this.modify
-                                .getCreator()
-                                .startMessage()
-                                .setSender(appUser)
-                                .setRoom(room)
-                                .setGroupable(false)
-                                .setText(`@${user.username} ${t('User_Preference_Success', selectedLanguage)}`);
-                            
-                            await this.modify.getCreator().finish(roomMessageBuilder);
-                        } catch (roomError) {
-                            // Silent error handling
-                        }
-                    }
-                }
-            }
+            // Send success notification to user
+            await this.sendSuccessNotification(user, room, currentPreference, preference, selectedLanguage);
 
             return this.context.getInteractionResponder().successResponse();
 
@@ -125,6 +113,79 @@ export class ExecuteViewSubmitHandler {
 
             // Return error response - just return success as errorResponse may not accept message
             return this.context.getInteractionResponder().successResponse();
+        }
+    }
+
+    private async sendSuccessNotification(
+        user: any, 
+        room: any, 
+        oldPreference: IPreference | null, 
+        newPreference: IPreference, 
+        language: Language
+    ): Promise<void> {
+        try {
+            // Build detailed success message showing what changed
+            let message = t('User_Preference_Success', language);
+            
+            // Add details about what changed
+            const changes: string[] = [];
+            
+            if (!oldPreference || oldPreference.language !== newPreference.language) {
+                changes.push(t('Language_Changed', language, { 
+                    language: this.getLanguageDisplayName(newPreference.language, language) 
+                }));
+            }
+            
+            if (!oldPreference || oldPreference.emailProvider !== newPreference.emailProvider) {
+                changes.push(t('Email_Provider_Changed', language, { 
+                    provider: this.getProviderDisplayName(newPreference.emailProvider, language) 
+                }));
+            }
+
+            if (changes.length > 0) {
+                message += '\n\n' + changes.join('\n');
+            }
+
+            // Send notification using room context (QuickReplies approach)
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: message
+                });
+            }
+        } catch (error) {
+            // Silent error handling for notification failures
+        }
+    }
+
+    private getLanguageDisplayName(targetLanguage: Language, displayLanguage: Language): string {
+        // Use proper translation keys for language names
+        switch (targetLanguage) {
+            case Language.en:
+                return t('Language_EN', displayLanguage);
+            case Language.es:
+                return t('Language_ES', displayLanguage);
+            case Language.ru:
+                return t('Language_RU', displayLanguage);
+            case Language.de:
+                return t('Language_DE', displayLanguage);
+            case Language.pl:
+                return t('Language_PL', displayLanguage);
+            case Language.pt:
+                return t('Language_PT', displayLanguage);
+            default:
+                return targetLanguage;
+        }
+    }
+
+    private getProviderDisplayName(provider: EmailProviders, displayLanguage: Language): string {
+        // Use proper translation keys for provider names
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                return t('Gmail_Label', displayLanguage);
+            case EmailProviders.OUTLOOK:
+                return t('Outlook_Label', displayLanguage);
+            default:
+                return provider;
         }
     }
 } 
