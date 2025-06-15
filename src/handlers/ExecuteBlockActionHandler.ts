@@ -10,7 +10,6 @@ import {
 } from '@rocket.chat/apps-engine/definition/uikit';
 
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
-import { getEmailSettings } from '../config/SettingsManager';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t } from '../lib/Translation/translation';
@@ -136,19 +135,19 @@ export class ExecuteBlockActionHandler {
                 user.id,
             );
 
-            // Get email settings to determine provider
-            const emailSettings = await getEmailSettings(this.read.getEnvironmentReader().getSettings());
+            // Get user's preferred email provider from their personal settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
 
             // Check if provider is supported
-            if (!EmailServiceFactory.isProviderSupported(emailSettings.provider)) {
-                const providerName = getProviderDisplayName(emailSettings.provider);
-                let message: string;
-                
-                if (emailSettings.provider === EmailProviders.OUTLOOK) {
-                    message = t('Outlook_Coming_Soon', language);
-                } else {
-                    message = t('Provider_Not_Supported_Logout', language, { provider: providerName });
-                }
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t('Provider_Not_Supported_Logout', language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
@@ -157,7 +156,7 @@ export class ExecuteBlockActionHandler {
 
             // Attempt to logout using the service factory
             const success = await EmailServiceFactory.logoutUser(
-                emailSettings.provider,
+                emailProvider,
                 user.id,
                 this.http,
                 this.persistence,
@@ -166,7 +165,7 @@ export class ExecuteBlockActionHandler {
             );
 
             if (success) {
-                const providerName = getProviderDisplayName(emailSettings.provider);
+                const providerName = getProviderDisplayName(emailProvider);
                 messageBuilder.setText(t('Logout_Success', language, { provider: providerName }));
                 await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
                 return;

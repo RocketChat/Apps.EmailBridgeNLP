@@ -2,7 +2,8 @@ import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/de
 import { IEmailSettings, IOAuthService } from '../../definition/auth/IAuth';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { GoogleOAuthService } from '../auth/GoogleOAuthService';
-import { getGoogleOAuthSettings } from '../../config/SettingsManager';
+import { OutlookOAuthService } from '../auth/OutlookOAuthService';
+import { getGoogleOAuthSettings, getOutlookOAuthSettings } from '../../config/SettingsManager';
 
 export class EmailServiceFactory {
     /**
@@ -28,7 +29,14 @@ export class EmailServiceFactory {
                 return googleOAuthService;
 
             case EmailProviders.OUTLOOK:
-                throw new Error(`🚧 **Outlook authentication is coming soon!**\n\nFor now, please use **Gmail** for email authentication.\n\nChange your email provider to Gmail in the app settings to get started.`);
+                const outlookOauthSettings = await getOutlookOAuthSettings(read.getEnvironmentReader().getSettings());
+                const outlookSettings = {
+                    get: async (key: string) => outlookOauthSettings[key] || ''
+                };
+                
+                const outlookOAuthService = new OutlookOAuthService(http, persistence, read, logger, outlookSettings);
+                await outlookOAuthService.initialize();
+                return outlookOAuthService;
 
             default:
                 throw new Error(`Unsupported email provider: ${provider}`);
@@ -39,7 +47,7 @@ export class EmailServiceFactory {
      * Check if a provider is supported for authentication
      */
     public static isProviderSupported(provider: EmailProviders): boolean {
-        return provider === EmailProviders.GMAIL;
+        return provider === EmailProviders.GMAIL || provider === EmailProviders.OUTLOOK;
     }
 
     /**
@@ -54,10 +62,7 @@ export class EmailServiceFactory {
         logger: ILogger
     ): Promise<string> {
         if (!this.isProviderSupported(provider)) {
-            if (provider === EmailProviders.OUTLOOK) {
-                throw new Error(`🚧 **Outlook authentication is coming soon!**\n\nFor now, please use **Gmail** for email authentication.`);
-            }
-            throw new Error(`Authentication for ${provider} is not yet implemented. Please use Gmail.`);
+            throw new Error(`Authentication for ${provider} is not yet implemented. Please use Gmail or Outlook.`);
         }
 
         const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
