@@ -7,7 +7,11 @@ import {
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
+import { Language } from '../../lib/Translation/translation';
 
+/**
+ * Handler interfaces for message and action handling
+ */
 export interface IHandlerParams {
     app: EmailBridgeNlpApp;
     sender: IUser;
@@ -18,6 +22,7 @@ export interface IHandlerParams {
     persis: IPersistence;
     triggerId?: string;
     threadId?: string;
+    language: Language;
 }
 
 export interface IHandler {
@@ -30,6 +35,9 @@ export interface IHandler {
     persis: IPersistence;
     triggerId?: string;
     threadId?: string;
+    language: Language;
     Help(): Promise<void>;
     sendDefault(): Promise<void>;
+    Login(): Promise<void>;
+    Logout(): Promise<void>;
 } 
