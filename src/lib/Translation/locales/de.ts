@@ -45,7 +45,7 @@ export const de = {
     
     // Logout action messages
     Provider_Not_Supported_Logout: "❌ **__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator um Hilfe.",
-    Logout_Success: "✅ **Erfolgreich von Ihrem __provider__-Konto abgemeldet.**\n\nSie können sich jetzt bei Bedarf mit einem anderen Konto anmelden.",
+    Logout_Success: "✅ **Erfolgreich von Ihrem __provider__-Konto abgemeldet.**",
     Logout_Failed: "❌ **Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
     Logout_Error: "❌ **Ein Fehler ist während des Abmeldevorgangs aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
     

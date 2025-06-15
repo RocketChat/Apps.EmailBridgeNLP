@@ -56,7 +56,7 @@ export const en = {
     
     // Logout action messages
     Provider_Not_Supported_Logout: "❌ **__provider__ is not supported for logout.**\n\nPlease contact your administrator for assistance.",
-    Logout_Success: "✅ **Successfully logged out from your __provider__ account.**\n\nYou can now login with a different account if needed.",
+    Logout_Success: "✅ **Successfully logged out from your __provider__ account.**",
     Logout_Failed: "❌ **Failed to logout from your email account.**\n\nPlease try again or contact your administrator.",
     Logout_Error: "❌ **Error occurred during logout process:**\n__error__\n\nPlease try again or contact your administrator.",
     

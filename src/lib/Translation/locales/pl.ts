@@ -56,7 +56,7 @@ export const pl = {
     
     // Logout action messages
     Provider_Not_Supported_Logout: "❌ **__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
-    Logout_Success: "✅ **Pomyślnie wylogowano z konta __provider__.**\n\nMożesz teraz zalogować się na inne konto w razie potrzeby.",
+    Logout_Success: "✅ **Pomyślnie wylogowano z konta __provider__.**",
     Logout_Failed: "❌ **Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Logout_Error: "❌ **Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     

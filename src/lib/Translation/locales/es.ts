@@ -56,7 +56,7 @@ export const es = {
     
     // Logout action messages
     Provider_Not_Supported_Logout: "❌ **__provider__ no es compatible para cerrar sesión.**\n\nPor favor, contacte a su administrador para obtener ayuda.",
-    Logout_Success: "✅ **Cerró sesión exitosamente de su cuenta __provider__.**\n\nAhora puede iniciar sesión con una cuenta diferente si es necesario.",
+    Logout_Success: "✅ **Cerró sesión exitosamente de su cuenta __provider__.**",
     Logout_Failed: "❌ **No se pudo cerrar sesión de su cuenta de correo electrónico.**\n\nPor favor, inténtelo de nuevo o contacte a su administrador.",
     Logout_Error: "❌ **Ocurrió un error durante el proceso de cierre de sesión:**\n__error__\n\nPor favor, inténtelo de nuevo o contacte a su administrador.",
     
