@@ -46,7 +46,7 @@ export const pl = {
     Already_Logged_In: "✅ Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
     Outlook_Coming_Soon: "🚧 **Uwierzytelnianie Outlook już wkrótce!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
     Provider_Not_Implemented: "❌ **Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwany do uwierzytelniania.\n\n",
-    Connect_Account_Message: "🔐 **Połącz swoje konto __provider__ z Rocket Chat**\nJeśli chcesz użyć konta Outlook, zmień Dostawcę E-mail w ustawieniach.",
+    Connect_Account_Message: "🔐 **Połącz swoje konto __provider__ z Rocket Chat**",
     Login_With_Provider: "🔑 Zaloguj się z __provider__",
     Error_Processing_Login: "❌ Błąd przetwarzania logowania: __error__",
     Not_Authenticated: "❌ Nie jesteś obecnie uwierzytelniony z __provider__. Użyj `/email login` aby się zalogować.",
