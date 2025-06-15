@@ -13,6 +13,7 @@ import {
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { GoogleOAuthService } from '../services/auth/GoogleOAuthService';
 import { oauthErrorHtml, oauthSuccessHtml } from '../templates/OAuthHtmlTemplates';
+import { getGoogleOAuthSettings } from '../config/SettingsManager';
 
 export class GoogleOAuthEndpoint implements IApiEndpoint {
     public path = 'oauth-callback';
@@ -28,12 +29,10 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         persistence: IPersistence
     ): Promise<IApiResponse> {
         try {
-            // Initialize OAuth service
+            // Initialize OAuth service using the same method as the rest of the app
+            const oauthSettings = await getGoogleOAuthSettings(read.getEnvironmentReader().getSettings());
             const settings = {
-                get: async (key: string) => {
-                    const settingsReader = read.getEnvironmentReader().getSettings();
-                    return await settingsReader.getValueById(key) as string;
-                }
+                get: async (key: string) => oauthSettings[key] || ''
             };
 
             const oauthService = new GoogleOAuthService(http, persistence, read, this.app.getLogger(), settings);

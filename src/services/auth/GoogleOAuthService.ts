@@ -39,7 +39,8 @@ export class GoogleOAuthService implements IOAuthService {
 
             this.initialized = true;
         } catch (error) {
-            throw new Error('Failed to initialize OAuth Service: ' + error.message);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new Error('Failed to initialize OAuth Service: ' + errorMessage);
         }
     }
 
