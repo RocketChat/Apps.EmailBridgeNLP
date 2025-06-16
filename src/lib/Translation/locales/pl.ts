@@ -4,12 +4,12 @@ export const pl = {
     Email_Provider_Description: "Wybierz swojego dostawcę usług e-mail do uwierzytelniania",
     Gmail_Label: "Gmail",
     Outlook_Label: "Outlook/Hotmail",
-    Google_OAuth_Client_ID_Label: "ID klienta Google OAuth",
-    Google_OAuth_Client_ID_Description: "ID klienta OAuth do uwierzytelniania Google (tylko Gmail)",
-    Google_OAuth_Client_Secret_Label: "Sekret klienta Google OAuth",
-    Google_OAuth_Client_Secret_Description: "Sekret klienta OAuth do uwierzytelniania Google (tylko Gmail)",
-    OAuth_Redirect_URI_Label: "URI przekierowania OAuth",
-    OAuth_Redirect_URI_Description: "URI przekierowania OAuth - powinno kończyć się na /api/apps/public/[app-id]/oauth-callback",
+    Google_OAuth_Client_ID_Label: "Google OAuth Client ID",
+    Google_OAuth_Client_ID_Description: "OAuth client ID do uwierzytelniania Google (tylko Gmail)",
+    Google_OAuth_Client_Secret_Label: "Google OAuth Client Secret",
+    Google_OAuth_Client_Secret_Description: "OAuth client secret do uwierzytelniania Google (tylko Gmail)",
+    OAuth_Redirect_URI_Label: "OAuth Redirect URI",
+    OAuth_Redirect_URI_Description: "OAuth redirect URI - powinno kończyć się na /api/apps/public/[app-id]/oauth-callback",
     
     // Commands
     Email_Command_Params: "połącz, status, rozłącz, pomoc",
@@ -21,24 +21,24 @@ export const pl = {
     Connected_Account_Message: "Pomyślnie połączyłeś swoje konto Gmail:",
     Try_Again_Message: "Spróbuj ponownie lub skontaktuj się z administratorem.",
     Close_Window_Label: "Zamknij okno",
-    Features_Available_Message: "Możesz teraz używać funkcji EmailBridge NLP w Rocket.Chat!",
+    Features_Available_Message: "Możesz teraz używać funkcji Email Assistant w Rocket.Chat!",
     Safe_To_Close_Message: "Możesz bezpiecznie zamknąć to okno i wrócić do Rocket.Chat.",
     
     // Action Labels
-    Connect_Email_Action_Label: "🔗 Połącz konto e-mail",
-    Check_Status_Action_Label: "📊 Sprawdź status połączenia",
-    Disconnect_Email_Action_Label: "🔌 Rozłącz e-mail",
-    Send_Email_Action_Label: "📧 Wyślij e-mail",
-    View_Inbox_Action_Label: "📥 Zobacz skrzynkę odbiorczą",
+    Connect_Email_Action_Label: "Połącz konto e-mail",
+    Check_Status_Action_Label: "Sprawdź status połączenia",
+    Disconnect_Email_Action_Label: "Rozłącz e-mail",
+    Send_Email_Action_Label: "Wyślij e-mail",
+    View_Inbox_Action_Label: "Zobacz skrzynkę odbiorczą",
     
     // Messages
-    OAuth_Connection_Success: "Pomyślnie połączono z kontem e-mail!",
-    OAuth_Connection_Failed: "Nie udało się połączyć z kontem e-mail. Spróbuj ponownie.",
+    OAuth_Connection_Success: "Pomyślnie połączono z twoim kontem e-mail!",
+    OAuth_Connection_Failed: "Nie udało się połączyć z twoim kontem e-mail. Spróbuj ponownie.",
     Email_Not_Connected: "Brak połączonego konta e-mail. Najpierw połącz swoje konto.",
     Invalid_Email_Provider: "Wybrano nieprawidłowego dostawcę e-mail. Sprawdź swoje ustawienia.",
     Authentication_Required: "Wymagane uwierzytelnianie. Połącz swoje konto e-mail.",
-    Connection_Status_Connected: "✅ Konto e-mail jest połączone i gotowe do użycia.",
-    Connection_Status_Disconnected: "❌ Brak połączonego konta e-mail.",
+    Connection_Status_Connected: "Konto e-mail jest połączone i gotowe do użycia.",
+    Connection_Status_Disconnected: "Brak połączonego konta e-mail.",
     Disconnect_Success: "Pomyślnie rozłączono konto e-mail.",
     Disconnect_Failed: "Nie udało się rozłączyć konta e-mail.",
     
@@ -66,6 +66,7 @@ export const pl = {
     Help_Command: "użyj `/email help` - Pokaż tę wiadomość pomocy",
     Login_Command: "użyj `/email login` - Zaloguj się do swojego konta e-mail",
     Logout_Command: "użyj `/email logout` - Wyloguj się z konta e-mail",
+    Config_Command: "użyj `/email config` - Otwórz preferencje użytkownika i ustawienia",
     Default_Greeting: "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc Ci ze wszystkimi potrzebami e-mail.",
     Use_Help_Command: "Użyj `/email help` aby dowiedzieć się o wszystkich dostępnych funkcjach i poleceniach.",
     Login_Action_Text: "Zaloguj się do swojego konta e-mail",
@@ -90,4 +91,7 @@ export const pl = {
     Language_PL: "Polski",
     Language_PT: "Portugalski",
     Language_RU: "Rosyjski",
+    
+    // Config error messages
+    Config_Error: "❌ Błąd konfiguracji: __error__",
 }; 
