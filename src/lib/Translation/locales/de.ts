@@ -43,22 +43,22 @@ export const de = {
     Disconnect_Failed: "Trennen Ihres E-Mail-Kontos fehlgeschlagen.",
     
     // Handler messages
-    Already_Logged_In: "✅ Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",
-    Outlook_Coming_Soon: "🚧 **Outlook-Authentifizierung kommt bald!**\n\nVerwenden Sie vorerst **Gmail** für die E-Mail-Authentifizierung.\n\n",
-    Provider_Not_Implemented: "❌ **__provider__-Authentifizierung ist noch nicht implementiert.**\n\nDerzeit wird nur **Gmail** für die Authentifizierung unterstützt.\n\n",
-    Connect_Account_Message: "🔐 **Verbinden Sie Ihr __provider__-Konto mit Rocket Chat**",
-    Login_With_Provider: "🔑 Mit __provider__ anmelden",
-    Error_Processing_Login: "❌ Fehler beim Verarbeiten der Anmeldung: __error__",
-    Not_Authenticated: "❌ Sie sind nicht mit __provider__ authentifiziert. Verwenden Sie `/email login` zum Anmelden.",
-    Logout_Confirmation: "🔓 **Abmeldebestätigung**\n\nSind Sie sicher, dass Sie sich vom **__provider__**-Konto **__email__** abmelden möchten?",
-    Confirm_Logout: "🔒 Abmeldung bestätigen",
-    Error_Preparing_Logout: "❌ Fehler beim Vorbereiten der Abmeldung: __error__",
+    Already_Logged_In: "Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",
+    Outlook_Coming_Soon: "**Outlook-Authentifizierung kommt bald!**\n\nVerwenden Sie vorerst **Gmail** für die E-Mail-Authentifizierung.\n\n",
+    Provider_Not_Implemented: "**__provider__-Authentifizierung ist noch nicht implementiert.**\n\nDerzeit wird nur **Gmail** für die Authentifizierung unterstützt.\n\n",
+    Connect_Account_Message: "**Verbinden Sie Ihr __provider__-Konto mit Rocket Chat**",
+    Login_With_Provider: "Mit __provider__ anmelden",
+    Error_Processing_Login: "Fehler beim Verarbeiten der Anmeldung: __error__",
+    Not_Authenticated: "Sie sind nicht mit __provider__ authentifiziert. Verwenden Sie `/email login` zum Anmelden.",
+    Logout_Confirmation: " **Abmeldebestätigung**\n\nSind Sie sicher, dass Sie sich vom **__provider__**-Konto **__email__** abmelden möchten?",
+    Confirm_Logout: "Abmeldung bestätigen",
+    Error_Preparing_Logout: "Fehler beim Vorbereiten der Abmeldung: __error__",
     
     // Logout action messages
-    Provider_Not_Supported_Logout: "❌ **__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator für Unterstützung.",
-    Logout_Success: "✅ **Erfolgreich von Ihrem __provider__-Konto abgemeldet.**",
-    Logout_Failed: "❌ **Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
-    Logout_Error: "❌ **Fehler beim Abmeldeprozess aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    Provider_Not_Supported_Logout: "**__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator für Unterstützung.",
+    Logout_Success: "**Erfolgreich von Ihrem __provider__-Konto abgemeldet.**",
+    Logout_Failed: "**Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    Logout_Error: "**Fehler beim Abmeldeprozess aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
     
     // Notification messages
     Helper_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Hier sind einige schnelle Tipps für den Einstieg!",
@@ -72,14 +72,14 @@ export const de = {
     Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
     
     // User Preference Modal
-    User_Preference_Title: "⚙️ Benutzereinstellungen",
+    User_Preference_Title: "Benutzereinstellungen",
     User_Preference_Button_Label: "⚙️ Benutzereinstellungen",
     User_Preference_Update_Button: "Einstellungen aktualisieren",
     User_Preference_Close_Button: "Schließen",
     User_Preference_Success: "**Benutzereinstellungen erfolgreich aktualisiert!**",
     Language_Changed: "Sprache geändert zu: __language__",
     Email_Provider_Changed: "E-Mail-Anbieter geändert zu: __provider__",
-    User_Preference_Error: "❌ **Fehler beim Aktualisieren der Benutzereinstellungen:**\n__error__",
+    User_Preference_Error: "**Fehler beim Aktualisieren der Benutzereinstellungen:**\n__error__",
     Email_Provider_Preference_Label: "E-Mail-Anbieter",
     Email_Provider_Preference_Description: "Wählen Sie Ihren bevorzugten E-Mail-Anbieter für die Authentifizierung",
     
@@ -93,7 +93,11 @@ export const de = {
     Language_RU: "Russisch",
     
     // Config error messages
-    Config_Error: "❌ Konfigurationsfehler: __error__",
+    Config_Error: "Konfigurationsfehler: __error__",
+    
+    // Provider change messages
+    Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__**",
+    Provider_Change_Warning: "⚠️ Warnung: Das Ändern Ihres E-Mail-Anbieters wird Sie automatisch von Ihrem aktuellen Konto abmelden.",
     
     
 }; 

@@ -18,6 +18,11 @@ import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
+import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+import { Handler } from './Handler';
+import { ActionIds } from '../enums/ActionIds';
+import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
+import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -95,11 +100,40 @@ export class ExecuteViewSubmitHandler {
             
             const currentPreference = await userPreference.getUserPreference();
             
+            // Check if provider changed and handle auto-logout
+            const providerChanged = currentPreference && currentPreference.emailProvider !== selectedEmailProvider;
+            let wasLoggedOut = false;
+            
+            if (providerChanged) {
+                // Check if user was authenticated with the old provider
+                const wasAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                    currentPreference.emailProvider,
+                    user.id,
+                    this.http,
+                    this.persistence,
+                    this.read,
+                    this.app.getLogger()
+                );
+                
+                if (wasAuthenticated) {
+                    // Logout from old provider
+                    await EmailServiceFactory.logoutUser(
+                        currentPreference.emailProvider,
+                        user.id,
+                        this.http,
+                        this.persistence,
+                        this.read,
+                        this.app.getLogger()
+                    );
+                    wasLoggedOut = true;
+                }
+            }
+
             // Save the new preference
             await userPreference.storeUserPreference(preference);
 
-            // Send success notification to user
-            await this.sendSuccessNotification(user, room, currentPreference, preference, selectedLanguage);
+            // Send success notification and handle auto-login if provider changed
+            await this.sendSuccessNotification(user, room, currentPreference, preference, selectedLanguage, wasLoggedOut, providerChanged);
 
             return this.context.getInteractionResponder().successResponse();
 
@@ -121,11 +155,13 @@ export class ExecuteViewSubmitHandler {
         room: any, 
         oldPreference: IPreference | null, 
         newPreference: IPreference, 
-        language: Language
+        language: Language,
+        wasLoggedOut: boolean = false,
+        providerChanged: boolean = false
     ): Promise<void> {
         try {
             // Build detailed success message showing what changed
-            let message = t('User_Preference_Success', language);
+            let message = ""
             
             // Add details about what changed
             const changes: string[] = [];
@@ -143,14 +179,28 @@ export class ExecuteViewSubmitHandler {
             }
 
             if (changes.length > 0) {
-                message += '\n\n' + changes.join('\n');
+                message += changes.join('\n');
             }
 
-            // Send notification using room context (QuickReplies approach)
-            if (room) {
-                await sendNotification(this.read, this.modify, user, room, {
-                    message: message
+            // If provider changed and user was logged out, show login message
+            if (wasLoggedOut && oldPreference && oldPreference.emailProvider !== newPreference.emailProvider) {
+                message += '\n' + t('Provider_Changed_Auto_Logout', language, {
+                    oldProvider: this.getProviderDisplayName(oldPreference.emailProvider, language),
+                    newProvider: this.getProviderDisplayName(newPreference.emailProvider, language)
                 });
+            }
+
+            // Send notification using room context
+            if (room) {
+                if (providerChanged && wasLoggedOut) {
+                    // Send message with login button for provider change
+                    await this.sendNotificationWithLoginButton(user, room, message, newPreference.emailProvider, language);
+                } else {
+                    // Send regular text notification
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: message
+                    });
+                }
             }
         } catch (error) {
             // Silent error handling for notification failures
@@ -186,6 +236,62 @@ export class ExecuteViewSubmitHandler {
                 return t('Outlook_Label', displayLanguage);
             default:
                 return provider;
+        }
+    }
+
+    private async sendNotificationWithLoginButton(
+        user: any, 
+        room: any, 
+        message: string, 
+        provider: EmailProviders, 
+        language: Language
+    ): Promise<void> {
+        try {
+            const appUser = await this.read.getUserReader().getAppUser();
+            const messageBuilder = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser!)
+                .setRoom(room)
+                .setGroupable(false);
+
+            // Generate the authorization URL for the new provider
+            const authUrl = await EmailServiceFactory.getAuthenticationUrl(
+                provider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Create a UI block with the message and login button
+            const block = this.modify.getCreator().getBlockBuilder();
+
+            // Add the success message as a section
+            block.addSectionBlock({
+                text: block.newMarkdownTextObject(message),
+            });
+
+            // Add the login button
+            block.addActionsBlock({
+                elements: [
+                    block.newButtonElement({
+                        actionId: ActionIds.EMAIL_LOGIN_ACTION,
+                        text: block.newPlainTextObject(t('Login_With_Provider', language, { provider: getProviderDisplayName(provider) })),
+                        url: authUrl,
+                        style: ButtonStyle.PRIMARY,
+                    }),
+                ],
+            });
+
+            messageBuilder.setBlocks(block.getBlocks());
+            await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+        } catch (error) {
+            // Fallback to regular text notification if button creation fails
+            await sendNotification(this.read, this.modify, user, room, {
+                message: message
+            });
         }
     }
 } 

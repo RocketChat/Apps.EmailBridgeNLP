@@ -2,7 +2,7 @@ import {
     IModify,
     IUIKitSurfaceViewParam,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { TextObjectType, InputBlock, DividerBlock } from '@rocket.chat/ui-kit';
+import { TextObjectType, InputBlock, DividerBlock, SectionBlock } from '@rocket.chat/ui-kit';
 
 import {
     ButtonStyle,
@@ -32,7 +32,7 @@ export async function UserPreferenceModal({
     const viewId = UserPreferenceModalEnum.VIEW_ID;
     const { elementBuilder, blockBuilder } = app.getUtils();
     const language = existingPreference.language as Language;
-    const blocks: (InputBlock | DividerBlock)[] = [];
+    const blocks: (InputBlock | DividerBlock | SectionBlock)[] = [];
 
     // Language Selection
     const languageOptions = supportedLanguageList.map((lang) => ({
@@ -103,6 +103,17 @@ export async function UserPreferenceModal({
             optional: false,
         }),
     );
+
+    // Show warning if provider change will cause logout
+    if (existingPreference.showProviderWarning) {
+        blocks.push({
+            type: 'section',
+            text: {
+                type: TextObjectType.PLAIN_TEXT,
+                text: t('Provider_Change_Warning', language),
+            },
+        } as SectionBlock);
+    }
 
     const submitButton = elementBuilder.addButton(
         {

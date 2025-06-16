@@ -43,22 +43,22 @@ export const es = {
     Disconnect_Failed: "Error al desconectar tu cuenta de correo electrónico.",
     
     // Handler messages
-    Already_Logged_In: "✅ Ya estás conectado con **__provider__** como **__email__**.\n\nSi quieres desconectarte, usa `/email logout`.",
-    Outlook_Coming_Soon: "🚧 **¡La autenticación de Outlook estará disponible pronto!**\n\nPor ahora, usa **Gmail** para la autenticación de correo electrónico.\n\n",
-    Provider_Not_Implemented: "❌ **La autenticación de __provider__ aún no está implementada.**\n\nActualmente solo **Gmail** es compatible para autenticación.\n\n",
-    Connect_Account_Message: "🔐 **Conecta tu cuenta de __provider__ a Rocket Chat**",
-    Login_With_Provider: "🔑 Iniciar sesión con __provider__",
-    Error_Processing_Login: "❌ Error procesando el inicio de sesión: __error__",
-    Not_Authenticated: "❌ No estás autenticado con __provider__. Usa `/email login` para iniciar sesión.",
-    Logout_Confirmation: "🔓 **Confirmación de Cierre de Sesión**\n\n¿Estás seguro de que quieres cerrar sesión de la cuenta **__provider__** **__email__**?",
-    Confirm_Logout: "🔒 Confirmar Cierre de Sesión",
-    Error_Preparing_Logout: "❌ Error preparando el cierre de sesión: __error__",
+    Already_Logged_In: "Ya estás conectado con **__provider__** como **__email__**.\n\nSi quieres desconectarte, usa `/email logout`.",
+    Outlook_Coming_Soon: "**¡La autenticación de Outlook estará disponible pronto!**\n\nPor ahora, usa **Gmail** para la autenticación de correo electrónico.\n\n",
+    Provider_Not_Implemented: "**La autenticación de __provider__ aún no está implementada.**\n\nActualmente solo **Gmail** es compatible para autenticación.\n\n",
+    Connect_Account_Message: "**Conecta tu cuenta de __provider__ a Rocket Chat**",
+    Login_With_Provider: "Iniciar sesión con __provider__",
+    Error_Processing_Login: "Error procesando el inicio de sesión: __error__",
+    Not_Authenticated: "No estás autenticado con __provider__. Usa `/email login` para iniciar sesión.",
+    Logout_Confirmation: "**Confirmación de Cierre de Sesión**\n\n¿Estás seguro de que quieres cerrar sesión de la cuenta **__provider__** **__email__**?",
+    Confirm_Logout: "Confirmar Cierre de Sesión",
+    Error_Preparing_Logout: "Error preparando el cierre de sesión: __error__",
     
     // Logout action messages
-    Provider_Not_Supported_Logout: "❌ **__provider__ no es compatible para cierre de sesión.**\n\nPor favor, contacta a tu administrador para asistencia.",
-    Logout_Success: "✅ **Cerrado exitosamente la sesión de tu cuenta __provider__.**",
-    Logout_Failed: "❌ **Error al cerrar sesión de tu cuenta de correo electrónico.**\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
-    Logout_Error: "❌ **Ocurrió un error durante el proceso de cierre de sesión:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Provider_Not_Supported_Logout: "**__provider__ no es compatible para cierre de sesión.**\n\nPor favor, contacta a tu administrador para asistencia.",
+    Logout_Success: "**Cerrado exitosamente la sesión de tu cuenta __provider__.**",
+    Logout_Failed: "**Error al cerrar sesión de tu cuenta de correo electrónico.**\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Logout_Error: "**Ocurrió un error durante el proceso de cierre de sesión:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
     
     // Notification messages
     Helper_Greeting: "¡Hola __name__! Soy Email Bot 👋. ¡Aquí tienes algunos consejos rápidos para empezar!",
@@ -72,14 +72,14 @@ export const es = {
     Login_Action_Text: "Iniciar sesión en tu cuenta de correo",
     
     // User Preference Modal
-    User_Preference_Title: "⚙️ Preferencias de Usuario",
+    User_Preference_Title: "Preferencias de Usuario",
     User_Preference_Button_Label: "⚙️ Preferencias de Usuario",
     User_Preference_Update_Button: "Actualizar Preferencias",
     User_Preference_Close_Button: "Cerrar",
     User_Preference_Success: "**¡Preferencias de usuario actualizadas exitosamente!**",
     Language_Changed: "Idioma cambiado a: __language__",
     Email_Provider_Changed: "Proveedor de correo cambiado a: __provider__",
-    User_Preference_Error: "❌ **Error al actualizar las preferencias de usuario:**\n__error__",
+    User_Preference_Error: "**Error al actualizar las preferencias de usuario:**\n__error__",
     Email_Provider_Preference_Label: "Proveedor de Correo Electrónico",
     Email_Provider_Preference_Description: "Elige tu proveedor de correo electrónico preferido para autenticación",
     
@@ -93,7 +93,11 @@ export const es = {
     Language_RU: "Ruso",
     
     // Config error messages
-    Config_Error: "❌ Error de configuración: __error__",
+    Config_Error: "Error de configuración: __error__",
+    
+    // Provider change messages
+    Provider_Changed_Auto_Logout: "Has sido desconectado automáticamente de **__oldProvider__**",
+    Provider_Change_Warning: "⚠️ Advertencia: Cambiar tu proveedor de correo electrónico te desconectará automáticamente de tu cuenta actual.",
     
     // Command preview - handled by hardcoded i18nTitle in EmailCommand.ts
 }; 

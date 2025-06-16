@@ -43,22 +43,22 @@ export const pl = {
     Disconnect_Failed: "Nie udało się rozłączyć konta e-mail.",
     
     // Handler messages
-    Already_Logged_In: "✅ Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
-    Outlook_Coming_Soon: "🚧 **Uwierzytelnianie Outlook już wkrótce!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
-    Provider_Not_Implemented: "❌ **Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwany do uwierzytelniania.\n\n",
-    Connect_Account_Message: "🔐 **Połącz swoje konto __provider__ z Rocket Chat**",
-    Login_With_Provider: "🔑 Zaloguj się z __provider__",
-    Error_Processing_Login: "❌ Błąd przetwarzania logowania: __error__",
-    Not_Authenticated: "❌ Nie jesteś obecnie uwierzytelniony z __provider__. Użyj `/email login` aby się zalogować.",
-    Logout_Confirmation: "🔓 **Potwierdzenie wylogowania**\n\nCzy na pewno chcesz się wylogować z konta **__provider__** **__email__**?",
-    Confirm_Logout: "🔒 Potwierdź wylogowanie",
-    Error_Preparing_Logout: "❌ Błąd przygotowywania wylogowania: __error__",
+    Already_Logged_In: "Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
+    Outlook_Coming_Soon: "**Uwierzytelnianie Outlook już wkrótce!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
+    Provider_Not_Implemented: "**Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwany do uwierzytelniania.\n\n",
+    Connect_Account_Message: "**Połącz swoje konto __provider__ z Rocket Chat**",
+    Login_With_Provider: "Zaloguj się z __provider__",
+    Error_Processing_Login: "Błąd przetwarzania logowania: __error__",
+    Not_Authenticated: "Nie jesteś obecnie uwierzytelniony z __provider__. Użyj `/email login` aby się zalogować.",
+    Logout_Confirmation: "**Potwierdzenie wylogowania**\n\nCzy na pewno chcesz się wylogować z konta **__provider__** **__email__**?",
+    Confirm_Logout: "Potwierdź wylogowanie",
+    Error_Preparing_Logout: "Błąd przygotowywania wylogowania: __error__",
     
     // Logout action messages
-    Provider_Not_Supported_Logout: "❌ **__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
-    Logout_Success: "✅ **Pomyślnie wylogowano z konta __provider__.**",
-    Logout_Failed: "❌ **Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
-    Logout_Error: "❌ **Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
+    Provider_Not_Supported_Logout: "**__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
+    Logout_Success: "**Pomyślnie wylogowano z konta __provider__.**",
+    Logout_Failed: "**Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
+    Logout_Error: "**Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     
     // Notification messages
     Helper_Greeting: "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
@@ -72,14 +72,14 @@ export const pl = {
     Login_Action_Text: "Zaloguj się do swojego konta e-mail",
     
     // User Preference Modal
-    User_Preference_Title: "⚙️ Preferencje użytkownika",
+    User_Preference_Title: "Preferencje użytkownika",
     User_Preference_Button_Label: "⚙️ Preferencje użytkownika",
     User_Preference_Update_Button: "Aktualizuj preferencje",
     User_Preference_Close_Button: "Zamknij",
     User_Preference_Success: "**Preferencje użytkownika zostały pomyślnie zaktualizowane!**",
     Language_Changed: "Język zmieniony na: __language__",
     Email_Provider_Changed: "Dostawca poczty e-mail zmieniony na: __provider__",
-    User_Preference_Error: "❌ **Błąd podczas aktualizacji preferencji użytkownika:**\n__error__",
+    User_Preference_Error: "**Błąd podczas aktualizacji preferencji użytkownika:**\n__error__",
     Email_Provider_Preference_Label: "Dostawca poczty e-mail",
     Email_Provider_Preference_Description: "Wybierz preferowanego dostawcę e-mail do uwierzytelniania",
     
@@ -93,5 +93,9 @@ export const pl = {
     Language_RU: "Rosyjski",
     
     // Config error messages
-    Config_Error: "❌ Błąd konfiguracji: __error__",
+    Config_Error: "Błąd konfiguracji: __error__",
+    
+    // Provider change messages
+    Provider_Changed_Auto_Logout: "Zostałeś automatycznie wylogowany z **__oldProvider__**",
+    Provider_Change_Warning: "⚠️ Ostrzeżenie: Zmiana dostawcy poczty elektronicznej automatycznie wyloguje Cię z bieżącego konta.",
 }; 

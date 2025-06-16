@@ -19,6 +19,7 @@ import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -78,6 +79,11 @@ export class ExecuteBlockActionHandler {
 
             // Return immediate success response to prevent UI timeout
             return this.context.getInteractionResponder().successResponse();
+        }
+
+        // Handle provider dropdown change to show warning
+        if (actionId === UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID) {
+            return await this.handleProviderChange(user);
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -184,6 +190,61 @@ export class ExecuteBlockActionHandler {
             
             messageBuilder.setText(t('Logout_Error', language, { error: error.message }));
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+        }
+    }
+
+    private async handleProviderChange(user: any): Promise<IUIKitResponse> {
+        try {
+            // Get user's preferred language
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Get current user preferences
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const currentPreference = await userPreferenceStorage.getUserPreference();
+
+            // Get the selected provider from the dropdown
+            const { value } = this.context.getInteractionData();
+            const selectedProvider = value as EmailProviders;
+
+            // Check if provider changed and user is currently authenticated
+            if (selectedProvider !== currentPreference.emailProvider) {
+                const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                    currentPreference.emailProvider,
+                    user.id,
+                    this.http,
+                    this.persistence,
+                    this.read,
+                    this.app.getLogger()
+                );
+
+                // Create updated preference with warning flag for modal
+                const tempPreference = {
+                    ...currentPreference,
+                    emailProvider: selectedProvider,
+                    showProviderWarning: isAuthenticated // Add flag to show warning
+                };
+
+                // Update the modal to show warning
+                const updatedModal = await UserPreferenceModal({
+                    app: this.app,
+                    modify: this.modify,
+                    existingPreference: tempPreference,
+                });
+
+                return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+            }
+
+            return this.context.getInteractionResponder().successResponse();
+        } catch (error) {
+            return this.context.getInteractionResponder().successResponse();
         }
     }
 } 

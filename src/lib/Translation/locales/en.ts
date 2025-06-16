@@ -72,7 +72,7 @@ export const en = {
     Login_Action_Text: "Login to your email account",
     
     // User Preference Modal
-    User_Preference_Title: "⚙️ User Preferences",
+    User_Preference_Title: "User Preferences",
     User_Preference_Button_Label: "⚙️ User Preferences",
     User_Preference_Update_Button: "Update Preferences",
     User_Preference_Close_Button: "Close",
@@ -93,7 +93,11 @@ export const en = {
     Language_RU: "Russian",
     
     // Config error messages
-    Config_Error: "❌ Configuration error: __error__",
+    Config_Error: "Configuration error: __error__",
+    
+    // Provider change messages
+    Provider_Changed_Auto_Logout: "You have been automatically logged out from **__oldProvider__**",
+    Provider_Change_Warning: "⚠️ Warning: Changing your email provider will automatically log you out from your current account.",
     
     
 }; 
