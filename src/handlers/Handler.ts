@@ -18,6 +18,7 @@ import { EmailProviders } from '../enums/EmailProviders';
 import { t, Language } from '../lib/Translation/translation';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
@@ -300,6 +301,56 @@ export class Handler implements IHandler {
 
         } catch (error) {
             messageBuilder.setText(t('Error_Preparing_Logout', this.language, { error: error.message }));
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async Config(): Promise<void> {
+        try {
+            // Store room ID for later use in ExecuteViewSubmitHandler (similar to how the button works)
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
+            const userPreference = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const existingPreference = await userPreference.getUserPreference();
+
+            const modal = await UserPreferenceModal({
+                app: this.app,
+                modify: this.modify,
+                existingPreference: existingPreference,
+            });
+
+            if (!modal) {
+                throw new Error('Failed to create user preference modal');
+            }
+
+            if (!this.triggerId) {
+                throw new Error('Trigger ID not available for modal opening');
+            }
+
+            await this.modify
+                .getUiController()
+                .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
+
+        } catch (error) {
+            const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+            const messageBuilder = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser)
+                .setRoom(this.room)
+                .setGroupable(false);
+
+            messageBuilder.setText(t('Config_Error', this.language, { error: error.message }));
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }

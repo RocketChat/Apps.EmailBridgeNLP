@@ -17,6 +17,7 @@ export async function sendHelperNotification(
 ${t('Help_Command', language)}
 ${t('Login_Command', language)}
 ${t('Logout_Command', language)}
+${t('Config_Command', language)}
     `;
 
     const helperMessage = modify
