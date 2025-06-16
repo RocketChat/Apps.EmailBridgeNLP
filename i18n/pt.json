@@ -57,6 +57,7 @@
 	"Help_Command": "use `/email help` - Mostrar esta mensagem de ajuda",
 	"Login_Command": "use `/email login` - Fazer login na sua conta de e-mail",
 	"Logout_Command": "use `/email logout` - Fazer logout da conta de e-mail",
+	"Config_Command": "use `/email config` - Abrir preferências do usuário e configurações",
 	"Default_Greeting": "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de e-mail.",
 	"Use_Help_Command": "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
 	"Login_Action_Text": "Fazer login na sua conta de e-mail",
@@ -99,5 +100,8 @@
 	"Outlook_Get_Emails_Failed": "Falha ao obter e-mails",
 	"Outlook_Search_Emails_Failed": "Falha ao pesquisar e-mails",
 	"Outlook_Count_Emails_Failed": "Falha ao contar e-mails",
-	"Outlook_Get_Email_Failed": "Falha ao obter e-mail"
+	"Outlook_Get_Email_Failed": "Falha ao obter e-mail",
+	"Config_No_Trigger": "❌ Não é possível abrir o modal de configuração. Tente novamente.",
+	"Config_Modal_Error": "❌ Erro ao abrir o modal de configuração. Tente novamente.",
+	"Config_Error": "❌ Erro de configuração: __error__"
 } 

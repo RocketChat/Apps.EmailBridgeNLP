@@ -55,9 +55,10 @@
 	"Helper_Greeting": "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
 	"Available_Commands": "",
 	"Help_Command": "użyj `/email help` - Pokaż tę wiadomość pomocy",
-	"Login_Command": "użyj `/email login` - Zaloguj się do swojego konta e-mail",
+	"Login_Command": "użyj `/email login` - Zaloguj się na swoje konto e-mail",
 	"Logout_Command": "użyj `/email logout` - Wyloguj się z konta e-mail",
-	"Default_Greeting": "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc Ci ze wszystkimi potrzebami e-mail.",
+	"Config_Command": "użyj `/email config` - Otwórz preferencje użytkownika i ustawienia",
+	"Default_Greeting": "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc ci ze wszystkimi potrzebami dotyczącymi e-maili.",
 	"Use_Help_Command": "Użyj `/email help` aby dowiedzieć się o wszystkich dostępnych funkcjach i poleceniach.",
 	"Login_Action_Text": "Zaloguj się do swojego konta e-mail",
 	"Language": "Język",
@@ -99,5 +100,8 @@
 	"Outlook_Get_Emails_Failed": "Nie udało się pobrać e-maili",
 	"Outlook_Search_Emails_Failed": "Nie udało się wyszukać e-maili",
 	"Outlook_Count_Emails_Failed": "Nie udało się policzyć e-maili",
-	"Outlook_Get_Email_Failed": "Nie udało się pobrać e-maila"
+	"Outlook_Get_Email_Failed": "Nie udało się pobrać e-maila",
+	"Config_No_Trigger": "❌ Nie można otworzyć modalu konfiguracji. Spróbuj ponownie.",
+	"Config_Modal_Error": "❌ Błąd podczas otwierania modalu konfiguracji. Spróbuj ponownie.",
+	"Config_Error": "❌ Błąd konfiguracji: __error__"
 } 
