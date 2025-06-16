@@ -3,18 +3,12 @@ import { settings, SettingsIds } from './Settings';
 import { EmailProviders } from '../enums/EmailProviders';
 import { IEmailSettings } from '../definition/auth/IAuth';
 
-/**
- * Initialize app settings
- */
 export async function extendSettings(settingsExtend: ISettingsExtend): Promise<void> {
     for (const setting of settings) {
         await settingsExtend.provideSetting(setting);
     }
 }
 
-/**
- * Get email settings from the app configuration
- */
 export async function getEmailSettings(settingsReader: ISettingRead): Promise<IEmailSettings> {
     const providerString = await settingsReader.getValueById(SettingsIds.EmailProvider) as string;
     
@@ -37,9 +31,6 @@ export async function getEmailSettings(settingsReader: ISettingRead): Promise<IE
     };
 }
 
-/**
- * Get OAuth settings for Google
- */
 export async function getGoogleOAuthSettings(settingsReader: ISettingRead): Promise<{[key: string]: string}> {
     return {
         oauth_client_id: await settingsReader.getValueById(SettingsIds.OAuthClientId) as string,
@@ -48,9 +39,6 @@ export async function getGoogleOAuthSettings(settingsReader: ISettingRead): Prom
     };
 }
 
-/**
- * Get OAuth settings for Outlook 
- */
 export async function getOutlookOAuthSettings(settingsReader: ISettingRead): Promise<{[key: string]: string}> {
     return {
         outlook_client_id: await settingsReader.getValueById(SettingsIds.OutlookClientId) as string,

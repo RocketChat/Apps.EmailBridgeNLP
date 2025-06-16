@@ -8,9 +8,6 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
 
-/**
- * Command utility interfaces for command handling
- */
 export interface ICommandUtilityParams {
     app: EmailBridgeNlpApp;
     params: Array<string>;

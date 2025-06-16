@@ -16,7 +16,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.SELECT,
         packageValue: 'gmail',
         required: true,
-        public: false, //Admin only
+        public: false,
         i18nLabel: 'Email_Provider_Label',
         i18nDescription: 'Email_Provider_Description',
         values: [
@@ -35,7 +35,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.STRING,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'Google_OAuth_Client_ID_Label',
         i18nDescription: 'Google_OAuth_Client_ID_Description',
     },
@@ -44,7 +44,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.PASSWORD,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'Google_OAuth_Client_Secret_Label',
         i18nDescription: 'Google_OAuth_Client_Secret_Description',
     },
@@ -53,7 +53,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.STRING,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'OAuth_Redirect_URI_Label',
         i18nDescription: 'OAuth_Redirect_URI_Description',
     },
@@ -62,7 +62,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.STRING,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'Outlook_OAuth_Client_ID_Label',
         i18nDescription: 'Outlook_OAuth_Client_ID_Description',
     },
@@ -71,7 +71,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.PASSWORD,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'Outlook_OAuth_Client_Secret_Label',
         i18nDescription: 'Outlook_OAuth_Client_Secret_Description',
     },
@@ -80,7 +80,7 @@ export const settings: Array<ISetting> = [
         type: SettingType.STRING,
         packageValue: '',
         required: true,
-        public: false, // Admin only
+        public: false,
         i18nLabel: 'Outlook_OAuth_Redirect_URI_Label',
         i18nDescription: 'Outlook_OAuth_Redirect_URI_Description',
     },

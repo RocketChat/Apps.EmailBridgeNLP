@@ -8,6 +8,7 @@ export interface IPreference {
     userId: string;
     language: Language;
     emailProvider: EmailProviders;
+    showProviderWarning?: boolean; // Optional flag to show provider change warning in modal
 }
 
 /**

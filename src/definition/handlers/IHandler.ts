@@ -9,9 +9,6 @@ import {
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
 import { Language } from '../../lib/Translation/translation';
 
-/**
- * Handler interfaces for message and action handling
- */
 export interface IHandlerParams {
     app: EmailBridgeNlpApp;
     sender: IUser;

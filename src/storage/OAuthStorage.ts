@@ -55,9 +55,6 @@ export class OAuthStorage {
         }
     }
 
-    /**
-     * Get OAuth credentials for a user
-     */
     public async getCredentials(userId: string): Promise<IOAuthCredentials | undefined> {
         try {
             const associations = this.getCredentialsAssociations(userId);
@@ -68,9 +65,6 @@ export class OAuthStorage {
         }
     }
 
-    /**
-     * Delete OAuth credentials for a user
-     */
     public async deleteCredentials(userId: string): Promise<void> {
         try {
             const associations = this.getCredentialsAssociations(userId);
@@ -135,7 +129,7 @@ export class OAuthStorage {
     /**
      * Clean up expired OAuth states (optional cleanup method)
      */
-    public async cleanupExpiredStates(): Promise<void> {
+    public async cleanupExpiredStates(): Promise<void> { // TODO: 
         // This would require a more complex query to find all states
         // For now, states are cleaned up when validated and found to be expired
     }
