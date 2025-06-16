@@ -2,6 +2,13 @@ import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/de
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 import { IOAuthCredentials, IOAuthService } from '../../definition/auth/IAuth';
 import { OAuthStorage } from '../../storage/OAuthStorage';
+import { 
+    MICROSOFT_OAUTH_URLS, 
+    MICROSOFT_OAUTH_SCOPES, 
+    AUTH_ERRORS, 
+    OAUTH_CONFIG,
+    PROTOCOL_CONSTANTS 
+} from '../../constants/AuthConstants';
 
 export class OutlookOAuthService implements IOAuthService {
     private clientId: string = '';
@@ -34,13 +41,13 @@ export class OutlookOAuthService implements IOAuthService {
             this.redirectUri = await this.settings.get('outlook_redirect_uri');
 
             if (!this.clientId || !this.clientSecret || !this.redirectUri) {
-                throw new Error('Missing required Outlook OAuth settings. Please configure the Outlook OAuth settings in the app configuration.');
+                throw new Error(AUTH_ERRORS.MISSING_OAUTH_SETTINGS);
             }
 
             this.initialized = true;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            throw new Error('Failed to initialize Outlook OAuth Service: ' + errorMessage);
+            throw new Error(AUTH_ERRORS.OUTLOOK_INITIALIZATION_FAILED + ': ' + errorMessage);
         }
     }
 
@@ -74,9 +81,6 @@ export class OutlookOAuthService implements IOAuthService {
         }
     }
 
-    /**
-     * Generate OAuth authorization URL for the user
-     */
     public async getAuthorizationUrl(userId: string): Promise<string> {
         // Generate a state parameter for security
         const state = this.generateState();
@@ -94,28 +98,21 @@ export class OutlookOAuthService implements IOAuthService {
      * Generate OAuth authorization URL for Microsoft/Outlook
      */
     public getAuthUrl(state: string): string {
-        const scopes = [
-            'https://graph.microsoft.com/Mail.ReadWrite',
-            'https://graph.microsoft.com/Mail.Send',
-            'https://graph.microsoft.com/User.Read',
-            'offline_access'
-        ];
-
         // Handle localhost development - use http for localhost
         let finalRedirectUri = this.redirectUri;
-        if (this.redirectUri.includes('localhost') && this.redirectUri.startsWith('https://')) {
-            finalRedirectUri = this.redirectUri.replace('https://', 'http://');
+        if (this.redirectUri.includes(PROTOCOL_CONSTANTS.LOCALHOST) && this.redirectUri.startsWith(PROTOCOL_CONSTANTS.HTTPS)) {
+            finalRedirectUri = this.redirectUri.replace(PROTOCOL_CONSTANTS.HTTPS, PROTOCOL_CONSTANTS.HTTP);
             this.logger.warn('Development mode: Converting HTTPS redirect URI to HTTP for localhost');
         }
 
-        const url = new URL('https://login.microsoftonline.com/common/oauth2/v2.0/authorize');
+        const url = new URL(MICROSOFT_OAUTH_URLS.AUTHORIZATION);
         url.searchParams.append('client_id', this.clientId);
-        url.searchParams.append('response_type', 'code');
+        url.searchParams.append('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
         url.searchParams.append('redirect_uri', finalRedirectUri);
         url.searchParams.append('response_mode', 'query');
-        url.searchParams.append('scope', scopes.join(' '));
+        url.searchParams.append('scope', MICROSOFT_OAUTH_SCOPES.join(' '));
         url.searchParams.append('state', state);
-        url.searchParams.append('prompt', 'select_account'); // Always show account selector
+        url.searchParams.append('prompt', OAUTH_CONFIG.PROMPT_SELECT_ACCOUNT);
 
         return url.toString();
     }
@@ -131,15 +128,15 @@ export class OutlookOAuthService implements IOAuthService {
 
             // Handle localhost development - use http for localhost
             let finalRedirectUri = this.redirectUri;
-            if (this.redirectUri.includes('localhost') && this.redirectUri.startsWith('https://')) {
-                finalRedirectUri = this.redirectUri.replace('https://', 'http://');
+            if (this.redirectUri.includes(PROTOCOL_CONSTANTS.LOCALHOST) && this.redirectUri.startsWith(PROTOCOL_CONSTANTS.HTTPS)) {
+                finalRedirectUri = this.redirectUri.replace(PROTOCOL_CONSTANTS.HTTPS, PROTOCOL_CONSTANTS.HTTP);
             }
 
-            const response = await this.http.post('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+            const response = await this.http.post(MICROSOFT_OAUTH_URLS.TOKEN, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': OAUTH_CONFIG.CONTENT_TYPE_FORM_URLENCODED,
                 },
-                content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(finalRedirectUri)}&grant_type=authorization_code`,
+                content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(finalRedirectUri)}&grant_type=${OAUTH_CONFIG.GRANT_TYPE_AUTHORIZATION_CODE}`,
             });
 
             if (response.statusCode !== 200) {
@@ -156,14 +153,14 @@ export class OutlookOAuthService implements IOAuthService {
             const data = JSON.parse(response.content || '{}');
 
             if (!data.access_token) {
-                throw new Error('No access token received from OAuth provider');
+                throw new Error(AUTH_ERRORS.NO_ACCESS_TOKEN);
             }
 
             // Get user info to get email
             const userInfo = await this.getUserInfoFromToken(data.access_token);
 
             if (!userInfo || (!userInfo.mail && !userInfo.userPrincipalName)) {
-                throw new Error('Failed to get user email from Microsoft');
+                throw new Error(AUTH_ERRORS.NO_USER_EMAIL_MICROSOFT);
             }
 
             return {
@@ -176,7 +173,7 @@ export class OutlookOAuthService implements IOAuthService {
             };
         } catch (error) {
             this.logger.error('Outlook OAuth token exchange failed:', error);
-            throw new Error(`Failed to exchange code for tokens: ${error.message}`);
+            throw new Error(`${AUTH_ERRORS.EXCHANGE_CODE_FAILED}: ${error.message}`);
         }
     }
 
@@ -185,7 +182,7 @@ export class OutlookOAuthService implements IOAuthService {
      */
     private async getUserInfoFromToken(accessToken: string): Promise<any> {
         try {
-            const response = await this.http.get('https://graph.microsoft.com/v1.0/me', {
+            const response = await this.http.get(MICROSOFT_OAUTH_URLS.USER_INFO, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
@@ -197,7 +194,7 @@ export class OutlookOAuthService implements IOAuthService {
 
             return JSON.parse(response.content || '{}');
         } catch (error) {
-            throw new Error(`Failed to get user info: ${error.message}`);
+            throw new Error(`${AUTH_ERRORS.GET_USER_INFO_FAILED}: ${error.message}`);
         }
     }
 
@@ -218,7 +215,7 @@ export class OutlookOAuthService implements IOAuthService {
                 email: userInfo.mail || userInfo.userPrincipalName
             };
         } catch (error) {
-            throw new Error(`Failed to get user info: ${error.message}`);
+            throw new Error(`${AUTH_ERRORS.GET_USER_INFO_FAILED}: ${error.message}`);
         }
     }
 
@@ -262,12 +259,11 @@ export class OutlookOAuthService implements IOAuthService {
         const credentials = await this.getCredentials(userId);
         
         if (!credentials) {
-            throw new Error('User not authenticated, please use /email login to connect your email account');
+            throw new Error(AUTH_ERRORS.USER_NOT_AUTHENTICATED);
         }
 
-        // Check if token is expired (with 5-minute buffer)
-        const bufferTime = 5 * 60 * 1000; // 5 minutes
-        if (credentials.expiry_date && (Date.now() + bufferTime) >= credentials.expiry_date) {
+        // Check if token is expired (with buffer)
+        if (credentials.expiry_date && (Date.now() + OAUTH_CONFIG.TOKEN_BUFFER_TIME) >= credentials.expiry_date) {
             if (credentials.refresh_token) {
                 try {
                     const refreshedCredentials = await this.refreshAccessToken(credentials.refresh_token);
@@ -275,10 +271,10 @@ export class OutlookOAuthService implements IOAuthService {
                     await this.saveCredentials(userId, updatedCredentials);
                     return updatedCredentials.access_token;
                 } catch (error) {
-                    throw new Error('Your authentication has expired. Please use /email login to reconnect your account');
+                    throw new Error(AUTH_ERRORS.TOKEN_EXPIRED);
                 }
             } else {
-                throw new Error('Your authentication has expired. Please use /email login to reconnect your account');
+                throw new Error(AUTH_ERRORS.TOKEN_EXPIRED);
             }
         }
 
@@ -294,11 +290,11 @@ export class OutlookOAuthService implements IOAuthService {
                 await this.initialize();
             }
 
-            const response = await this.http.post('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+            const response = await this.http.post(MICROSOFT_OAUTH_URLS.TOKEN, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': OAUTH_CONFIG.CONTENT_TYPE_FORM_URLENCODED,
                 },
-                content: `client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&refresh_token=${encodeURIComponent(refreshToken)}&grant_type=refresh_token`,
+                content: `client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&refresh_token=${encodeURIComponent(refreshToken)}&grant_type=${OAUTH_CONFIG.GRANT_TYPE_REFRESH_TOKEN}`,
             });
 
             if (response.statusCode !== 200) {
@@ -318,7 +314,7 @@ export class OutlookOAuthService implements IOAuthService {
                 scope: data.scope,
             };
         } catch (error) {
-            throw new Error(`Failed to refresh access token: ${error.message}`);
+            throw new Error(`${AUTH_ERRORS.REFRESH_TOKEN_FAILED}: ${error.message}`);
         }
     }
 
