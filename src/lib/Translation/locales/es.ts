@@ -98,6 +98,4 @@ export const es = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "Has sido desconectado automáticamente de **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Advertencia: Cambiar tu proveedor de correo electrónico te desconectará automáticamente de tu cuenta actual.",
-    
-    // Command preview - handled by hardcoded i18nTitle in EmailCommand.ts
 }; 
