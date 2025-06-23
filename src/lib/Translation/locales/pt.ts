@@ -194,6 +194,6 @@ export const pt = {
     Report_Provider_Not_Supported: "❌ **__provider__ não é suportado para relatórios.**\n\nPor favor, entre em contato com seu administrador para assistência.",
     Report_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar o relatório novamente.",
     Report_Error: "❌ **Erro ao gerar relatório de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
-    Report_Header: "📊 **Relatório de Estatísticas de E-mail**\n⏰ **Período:** Últimas 24 horas",
-    Report_Statistics: "📨 **Recebidos:** __receivedToday__ e-mails\n📤 **Enviados:** __sentToday__ e-mails\n✉️ **Não lidos:** __totalUnread__ e-mails",
+    Report_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
+    Report_Statistics: "Recebidos: __receivedToday__ e-mails\nEnviados: __sentToday__ e-mails\nNão lidos: __totalUnread__ e-mails",
 }; 
