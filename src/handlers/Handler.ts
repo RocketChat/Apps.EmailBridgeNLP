@@ -413,8 +413,7 @@ export class Handler implements IHandler {
                 this.http,
                 this.persis,
                 this.read,
-                this.app.getLogger(),
-                this.language
+                this.app.getLogger()
             );
 
             // Create a comprehensive report

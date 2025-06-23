@@ -209,6 +209,18 @@ export class EmailServiceFactory {
             
             // For other errors, provide a generic message but preserve details for logging
             throw new Error(`Failed to generate email statistics. Please try again or use '/email login' to refresh your authentication.`);
+        const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
+        const userInfo = await oauthService.getUserInfo(params.userId);
+        
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                const gmailService = new GmailService(oauthService, http, logger);
+                return await gmailService.getEmailStatistics(params, userInfo);
+            case EmailProviders.OUTLOOK:
+                const outlookService = new OutlookService(oauthService, http, logger);
+                return await outlookService.getEmailStatistics(params, userInfo);
+            default:
+                throw new Error(`Statistics not implemented for provider: ${provider}`);
         }
     }
 } 
