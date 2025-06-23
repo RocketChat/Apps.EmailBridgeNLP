@@ -196,5 +196,5 @@ export const en = {
     Report_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the report again.",
     Report_Error: "❌ **Error generating email report:**\n__error__\n\nPlease try again or contact your administrator.",
     Report_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
-    Report_Statistics: "Received: __receivedToday__ emails\nSent: __sentToday__ emails\nUnread: __totalUnread__ emails",
+    Report_Statistics: "**Received**: __receivedToday__ emails\n**Sent**: __sentToday__ emails\n**Unread**: __totalUnread__ emails",
 }; 

@@ -199,5 +199,5 @@ export const de = {
     Report_Not_Authenticated: "❌ **Sie sind nicht bei __provider__ authentifiziert.**\n\nVerwenden Sie `/email login`, um sich zuerst anzumelden, und versuchen Sie dann erneut, den Bericht zu erstellen.",
     Report_Error: "❌ **Fehler beim Erstellen des E-Mail-Berichts:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
     Report_Header: "\n📊 **E-Mail-Statistikbericht(letzte 24 Stunden)**",
-    Report_Statistics: "Empfangen: __receivedToday__ E-Mails\nGesendet: __sentToday__ E-Mails\nUngelesen: __totalUnread__ E-Mails",
+    Report_Statistics: "**Empfangen**: __receivedToday__ E-Mails\n**Gesendet**: __sentToday__ E-Mails\n**Ungelesen**: __totalUnread__ E-Mails",
 }; 
