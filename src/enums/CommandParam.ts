@@ -3,4 +3,5 @@ export enum CommandParam {
     LOGIN = 'login',
     LOGOUT = 'logout',
     CONFIG = 'config',
+    REPORT = 'report',
 } 

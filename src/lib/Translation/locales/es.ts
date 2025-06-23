@@ -193,4 +193,10 @@ export const es = {
     Log_Btn_Fallback: "Error al crear notificación con botón de inicio de sesión, recurriendo a notificación de texto",
     Log_Fallback_Err: "Error al enviar notificación de texto de respaldo",
     
+    // Report feature messages
+    Report_Provider_Not_Supported: "❌ **__provider__ no es compatible para reportes.**\n\nPor favor, contacta a tu administrador para asistencia.",
+    Report_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar el reporte nuevamente.",
+    Report_Error: "❌ **Error al generar el reporte de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Report_Header: "📊 **Reporte de Estadísticas de Correo**\n⏰ **Período:** Últimas 24 horas",
+    Report_Statistics: "📨 **Recibidos:** __receivedToday__ correos\n📤 **Enviados:** __sentToday__ correos\n✉️ **Sin leer:** __totalUnread__ correos",
 }; 

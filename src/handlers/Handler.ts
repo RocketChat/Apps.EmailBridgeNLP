@@ -22,6 +22,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
+import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -352,6 +353,85 @@ export class Handler implements IHandler {
                 .setGroupable(false);
 
             messageBuilder.setText(t(Translations.CONFIG_ERROR, this.language, { error: error.message }));
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async Report(): Promise<void> {
+        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+
+        const messageBuilder = this.modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(this.room)
+            .setGroupable(false);
+
+        try {
+            // Get user's preferred email provider from their personal settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t('Report_Provider_Not_Supported', this.language, { provider: providerName });
+                
+                messageBuilder.setText(message);
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Check if user is authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailProvider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                messageBuilder.setText(t('Report_Not_Authenticated', this.language, { provider: getProviderDisplayName(emailProvider) }));
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Get email statistics for last 24 hours
+            const statsParams: IEmailStatsParams = {
+                userId: this.sender.id,
+                hoursBack: 24
+            };
+
+            const statistics = await EmailServiceFactory.getEmailStatistics(
+                emailProvider,
+                statsParams,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Create a comprehensive report
+            const reportMessage = t('Report_Header', this.language) + '\n\n' +
+                                 t('Report_Statistics', this.language, {
+                                     receivedToday: statistics.receivedToday.toString(),
+                                     sentToday: statistics.sentToday.toString(),
+                                     totalUnread: statistics.unreadEmails.toString()
+                                 });
+            messageBuilder.setText(reportMessage);
+            
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
+        } catch (error) {
+            this.app.getLogger().error('Report generation error:', error);
+            messageBuilder.setText(
+                t('Report_Error', this.language, { error: error.message })
+            );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }

@@ -5,6 +5,9 @@ import { GoogleOAuthService } from '../auth/GoogleOAuthService';
 import { OutlookOAuthService } from '../auth/OutlookOAuthService';
 import { getGoogleOAuthSettings, getOutlookOAuthSettings } from '../../config/SettingsManager';
 import { Translations } from '../../constants/Translations';
+import { IEmailStatistics, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
+import { GmailService } from '../email/GmailService';
+import { OutlookService } from '../email/OutlookService';
 
 export class EmailServiceFactory {
     /**
@@ -132,6 +135,36 @@ export class EmailServiceFactory {
             return await oauthService.revokeToken(userId);
         } catch (error) {
             return false;
+        }
+    }
+
+    /**
+     * Get email statistics for the specified time period
+     */
+    public static async getEmailStatistics(
+        provider: EmailProviders,
+        params: IEmailStatsParams,
+        http: IHttp,
+        persistence: IPersistence,
+        read: IRead,
+        logger: ILogger
+    ): Promise<IEmailStatistics> {
+        if (!this.isProviderSupported(provider)) {
+            throw new Error(`Provider ${provider} is not supported for statistics`);
+        }
+
+        const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
+        const userInfo = await oauthService.getUserInfo(params.userId);
+        
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                const gmailService = new GmailService(oauthService, http, logger);
+                return await gmailService.getEmailStatistics(params, userInfo);
+            case EmailProviders.OUTLOOK:
+                const outlookService = new OutlookService(oauthService, http, logger);
+                return await outlookService.getEmailStatistics(params, userInfo);
+            default:
+                throw new Error(`Statistics not implemented for provider: ${provider}`);
         }
     }
 } 
