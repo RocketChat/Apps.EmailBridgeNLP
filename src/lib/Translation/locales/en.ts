@@ -197,5 +197,4 @@ export const en = {
     Report_Error: "❌ **Error generating email report:**\n__error__\n\nPlease try again or contact your administrator.",
     Report_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
     Report_Statistics: "**Received**: __receivedToday__ emails\n**Sent**: __sentToday__ emails\n**Unread**: __totalUnread__ emails",
-    Report_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
 }; 

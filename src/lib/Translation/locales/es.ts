@@ -199,5 +199,4 @@ export const es = {
     Report_Error: "❌ **Error al generar el reporte de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
     Report_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
     Report_Statistics: "**Recibidos**: __receivedToday__ correos\n**Enviados**: __sentToday__ correos\n**Sin leer**: __totalUnread__ correos",
-    Report_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e inténtalo de nuevo.",
 }; 

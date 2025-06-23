@@ -196,5 +196,4 @@ export const pl = {
     Report_Error: "❌ **Błąd podczas generowania raportu e-mail:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Report_Header: "\n📊 **Raport Statystyk E-mail(ostatnie 24 godziny)**",
     Report_Statistics: "**Otrzymane**: __receivedToday__ e-maili\n**Wysłane**: __sentToday__ e-maili\n**Nieprzeczytane**: __totalUnread__ e-maili",
-    Report_Token_Expired: "❌ **Twoja autentykacja wygasła.**\n\nUżyj `/email login`, aby ponownie połączyć swoje konto __provider__ i spróbuj ponownie.",
 }; 
