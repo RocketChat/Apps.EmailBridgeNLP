@@ -1,6 +1,9 @@
 import { IHttp, ILogger } from '@rocket.chat/apps-engine/definition/accessors';
 import { IOAuthService } from '../../definition/auth/IAuth';
 import { IEmailStatistics, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
+import { t, Language } from '../../lib/Translation/translation';
+import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
+import { EmailProviders } from '../../enums/EmailProviders';
 
 export class OutlookService {
     private oauthService: IOAuthService;
@@ -16,7 +19,7 @@ export class OutlookService {
     /**
      * Get Outlook email statistics for the specified time period
      */
-    public async getEmailStatistics(params: IEmailStatsParams, userInfo: any): Promise<IEmailStatistics> {
+    public async getEmailStatistics(params: IEmailStatsParams, userInfo: any, language: Language = Language.en): Promise<IEmailStatistics> {
         try {
             const accessToken = await this.oauthService.getValidAccessToken(params.userId);
             
@@ -62,6 +65,13 @@ export class OutlookService {
                 }
             });
 
+            // Check for API errors
+            if (receivedResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
+                sentResponse.statusCode === 401 || totalResponse.statusCode === 401) {
+                const providerName = getProviderDisplayName(EmailProviders.OUTLOOK);
+                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+            }
+
             const receivedData = JSON.parse(receivedResponse.content || '{}');
             const unreadData = JSON.parse(unreadResponse.content || '{}');
             const sentData = JSON.parse(sentResponse.content || '{}');
@@ -86,6 +96,14 @@ export class OutlookService {
 
         } catch (error) {
             this.logger.error('Outlook statistics error:', error);
+            
+            // Provide more specific error messages
+            if (error.message.includes('expired') || error.message.includes('authentication') ||
+                error.message.includes('TOKEN_EXPIRED') || error.message.includes('USER_NOT_AUTHENTICATED')) {
+                const providerName = getProviderDisplayName(EmailProviders.OUTLOOK);
+                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+            }
+            
             throw new Error(`Failed to get Outlook statistics: ${error.message}`);
         }
     }

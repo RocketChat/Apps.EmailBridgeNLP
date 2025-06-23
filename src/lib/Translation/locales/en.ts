@@ -62,7 +62,7 @@ export const en = {
     Confirm_Logout: "Confirm Logout",
     Error_Preparing_Logout: "❌ Error preparing logout: __error__",
     Provider_Not_Supported_Logout: "❌ **__provider__ is not supported for logout.**\n\nPlease contact your administrator for assistance.",
-    Logout_Success: "✅ **Successfully logged out from your __provider__ account.**\n\nYou can now login with a different account if needed.",
+    Logout_Success: "**Successfully logged out from your __provider__ account.**\n\nYou can now login with a different account if needed.",
     Logout_Failed: "❌ **Failed to logout from your email account.**\n\nPlease try again or contact your administrator.",
     Logout_Error: "❌ **Error occurred during logout process:**\n__error__\n\nPlease try again or contact your administrator.",
     Helper_Greeting: "Hey __name__! I'm Email Bot 👋. Here are some quick tips to get you started!",
@@ -197,4 +197,5 @@ export const en = {
     Report_Error: "❌ **Error generating email report:**\n__error__\n\nPlease try again or contact your administrator.",
     Report_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
     Report_Statistics: "**Received**: __receivedToday__ emails\n**Sent**: __sentToday__ emails\n**Unread**: __totalUnread__ emails",
+    Report_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
 }; 

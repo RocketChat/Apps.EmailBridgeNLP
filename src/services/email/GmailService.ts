@@ -1,6 +1,9 @@
 import { IHttp, ILogger } from '@rocket.chat/apps-engine/definition/accessors';
 import { IOAuthService } from '../../definition/auth/IAuth';
 import { IEmailStatistics, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
+import { t, Language } from '../../lib/Translation/translation';
+import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
+import { EmailProviders } from '../../enums/EmailProviders';
 
 export class GmailService {
     private oauthService: IOAuthService;
@@ -16,7 +19,7 @@ export class GmailService {
     /**
      * Get Gmail email statistics for the specified time period
      */
-    public async getEmailStatistics(params: IEmailStatsParams, userInfo: any): Promise<IEmailStatistics> {
+    public async getEmailStatistics(params: IEmailStatsParams, userInfo: any, language: Language = Language.en): Promise<IEmailStatistics> {
         try {
             const accessToken = await this.oauthService.getValidAccessToken(params.userId);
             
@@ -57,6 +60,13 @@ export class GmailService {
                 }
             });
 
+            // Check for API errors
+            if (allEmailsResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
+                receivedResponse.statusCode === 401 || sentResponse.statusCode === 401) {
+                const providerName = getProviderDisplayName(EmailProviders.GMAIL);
+                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+            }
+
             const allEmailsData = JSON.parse(allEmailsResponse.content || '{}');
             const unreadData = JSON.parse(unreadResponse.content || '{}');
             const receivedData = JSON.parse(receivedResponse.content || '{}');
@@ -81,6 +91,14 @@ export class GmailService {
 
         } catch (error) {
             this.logger.error('Gmail statistics error:', error);
+            
+            // Provide more specific error messages
+            if (error.message.includes('expired') || error.message.includes('authentication') ||
+                error.message.includes('TOKEN_EXPIRED') || error.message.includes('USER_NOT_AUTHENTICATED')) {
+                const providerName = getProviderDisplayName(EmailProviders.GMAIL);
+                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+            }
+            
             throw new Error(`Failed to get Gmail statistics: ${error.message}`);
         }
     }

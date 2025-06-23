@@ -62,7 +62,7 @@ export const pl = {
     Confirm_Logout: "Potwierdź wylogowanie",
     Error_Preparing_Logout: "❌ Błąd podczas przygotowywania wylogowania: __error__",
     Provider_Not_Supported_Logout: "❌ **__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
-    Logout_Success: "✅ **Pomyślnie wylogowano z konta __provider__.**\n\nMożesz teraz zalogować się na inne konto, jeśli to konieczne.",
+    Logout_Success: "**Pomyślnie wylogowano z konta __provider__.**\n\nMożesz teraz zalogować się na inne konto, jeśli to konieczne.",
     Logout_Failed: "❌ **Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Logout_Error: "❌ **Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Helper_Greeting: "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
@@ -196,4 +196,5 @@ export const pl = {
     Report_Error: "❌ **Błąd podczas generowania raportu e-mail:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Report_Header: "\n📊 **Raport Statystyk E-mail(ostatnie 24 godziny)**",
     Report_Statistics: "**Otrzymane**: __receivedToday__ e-maili\n**Wysłane**: __sentToday__ e-maili\n**Nieprzeczytane**: __totalUnread__ e-maili",
+    Report_Token_Expired: "❌ **Twoja autentykacja wygasła.**\n\nUżyj `/email login`, aby ponownie połączyć swoje konto __provider__ i spróbuj ponownie.",
 }; 
