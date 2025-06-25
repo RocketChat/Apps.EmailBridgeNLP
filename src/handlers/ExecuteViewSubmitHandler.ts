@@ -63,9 +63,9 @@ export class ExecuteViewSubmitHandler {
             const roomId = await roomInteractionStorage.getInteractionRoomId();
             room = roomId ? await this.read.getRoomReader().getById(roomId) : undefined;
 
-            // Parse form data
-            const languageValue = view.state?.[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID]?.[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID]?.value;
-            const emailProviderValue = view.state?.[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID]?.[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID]?.value;
+            // Parse form data - use a more robust approach to handle dynamic block IDs
+            const languageValue = this.getFormValue(view.state, UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID);
+            const emailProviderValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID);
 
             // Validate required fields
             if (!languageValue || !emailProviderValue) {
@@ -110,6 +110,7 @@ export class ExecuteViewSubmitHandler {
             );
 
             // Handle email provider change - logout if provider changed
+            let wasLoggedOut = false;
             if (oldEmailProvider !== emailProviderValue) {
                 try {
                     // Check if user is authenticated with the old provider
@@ -132,15 +133,7 @@ export class ExecuteViewSubmitHandler {
                             this.read,
                             this.app.getLogger()
                         );
-
-                        // Notify user about the provider change and logout
-                        if (room) {
-                            await sendNotification(this.read, this.modify, user, room, {
-                                message: t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
-                                    oldProvider: getProviderDisplayName(oldEmailProvider) 
-                                })
-                            });
-                        }
+                        wasLoggedOut = true;
                     }
                 } catch (logoutError) {
                     this.app.getLogger().error(t(Translations.LOG_AUTO_LOGOUT, userLanguage), logoutError);
@@ -148,11 +141,27 @@ export class ExecuteViewSubmitHandler {
                 }
             }
 
-            // Notify user about successful update
+            // Notify user about successful update with provider-specific handling
             if (room) {
-                await sendNotification(this.read, this.modify, user, room, {
-                    message: t(Translations.SUCCESS_CONFIGURATION_UPDATED, userLanguage)
-                });
+                if (oldEmailProvider !== emailProviderValue && wasLoggedOut) {
+                    // Provider changed and user was logged out - show login button for new provider
+                    const message = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
+                        oldProvider: this.getProviderDisplayName(oldEmailProvider, userLanguage)
+                    });
+                    
+                    await this.sendNotificationWithLoginButton(
+                        user, 
+                        room, 
+                        message, 
+                        emailProviderValue as EmailProviders, 
+                        userLanguage
+                    );
+                } else {
+                    // Regular preference update - show simple success message
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.SUCCESS_CONFIGURATION_UPDATED, userLanguage)
+                    });
+                }
             }
 
             return this.context.getInteractionResponder().successResponse();
@@ -280,6 +289,20 @@ export class ExecuteViewSubmitHandler {
             default:
                 return provider;
         }
+    }
+
+    private getFormValue(viewState: any, actionId: string): any {
+        if (!viewState) return undefined;
+        
+        // Search through all blocks to find the one containing our action ID
+        for (const blockId of Object.keys(viewState)) {
+            const block = viewState[blockId];
+            if (block && typeof block === 'object' && actionId in block) {
+                return block[actionId];
+            }
+        }
+        
+        return undefined;
     }
 
     private async sendNotificationWithLoginButton(
