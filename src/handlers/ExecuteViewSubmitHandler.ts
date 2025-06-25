@@ -23,6 +23,8 @@ import { Handler } from './Handler';
 import { ActionIds } from '../enums/ActionIds';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { Translations } from '../constants/Translations';
+import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -49,103 +51,144 @@ export class ExecuteViewSubmitHandler {
     }
 
     private async handleUserPreferenceSubmit(user: any, view: any): Promise<IUIKitResponse> {
+        let room: IRoom | undefined;
+        
         try {
-            // Get the room from stored interaction context (QuickReplies approach)
+            // Get room context first (outside try block to avoid scope issues)
             const roomInteractionStorage = new RoomInteractionStorage(
                 this.persistence,
                 this.read.getPersistenceReader(),
                 user.id,
             );
-            
             const roomId = await roomInteractionStorage.getInteractionRoomId();
-            let room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
-            
-            // Fallback: Try to get room from interaction context if storage failed
-            if (!room) {
-                const { room: contextRoom } = this.context.getInteractionData();
-                room = contextRoom;
+            room = roomId ? await this.read.getRoomReader().getById(roomId) : undefined;
+
+            // Parse form data
+            const languageValue = view.state?.[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID]?.[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID]?.value;
+            const emailProviderValue = view.state?.[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID]?.[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID]?.value;
+
+            // Validate required fields
+            if (!languageValue || !emailProviderValue) {
+                const currentLanguage = await getUserPreferredLanguage(
+                    this.read.getPersistenceReader(),
+                    this.persistence,
+                    user.id,
+                );
+                
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.ERROR_FILL_REQUIRED_FIELDS, currentLanguage)
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
             }
-            
-            // Get user's current language for messages
-            const currentLanguage = await getUserPreferredLanguage(
-                this.read.getPersistenceReader(),
+
+            // Get current user preference
+            const userPreferenceStorage = new UserPreferenceStorage(
                 this.persistence,
+                this.read.getPersistenceReader(),
                 user.id,
             );
-
-            // Extract values from the form
-            const state = view.state || {};
-            
-            // Get language from dropdown
-            const languageBlockState = state[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID];
-            const selectedLanguage = languageBlockState?.[UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID] as Language || currentLanguage;
-            
-            // Get email provider from dropdown
-            const emailProviderBlockState = state[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID];
-            const selectedEmailProvider = emailProviderBlockState?.[UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID] as EmailProviders || EmailProviders.GMAIL;
+            const currentPreference = await userPreferenceStorage.getUserPreference();
+            const oldEmailProvider = currentPreference.emailProvider;
 
             // Create preference object
             const preference: IPreference = {
                 userId: user.id,
-                language: selectedLanguage,
-                emailProvider: selectedEmailProvider,
+                language: languageValue,
+                emailProvider: emailProviderValue as EmailProviders,
             };
 
-            // Get current preferences to compare changes
-            const userPreference = new UserPreferenceStorage(
-                this.persistence,
+            // Update user preference
+            await userPreferenceStorage.storeUserPreference(preference);
+
+            // Get updated language for messages
+            const userLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
+                this.persistence,
                 user.id,
             );
-            
-            const currentPreference = await userPreference.getUserPreference();
-            
-            // Check if provider changed and handle auto-logout
-            const providerChanged = currentPreference && currentPreference.emailProvider !== selectedEmailProvider;
-            let wasLoggedOut = false;
-            
-            if (providerChanged) {
-                // Check if user was authenticated with the old provider
-                const wasAuthenticated = await EmailServiceFactory.isUserAuthenticated(
-                    currentPreference.emailProvider,
-                    user.id,
-                    this.http,
-                    this.persistence,
-                    this.read,
-                    this.app.getLogger()
-                );
-                
-                if (wasAuthenticated) {
-                    // Logout from old provider
-                    await EmailServiceFactory.logoutUser(
-                        currentPreference.emailProvider,
+
+            // Handle email provider change - logout if provider changed
+            if (oldEmailProvider !== emailProviderValue) {
+                try {
+                    // Check if user is authenticated with the old provider
+                    const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                        oldEmailProvider,
                         user.id,
                         this.http,
                         this.persistence,
                         this.read,
                         this.app.getLogger()
                     );
-                    wasLoggedOut = true;
+
+                    if (isAuthenticated) {
+                        // Logout from old provider
+                        await EmailServiceFactory.logoutUser(
+                            oldEmailProvider,
+                            user.id,
+                            this.http,
+                            this.persistence,
+                            this.read,
+                            this.app.getLogger()
+                        );
+
+                        // Notify user about the provider change and logout
+                        if (room) {
+                            await sendNotification(this.read, this.modify, user, room, {
+                                message: t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
+                                    oldProvider: getProviderDisplayName(oldEmailProvider) 
+                                })
+                            });
+                        }
+                    }
+                } catch (logoutError) {
+                    this.app.getLogger().error(t(Translations.LOG_AUTO_LOGOUT, userLanguage), logoutError);
+                    // Continue with preference update even if logout fails
                 }
             }
 
-            // Save the new preference
-            await userPreference.storeUserPreference(preference);
-
-            // Send success notification and handle auto-login if provider changed
-            await this.sendSuccessNotification(user, room, currentPreference, preference, selectedLanguage, wasLoggedOut, providerChanged);
+            // Notify user about successful update
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: t(Translations.SUCCESS_CONFIGURATION_UPDATED, userLanguage)
+                });
+            }
 
             return this.context.getInteractionResponder().successResponse();
 
         } catch (error) {
-            // Get user's current language for error message
+            // Log the error and get user's current language for error message
             const currentLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
                 this.persistence,
                 user.id,
             );
+            this.app.getLogger().error(t(Translations.LOG_PREF_SUBMIT, currentLanguage), error);
 
-            // Return error response - just return success as errorResponse may not accept message
+            try {
+                if (room) {
+                    // Determine specific error type and use appropriate granular message
+                    let errorMessage: string;
+                    
+                    if (error.message?.includes('network') || error.message?.includes('connection')) {
+                        errorMessage = t(Translations.ERROR_NETWORK_FAILURE, currentLanguage);
+                    } else if (error.message?.includes('config') || error.message?.includes('setting')) {
+                        errorMessage = t(Translations.ERROR_MISSING_CONFIGURATION, currentLanguage);
+                    } else if (error.message?.includes('permission') || error.message?.includes('access')) {
+                        errorMessage = t(Translations.ERROR_PERMISSION_DENIED, currentLanguage);
+                    } else {
+                        errorMessage = t(Translations.ERROR_FAIL_INTERNAL, currentLanguage);
+                    }
+
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: errorMessage
+                    });
+                }
+            } catch (notificationError) {
+                this.app.getLogger().error(t(Translations.LOG_NOTIF_ERR, currentLanguage), notificationError);
+            }
+
             return this.context.getInteractionResponder().successResponse();
         }
     }
@@ -161,30 +204,30 @@ export class ExecuteViewSubmitHandler {
     ): Promise<void> {
         try {
             // Build detailed success message showing what changed
-            let message = ""
+            let message = t(Translations.SUCCESS_CONFIGURATION_UPDATED, language);
             
             // Add details about what changed
             const changes: string[] = [];
             
             if (!oldPreference || oldPreference.language !== newPreference.language) {
-                changes.push(t('Language_Changed', language, { 
+                changes.push(t(Translations.LANGUAGE_CHANGED, language, { 
                     language: this.getLanguageDisplayName(newPreference.language, language) 
                 }));
             }
             
             if (!oldPreference || oldPreference.emailProvider !== newPreference.emailProvider) {
-                changes.push(t('Email_Provider_Changed', language, { 
+                changes.push(t(Translations.EMAIL_PROVIDER_CHANGED, language, { 
                     provider: this.getProviderDisplayName(newPreference.emailProvider, language) 
                 }));
             }
 
             if (changes.length > 0) {
-                message += changes.join('\n');
+                message += '\n' + changes.join('\n');
             }
 
             // If provider changed and user was logged out, show login message
             if (wasLoggedOut && oldPreference && oldPreference.emailProvider !== newPreference.emailProvider) {
-                message += '\n' + t('Provider_Changed_Auto_Logout', language, {
+                message += '\n' + t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, language, {
                     oldProvider: this.getProviderDisplayName(oldPreference.emailProvider, language),
                     newProvider: this.getProviderDisplayName(newPreference.emailProvider, language)
                 });
@@ -203,7 +246,7 @@ export class ExecuteViewSubmitHandler {
                 }
             }
         } catch (error) {
-            // Silent error handling for notification failures
+            this.app.getLogger().error(t(Translations.LOG_SUCCESS_ERR, Language.en), error);
         }
     }
 
@@ -211,17 +254,17 @@ export class ExecuteViewSubmitHandler {
         // Use proper translation keys for language names
         switch (targetLanguage) {
             case Language.en:
-                return t('Language_EN', displayLanguage);
+                return t(Translations.LANGUAGE_EN, displayLanguage);
             case Language.es:
-                return t('Language_ES', displayLanguage);
+                return t(Translations.LANGUAGE_ES, displayLanguage);
             case Language.ru:
-                return t('Language_RU', displayLanguage);
+                return t(Translations.LANGUAGE_RU, displayLanguage);
             case Language.de:
-                return t('Language_DE', displayLanguage);
+                return t(Translations.LANGUAGE_DE, displayLanguage);
             case Language.pl:
-                return t('Language_PL', displayLanguage);
+                return t(Translations.LANGUAGE_PL, displayLanguage);
             case Language.pt:
-                return t('Language_PT', displayLanguage);
+                return t(Translations.LANGUAGE_PT, displayLanguage);
             default:
                 return targetLanguage;
         }
@@ -231,9 +274,9 @@ export class ExecuteViewSubmitHandler {
         // Use proper translation keys for provider names
         switch (provider) {
             case EmailProviders.GMAIL:
-                return t('Gmail_Label', displayLanguage);
+                return t(Translations.GMAIL_LABEL, displayLanguage);
             case EmailProviders.OUTLOOK:
-                return t('Outlook_Label', displayLanguage);
+                return t(Translations.OUTLOOK_LABEL, displayLanguage);
             default:
                 return provider;
         }
@@ -278,7 +321,7 @@ export class ExecuteViewSubmitHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                        text: block.newPlainTextObject(t('Login_With_Provider', language, { provider: getProviderDisplayName(provider) })),
+                        text: block.newPlainTextObject(t(Translations.LOGIN_WITH_PROVIDER, language, { provider: getProviderDisplayName(provider) })),
                         url: authUrl,
                         style: ButtonStyle.PRIMARY,
                     }),
@@ -288,10 +331,17 @@ export class ExecuteViewSubmitHandler {
             messageBuilder.setBlocks(block.getBlocks());
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         } catch (error) {
-            // Fallback to regular text notification if button creation fails
-            await sendNotification(this.read, this.modify, user, room, {
-                message: message
-            });
+            // Log the button creation failure and fallback to regular text notification
+            this.app.getLogger().warn(t(Translations.LOG_BTN_FALLBACK, language), error);
+            
+            try {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: message
+                });
+            } catch (fallbackError) {
+                this.app.getLogger().error(t(Translations.LOG_FALLBACK_ERR, language), fallbackError);
+                throw fallbackError;
+            }
         }
     }
 } 

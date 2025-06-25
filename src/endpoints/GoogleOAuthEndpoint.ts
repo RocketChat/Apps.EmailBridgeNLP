@@ -14,9 +14,12 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { GoogleOAuthService } from '../services/auth/GoogleOAuthService';
 import { oauthErrorHtml, oauthSuccessHtml } from '../templates/OAuthHtmlTemplates';
 import { getGoogleOAuthSettings } from '../config/SettingsManager';
+import { OauthEndpointPaths } from '../constants/AuthConstants';
+import { Translations } from '../constants/Translations';
+import { t, Language } from '../lib/Translation/translation';
 
 export class GoogleOAuthEndpoint implements IApiEndpoint {
-    public path = 'oauth-callback';
+    public path = OauthEndpointPaths.GOOGLE_CALLBACK;
 
     constructor(private readonly app: EmailBridgeNlpApp) {}
 
@@ -29,7 +32,7 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         persistence: IPersistence
     ): Promise<IApiResponse> {
         try {
-            // Initialize OAuth service using the same method as the rest of the app
+            // Initialize OAuth service
             const oauthSettings = await getGoogleOAuthSettings(read.getEnvironmentReader().getSettings());
             const settings = {
                 get: async (key: string) => oauthSettings[key] || ''
@@ -38,39 +41,35 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
             const oauthService = new GoogleOAuthService(http, persistence, read, this.app.getLogger(), settings);
             await oauthService.initialize();
 
-            // Get code and state from query
+            // Get code and state from query parameters
             const code = request.query.code;
             const state = request.query.state;
 
             if (!code || !state) {
-                return this.createErrorResponse('Missing required parameters (code or state)');
+                return this.createErrorResponse(t(Translations.OAUTH_ENDPOINT_MISSING_PARAMETERS, Language.en));
             }
 
             // Validate the state parameter and get user ID
             const stateInfo = await oauthService.validateState(state);
             if (!stateInfo) {
-                return this.createErrorResponse('Invalid or expired authorization request');
+                return this.createErrorResponse(t(Translations.OAUTH_ENDPOINT_INVALID_STATE, Language.en));
             }
 
             // Exchange code for tokens
-            try {
-                const credentials = await oauthService.exchangeCodeForTokens(code);
+            const credentials = await oauthService.exchangeCodeForTokens(code);
 
-                // Save credentials
-                await oauthService.saveCredentials(stateInfo.userId, credentials);
+            // Save credentials
+            await oauthService.saveCredentials(stateInfo.userId, credentials);
 
-                // Return success page
-                return this.createSuccessResponse(credentials.email);
-            } catch (error) {
-                return this.createErrorResponse(`Error obtaining access token: ${error.message}`);
-            }
+            // Return success page
+            return this.createSuccessResponse(credentials.email);
         } catch (error) {
-            return this.createErrorResponse(`An error occurred: ${error.message}`);
+            return this.createErrorResponse(t(Translations.OAUTH_ENDPOINT_GENERAL_ERROR, Language.en, { error: error.message }));
         }
     }
 
     /**
-     * Page shown when authentication fails
+     * Create error response page
      */
     private createErrorResponse(errorMessage: string): IApiResponse {
         return {
@@ -83,7 +82,7 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
     }
 
     /**
-     * Page shown when authentication is successful
+     * Create success response page
      */
     private createSuccessResponse(email: string): IApiResponse {
         return {

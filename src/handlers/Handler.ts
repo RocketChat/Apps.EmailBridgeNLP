@@ -21,6 +21,7 @@ import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { Translations } from '../constants/Translations';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -71,13 +72,13 @@ export class Handler implements IHandler {
 
         block.addSectionBlock({
             text: block.newMarkdownTextObject(
-                t('Default_Greeting', this.language, { name: this.sender.name })
+                t(Translations.DEFAULT_GREETING, this.language, { name: this.sender.name })
             ),
         });
 
         block.addSectionBlock({
             text: block.newMarkdownTextObject(
-                t('Use_Help_Command', this.language)
+                t(Translations.USE_HELP_COMMAND, this.language)
             ),
         });
 
@@ -86,7 +87,7 @@ export class Handler implements IHandler {
             elements: [
                 block.newButtonElement({
                     actionId: ActionIds.USER_PREFERENCE_ACTION,
-                    text: block.newPlainTextObject(t('User_Preference_Button_Label', this.language)),
+                    text: block.newPlainTextObject(t(Translations.USER_PREFERENCE_BUTTON_LABEL, this.language)),
                     style: ButtonStyle.PRIMARY,
                 }),
             ],
@@ -119,7 +120,7 @@ export class Handler implements IHandler {
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t('Provider_Not_Implemented', this.language, { provider: providerName });
+                const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -146,7 +147,7 @@ export class Handler implements IHandler {
                         this.app.getLogger()
                     );
                     messageBuilder.setText(
-                        t('Already_Logged_In', this.language, { 
+                        t(Translations.ALREADY_LOGGED_IN, this.language, { 
                             provider: getProviderDisplayName(emailProvider), 
                             email: userInfo.email 
                         })
@@ -165,7 +166,7 @@ export class Handler implements IHandler {
                             this.app.getLogger()
                         );
                     } catch (logoutError) {
-                        // Silent error handling for cleanup attempt
+                        this.app.getLogger().error(t(Translations.LOG_LOGOUT_ERR, this.language), logoutError);
                     }
                     
                     // Fall through to show login button
@@ -187,7 +188,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    t('Connect_Account_Message', this.language, { provider: getProviderDisplayName(emailProvider) })
+                    t(Translations.CONNECT_ACCOUNT_MESSAGE, this.language, { provider: getProviderDisplayName(emailProvider) })
                 ),
             });
 
@@ -195,7 +196,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                        text: block.newPlainTextObject(t('Login_With_Provider', this.language, { provider: getProviderDisplayName(emailProvider) })),
+                        text: block.newPlainTextObject(t(Translations.LOGIN_WITH_PROVIDER, this.language, { provider: getProviderDisplayName(emailProvider) })),
                         url: authUrl,
                         style: ButtonStyle.PRIMARY,
                     }),
@@ -207,7 +208,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             messageBuilder.setText(
-                t('Error_Processing_Login', this.language, { error: error.message })
+                t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: error.message })
             );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
@@ -236,7 +237,7 @@ export class Handler implements IHandler {
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t('Provider_Not_Implemented', this.language, { provider: providerName });
+                const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -253,7 +254,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(t('Not_Authenticated', this.language, { provider: getProviderDisplayName(emailProvider) }));
+                messageBuilder.setText(t(Translations.NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -270,7 +271,7 @@ export class Handler implements IHandler {
                 );
             } catch (error) {
                 // If we can't get user info, use generic email
-                userInfo = { email: 'your account' };
+                userInfo = { email: t(Translations.GENERIC_ACCOUNT, this.language) };
             }
 
             // Create a UI block with a confirmation button
@@ -278,7 +279,7 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    t('Logout_Confirmation', this.language, { 
+                    t(Translations.LOGOUT_CONFIRMATION, this.language, { 
                         provider: getProviderDisplayName(emailProvider), 
                         email: userInfo.email 
                     })
@@ -289,7 +290,7 @@ export class Handler implements IHandler {
                 elements: [
                     block.newButtonElement({
                         actionId: ActionIds.EMAIL_LOGOUT_ACTION,
-                        text: block.newPlainTextObject(t('Confirm_Logout', this.language)),
+                        text: block.newPlainTextObject(t(Translations.CONFIRM_LOGOUT, this.language)),
                         style: ButtonStyle.DANGER,
                     }),
                 ],
@@ -300,7 +301,7 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            messageBuilder.setText(t('Error_Preparing_Logout', this.language, { error: error.message }));
+            messageBuilder.setText(t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: error.message }));
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -330,11 +331,11 @@ export class Handler implements IHandler {
             });
 
             if (!modal) {
-                throw new Error('Failed to create user preference modal');
+                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
             }
 
             if (!this.triggerId) {
-                throw new Error('Trigger ID not available for modal opening');
+                throw new Error(t(Translations.ERROR_TRIGGER_ID_MISSING, this.language));
             }
 
             await this.modify
@@ -350,7 +351,7 @@ export class Handler implements IHandler {
                 .setRoom(this.room)
                 .setGroupable(false);
 
-            messageBuilder.setText(t('Config_Error', this.language, { error: error.message }));
+            messageBuilder.setText(t(Translations.CONFIG_ERROR, this.language, { error: error.message }));
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }

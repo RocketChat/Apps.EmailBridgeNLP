@@ -7,6 +7,7 @@ import {
     supportedLanguageList,
     t,
 } from '../lib/Translation/translation';
+import { Translations } from '../constants/Translations';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 
 export const getUserPreferredLanguage = async (
@@ -40,17 +41,17 @@ export const getLanguageDisplayTextFromCode = (
 ): string => {
     switch (code) {
         case Language.en:
-            return t('Language_EN', language);
+            return t(Translations.LANGUAGE_EN, language);
         case Language.es:
-            return t('Language_ES', language);
+            return t(Translations.LANGUAGE_ES, language);
         case Language.de:
-            return t('Language_DE', language);
+            return t(Translations.LANGUAGE_DE, language);
         case Language.pl:
-            return t('Language_PL', language);
+            return t(Translations.LANGUAGE_PL, language);
         case Language.pt:
-            return t('Language_PT', language);
+            return t(Translations.LANGUAGE_PT, language);
         case Language.ru:
-            return t('Language_RU', language);
+            return t(Translations.LANGUAGE_RU, language);
         default:
             return code;
     }

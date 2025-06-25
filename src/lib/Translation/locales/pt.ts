@@ -11,6 +11,14 @@ export const pt = {
     OAuth_Redirect_URI_Label: "OAuth Redirect URI",
     OAuth_Redirect_URI_Description: "OAuth redirect URI - deve terminar com /api/apps/public/[app-id]/oauth-callback",
     
+    // Outlook OAuth Settings
+    Outlook_OAuth_Client_ID_Label: "Outlook OAuth Client ID",
+    Outlook_OAuth_Client_ID_Description: "OAuth client ID para autenticação Outlook/Microsoft",
+    Outlook_OAuth_Client_Secret_Label: "Outlook OAuth Client Secret",
+    Outlook_OAuth_Client_Secret_Description: "OAuth client secret para autenticação Outlook/Microsoft",
+    Outlook_OAuth_Redirect_URI_Label: "Outlook OAuth Redirect URI",
+    Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI para Outlook - deve terminar com /api/apps/public/[app-id]/oauth-callback",
+    
     // Commands
     Email_Command_Params: "conectar, status, desconectar, ajuda",
     Email_Command_Description: "Conecte e gerencie a integração da sua conta de email com assistência de IA.",
@@ -96,6 +104,93 @@ export const pt = {
     Config_Error: "Erro de configuração: __error__",
     
     // Provider change messages
-    Provider_Changed_Auto_Logout: "Você foi automaticamente desconectado do **__oldProvider__**.",
-    Provider_Change_Warning: "⚠️ Aviso: Alterar seu provedor de e-mail irá desconectá-lo automaticamente da sua conta atual.",
+    Provider_Changed_Auto_Logout: "Você foi automaticamente desconectado de **__oldProvider__**",
+    Provider_Change_Warning: "⚠️ Aviso: Alterar seu provedor de email irá desconectá-lo automaticamente de sua conta atual.",
+    
+    // Granular Error Messages (inspired by QuickReplies)
+    Error_Fill_Required_Fields: "Erro ao processar solicitação. Por favor, preencha todos os campos obrigatórios ❌",
+    Error_Fail_Internal: "Erro interno. Tente novamente mais tarde.",
+    Error_Network_Failure: "Falha na conexão de rede. Verifique sua conexão com a internet e tente novamente.",
+    Error_Invalid_Credentials: "Credenciais inválidas fornecidas. Verifique suas configurações OAuth.",
+    Error_Token_Expired: "Seu token de autenticação expirou. Faça login novamente.",
+    Error_Token_Invalid: "Token de autenticação é inválido. Faça login novamente.",
+    Error_Missing_Configuration: "Configuração necessária ausente. Entre em contato com seu administrador.",
+    Error_Service_Unavailable: "Serviço de email está atualmente indisponível. Tente novamente mais tarde.",
+    Error_Rate_Limit_Exceeded: "Muitas solicitações. Aguarde um momento e tente novamente.",
+    Error_Permission_Denied: "Permissão negada. Verifique as permissões de sua conta.",
+    Error_User_Info_Missing: "Erro ao recuperar informações do usuário. Tente fazer login novamente.",
+    Error_Connection_Lost: "Conexão com o serviço de email perdida. Verifique sua rede e tente novamente.",
+    Error_OAuth_Callback_Failed: "Callback OAuth falhou. Tente o processo de autenticação novamente.",
+    Error_Settings_Not_Found: "Configurações de email não configuradas. Entre em contato com seu administrador.",
+    Error_Provider_Mismatch: "Incompatibilidade na configuração do provedor de email. Entre em contato com seu administrador.",
+    
+    // Success Messages
+    Success_Connection_Established: "Conexão de email estabelecida com sucesso ✅",
+    Success_User_Info_Retrieved: "Informações do usuário recuperadas com sucesso ✅",
+    Success_Token_Refreshed: "Token de autenticação atualizado com sucesso ✅",
+    Success_Logout_Complete: "Desconectado com sucesso de sua conta de email ✅",
+    Success_Configuration_Updated: "Configuração de email atualizada com sucesso ✅",
+    
+    // OAuth Specific Errors
+    OAuth_Error_Authorization_Denied: "Autorização foi negada. Tente novamente e conceda as permissões necessárias.",
+    OAuth_Error_Invalid_State: "Parâmetro de estado OAuth inválido. Isso pode ser um problema de segurança. Tente novamente.",
+    OAuth_Error_Code_Exchange_Failed: "Erro ao trocar código de autorização por tokens. Tente novamente.",
+    OAuth_Error_Invalid_Grant: "Grant OAuth inválido. Seu código de autorização pode ter expirado. Tente novamente.",
+    OAuth_Error_Scope_Insufficient: "Permissões de escopo OAuth insuficientes. Entre em contato com seu administrador.",
+    
+    // User-Friendly Error Messages
+    User_Friendly_Auth_Error: "**Falha na Autenticação**\n\nNão conseguimos conectar à sua conta de email. Isso pode ser porque:\n• Suas credenciais expiraram\n• O serviço está temporariamente indisponível\n• Há um problema de configuração\n\nTente novamente ou entre em contato com seu administrador se o problema persistir.",
+    User_Friendly_Network_Error: "**Problema de Conexão**\n\nEstamos tendo problemas para conectar ao serviço de email. Por favor:\n• Verifique sua conexão com a internet\n• Tente novamente em alguns momentos\n• Entre em contato com o suporte se o problema continuar",
+    User_Friendly_Config_Error: "**Problema de Configuração**\n\nHá um problema com a configuração do serviço de email. Entre em contato com seu administrador para resolver este problema.",
+    
+    // Modal Error Messages
+    Modal_Error_Failed_To_Open: "Erro ao abrir modal de preferências. Tente novamente.",
+    Modal_Error_Save_Failed: "Erro ao salvar preferências. Verifique sua entrada e tente novamente.",
+    Modal_Error_Invalid_Input: "Entrada inválida fornecida. Verifique suas entradas e tente novamente.",
+    
+    // Form Validation Messages
+    Validation_Email_Required: "Endereço de email é obrigatório.",
+    Validation_Email_Invalid: "Insira um endereço de email válido.",
+    Validation_Field_Required: "Este campo é obrigatório.",
+    Validation_Field_Too_Long: "Entrada é muito longa. Comprimento máximo é __max__ caracteres.",
+    Validation_Field_Too_Short: "Entrada é muito curta. Comprimento mínimo é __min__ caracteres.",
+    
+    // OAuth Endpoint Error Messages
+    OAuth_Endpoint_Error_Obtaining_Token: "Erro ao obter token de acesso: __error__",
+    OAuth_Endpoint_General_Error: "Ocorreu um erro: __error__",
+    OAuth_Endpoint_Missing_Parameters: "Parâmetros obrigatórios ausentes (código ou estado)",
+    OAuth_Endpoint_Invalid_State: "Solicitação de autorização inválida ou expirada",
+    OAuth_Endpoint_Authentication_Failed: "Autenticação falhou",
+    OAuth_Endpoint_OAuth_Error: "Erro OAuth: __error__ - __description__",
+    OAuth_Endpoint_Enhanced_Error: "__prefix__: __message__",
+    
+    // Modal and UI Error Messages
+    Error_Modal_Creation_Failed: "Falha ao criar modal de preferências do usuário",
+    Error_Trigger_ID_Missing: "ID do gatilho não disponível para abrir modal",
+    
+    // Storage Error Messages
+    Storage_Failed_Save_Credentials: "Falha ao salvar credenciais OAuth",
+    Storage_Failed_Delete_Credentials: "Falha ao excluir credenciais OAuth", 
+    Storage_Failed_Save_State: "Falha ao salvar estado OAuth",
+    
+    // Generic Account Reference
+    Generic_Account: "sua conta",
+    
+    // OAuth Endpoint Short Keys (shorter names as requested)
+    OAuth_Redir_Err: "Incompatibilidade de URI de redirecionamento. Certifique-se de que seu registro de aplicativo Azure inclui o URI exato: __uri__",
+    OAuth_SSL_Err: "Erro de Protocolo SSL/TLS. Para desenvolvimento localhost, certifique-se de que o registro do aplicativo Azure inclui URI de redirecionamento HTTP (não HTTPS)",
+    Provider_Label: "__provider__",
+    
+    // Logger Messages (ultra-short keys)
+    Log_Logout_Err: "Erro durante tentativa de limpeza de logout",
+    Log_Async_Logout: "Erro em ação de logout assíncrona", 
+    Log_Async_Pref: "Erro em ação de preferência de usuário assíncrona",
+    Log_Pref_Handle: "Erro em handleUserPreferenceAction",
+    Log_Auto_Logout: "Erro durante logout automático na mudança de provedor",
+    Log_Pref_Submit: "Erro em handleUserPreferenceSubmit",
+    Log_Notif_Err: "Falha ao enviar notificação de erro",
+    Log_Success_Err: "Falha ao enviar notificação de sucesso", 
+    Log_Btn_Fallback: "Falha ao criar notificação com botão de login, recorrendo à notificação de texto",
+    Log_Fallback_Err: "Falha ao enviar notificação de texto de fallback",
+    
 }; 

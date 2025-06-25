@@ -2,6 +2,7 @@ import { IRead, IModify } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
+import { Translations } from '../constants/Translations';
 import { t, Language } from '../lib/Translation/translation';
 
 export async function sendHelperNotification(
@@ -12,12 +13,12 @@ export async function sendHelperNotification(
     language: Language = Language.en,
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
-    const message = `${t('Helper_Greeting', language, { name: user.name })}
+    const message = `${t(Translations.HELPER_GREETING, language, { name: user.name })}
 
-${t('Help_Command', language)}
-${t('Login_Command', language)}
-${t('Logout_Command', language)}
-${t('Config_Command', language)}
+${t(Translations.HELP_COMMAND, language)}
+${t(Translations.LOGIN_COMMAND, language)}
+${t(Translations.LOGOUT_COMMAND, language)}
+${t(Translations.CONFIG_COMMAND, language)}
     `;
 
     const helperMessage = modify
@@ -41,9 +42,9 @@ export async function sendDefaultNotification(
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
 
-    const message = `${t('Default_Greeting', language, { name: user.name })}
+    const message = `${t(Translations.DEFAULT_GREETING, language, { name: user.name })}
 
-${t('Use_Help_Command', language)}
+${t(Translations.USE_HELP_COMMAND, language)}
 
     `;
 

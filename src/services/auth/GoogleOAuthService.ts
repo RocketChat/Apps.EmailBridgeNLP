@@ -2,12 +2,12 @@ import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/de
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 import { IOAuthCredentials, IOAuthService } from '../../definition/auth/IAuth';
 import { OAuthStorage } from '../../storage/OAuthStorage';
-import { 
-    GOOGLE_OAUTH_URLS, 
-    GOOGLE_OAUTH_SCOPES, 
-    AUTH_ERRORS, 
-    OAUTH_CONFIG 
+import {
+    GoogleOauthUrls,
+    GoogleOauthScopes,
+    OauthConfig
 } from '../../constants/AuthConstants';
+import { Translations } from '../../constants/Translations';
 
 export class GoogleOAuthService implements IOAuthService {
     private clientId: string = '';
@@ -40,13 +40,13 @@ export class GoogleOAuthService implements IOAuthService {
             this.redirectUri = await this.settings.get('oauth_redirect_uri');
 
             if (!this.clientId || !this.clientSecret || !this.redirectUri) {
-                throw new Error(AUTH_ERRORS.MISSING_OAUTH_SETTINGS);
+                throw new Error(Translations.AUTH_MISSING_OAUTH_SETTINGS);
             }
 
             this.initialized = true;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            throw new Error(AUTH_ERRORS.INITIALIZATION_FAILED + ': ' + errorMessage);
+            throw new Error(Translations.AUTH_INITIALIZATION_FAILED + ': ' + errorMessage);
         }
     }
 
@@ -95,13 +95,13 @@ export class GoogleOAuthService implements IOAuthService {
     }
 
     public getAuthUrl(state: string): string {
-        const url = new URL(GOOGLE_OAUTH_URLS.AUTHORIZATION);
+        const url = new URL(GoogleOauthUrls.AUTHORIZATION);
         url.searchParams.append('client_id', this.clientId);
         url.searchParams.append('redirect_uri', this.redirectUri);
-        url.searchParams.append('response_type', OAUTH_CONFIG.RESPONSE_TYPE);
-        url.searchParams.append('access_type', OAUTH_CONFIG.ACCESS_TYPE);
-        url.searchParams.append('prompt', OAUTH_CONFIG.PROMPT_CONSENT);
-        url.searchParams.append('scope', GOOGLE_OAUTH_SCOPES.join(' '));
+        url.searchParams.append('response_type', OauthConfig.RESPONSE_TYPE);
+        url.searchParams.append('access_type', OauthConfig.ACCESS_TYPE);
+        url.searchParams.append('prompt', OauthConfig.PROMPT_CONSENT);
+        url.searchParams.append('scope', GoogleOauthScopes.join(' '));
         url.searchParams.append('state', state);
 
         return url.toString();
@@ -114,29 +114,29 @@ export class GoogleOAuthService implements IOAuthService {
                 await this.initialize();
             }
 
-            const response = await this.http.post(GOOGLE_OAUTH_URLS.TOKEN, {
+            const response = await this.http.post(GoogleOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OAUTH_CONFIG.CONTENT_TYPE_FORM_URLENCODED,
+                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
                 },
-                content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(this.redirectUri)}&grant_type=${OAUTH_CONFIG.GRANT_TYPE_AUTHORIZATION_CODE}`,
+                content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(this.redirectUri)}&grant_type=${OauthConfig.GRANT_TYPE_AUTHORIZATION_CODE}`,
             });
 
             if (response.statusCode !== 200) {
-                const errorContent = response.content || 'Unknown error';
-                throw new Error(`Failed to exchange code for tokens: HTTP ${response.statusCode}`);
+                const errorContent = response.content || Translations.COMMON_UNKNOWN_ERROR;
+                throw new Error(`${Translations.COMMON_FAILED_EXCHANGE_CODE}: HTTP ${response.statusCode}`);
             }
 
             const data = JSON.parse(response.content || '{}');
 
             if (!data.access_token) {
-                throw new Error(AUTH_ERRORS.NO_ACCESS_TOKEN);
+                throw new Error(Translations.AUTH_NO_ACCESS_TOKEN);
             }
 
             // Get user info to get email
             const userInfo = await this.getUserInfoFromToken(data.access_token);
 
             if (!userInfo || !userInfo.email) {
-                throw new Error(AUTH_ERRORS.NO_USER_EMAIL_GOOGLE);
+                throw new Error(Translations.AUTH_NO_USER_EMAIL_GOOGLE);
             }
 
             return {
@@ -148,7 +148,7 @@ export class GoogleOAuthService implements IOAuthService {
                 email: userInfo.email
             };
         } catch (error) {
-            throw new Error(`${AUTH_ERRORS.EXCHANGE_CODE_FAILED}: ${error.message}`);
+            throw new Error(`${Translations.AUTH_EXCHANGE_CODE_FAILED}: ${error.message}`);
         }
     }
 
@@ -157,19 +157,19 @@ export class GoogleOAuthService implements IOAuthService {
      */
     private async getUserInfoFromToken(accessToken: string): Promise<any> {
         try {
-            const response = await this.http.get(GOOGLE_OAUTH_URLS.USER_INFO, {
+            const response = await this.http.get(GoogleOauthUrls.USER_INFO, {
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `${OauthConfig.AUTHORIZATION_HEADER_PREFIX} ${accessToken}`
                 }
             });
 
             if (response.statusCode !== 200) {
-                throw new Error(`Failed to get user info: HTTP ${response.statusCode}`);
+                throw new Error(`${Translations.COMMON_FAILED_GET_USER_INFO}: HTTP ${response.statusCode}`);
             }
 
             return JSON.parse(response.content || '{}');
         } catch (error) {
-            throw new Error(`${AUTH_ERRORS.GET_USER_INFO_FAILED}: ${error.message}`);
+            throw new Error(`${Translations.AUTH_GET_USER_INFO_FAILED}: ${error.message}`);
         }
     }
 
@@ -182,12 +182,12 @@ export class GoogleOAuthService implements IOAuthService {
             const userInfo = await this.getUserInfoFromToken(accessToken);
             
             if (!userInfo || !userInfo.email) {
-                throw new Error('User info incomplete or missing email');
+                throw new Error(Translations.COMMON_USER_INFO_INCOMPLETE);
             }
             
             return userInfo;
         } catch (error) {
-            throw new Error(`${AUTH_ERRORS.GET_USER_INFO_FAILED}: ${error.message}`);
+            throw new Error(`${Translations.AUTH_GET_USER_INFO_FAILED}: ${error.message}`);
         }
     }
 
@@ -231,11 +231,11 @@ export class GoogleOAuthService implements IOAuthService {
         const credentials = await this.getCredentials(userId);
         
         if (!credentials) {
-            throw new Error(AUTH_ERRORS.USER_NOT_AUTHENTICATED);
+            throw new Error(Translations.AUTH_USER_NOT_AUTHENTICATED);
         }
 
         // Check if token is expired (with buffer)
-        if (credentials.expiry_date && (Date.now() + OAUTH_CONFIG.TOKEN_BUFFER_TIME) >= credentials.expiry_date) {
+        if (credentials.expiry_date && (Date.now() + OauthConfig.TOKEN_BUFFER_TIME) >= credentials.expiry_date) {
             if (credentials.refresh_token) {
                 try {
                     const refreshedCredentials = await this.refreshAccessToken(credentials.refresh_token);
@@ -243,10 +243,10 @@ export class GoogleOAuthService implements IOAuthService {
                     await this.saveCredentials(userId, updatedCredentials);
                     return updatedCredentials.access_token;
                 } catch (error) {
-                    throw new Error(AUTH_ERRORS.TOKEN_EXPIRED);
+                    throw new Error(Translations.AUTH_TOKEN_EXPIRED);
                 }
             } else {
-                throw new Error(AUTH_ERRORS.TOKEN_EXPIRED);
+                throw new Error(Translations.AUTH_TOKEN_EXPIRED);
             }
         }
 
@@ -263,15 +263,15 @@ export class GoogleOAuthService implements IOAuthService {
                 await this.initialize();
             }
 
-            const response = await this.http.post(GOOGLE_OAUTH_URLS.TOKEN, {
+            const response = await this.http.post(GoogleOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OAUTH_CONFIG.CONTENT_TYPE_FORM_URLENCODED,
+                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
                 },
-                content: `refresh_token=${encodeURIComponent(refreshToken)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&grant_type=${OAUTH_CONFIG.GRANT_TYPE_REFRESH_TOKEN}`,
+                content: `refresh_token=${encodeURIComponent(refreshToken)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&grant_type=${OauthConfig.GRANT_TYPE_REFRESH_TOKEN}`,
             });
 
             if (response.statusCode !== 200) {
-                throw new Error(`Failed to refresh token: HTTP ${response.statusCode}`);
+                throw new Error(`${Translations.COMMON_FAILED_REFRESH_TOKEN}: HTTP ${response.statusCode}`);
             }
 
             const data = JSON.parse(response.content || '{}');
@@ -283,7 +283,7 @@ export class GoogleOAuthService implements IOAuthService {
                 scope: data.scope,
             };
         } catch (error) {
-            throw new Error(`${AUTH_ERRORS.REFRESH_TOKEN_FAILED}: ${error.message}`);
+            throw new Error(`${Translations.AUTH_REFRESH_TOKEN_FAILED}: ${error.message}`);
         }
     }
 
@@ -299,7 +299,7 @@ export class GoogleOAuthService implements IOAuthService {
 
             // Revoke the token with Google
             if (credentials.access_token) {
-                await this.http.post(`${GOOGLE_OAUTH_URLS.REVOKE}?token=${credentials.access_token}`);
+                await this.http.post(`${GoogleOauthUrls.REVOKE}?token=${credentials.access_token}`);
             }
 
             // Delete stored credentials

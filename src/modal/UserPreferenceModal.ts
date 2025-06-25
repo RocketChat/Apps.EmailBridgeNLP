@@ -19,6 +19,7 @@ import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 import { getLanguageDisplayTextFromCode } from '../helper/userPreference';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { EmailProviders } from '../enums/EmailProviders';
+import { Translations } from '../constants/Translations';
 
 export async function UserPreferenceModal({
     app,
@@ -44,12 +45,12 @@ export async function UserPreferenceModal({
 
     const languageDropDown = elementBuilder.addDropDown(
         {
-            placeholder: t('Language', existingPreference.language),
+            placeholder: t(Translations.LANGUAGE, existingPreference.language),
             options: languageDropDownOption,
             initialOption: languageDropDownOption.find(
                 (option) => option.value === existingPreference.language,
             ),
-            dispatchActionConfig: [Modals.dispatchActionConfigOnSelect],
+            dispatchActionConfig: [Modals.DISPATCH_ACTION_CONFIG_ON_SELECT],
         },
         {
             blockId: UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID,
@@ -59,7 +60,7 @@ export async function UserPreferenceModal({
 
     blocks.push(
         blockBuilder.createInputBlock({
-            text: t('Language', existingPreference.language),
+            text: t(Translations.LANGUAGE, existingPreference.language),
             element: languageDropDown,
             optional: false,
         }),
@@ -70,11 +71,11 @@ export async function UserPreferenceModal({
     // Email Provider Selection
     const emailProviderOptions = [
         {
-            text: t('Gmail_Label', language),
+            text: t(Translations.GMAIL_LABEL, language),
             value: EmailProviders.GMAIL,
         },
         {
-            text: t('Outlook_Label', language),
+            text: t(Translations.OUTLOOK_LABEL, language),
             value: EmailProviders.OUTLOOK,
         },
     ];
@@ -83,12 +84,12 @@ export async function UserPreferenceModal({
 
     const emailProviderDropDown = elementBuilder.addDropDown(
         {
-            placeholder: t('Email_Provider_Preference_Description', language),
+            placeholder: t(Translations.EMAIL_PROVIDER_PREFERENCE_DESCRIPTION, language),
             options: emailProviderDropDownOption,
             initialOption: emailProviderDropDownOption.find(
                 (option) => option.value === existingPreference.emailProvider,
             ),
-            dispatchActionConfig: [Modals.dispatchActionConfigOnSelect],
+            dispatchActionConfig: [Modals.DISPATCH_ACTION_CONFIG_ON_SELECT],
         },
         {
             blockId: UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID,
@@ -98,7 +99,7 @@ export async function UserPreferenceModal({
 
     blocks.push(
         blockBuilder.createInputBlock({
-            text: t('Email_Provider_Preference_Label', language),
+            text: t(Translations.EMAIL_PROVIDER_PREFERENCE_LABEL, language),
             element: emailProviderDropDown,
             optional: false,
         }),
@@ -110,14 +111,14 @@ export async function UserPreferenceModal({
             type: 'section',
             text: {
                 type: TextObjectType.PLAIN_TEXT,
-                text: t('Provider_Change_Warning', language),
+                text: t(Translations.PROVIDER_CHANGE_WARNING, language),
             },
         } as SectionBlock);
     }
 
     const submitButton = elementBuilder.addButton(
         {
-            text: t('User_Preference_Update_Button', language),
+            text: t(Translations.USER_PREFERENCE_UPDATE_BUTTON, language),
             style: ButtonStyle.PRIMARY,
         },
         {
@@ -128,7 +129,7 @@ export async function UserPreferenceModal({
 
     const closeButton = elementBuilder.addButton(
         {
-            text: t('User_Preference_Close_Button', language),
+            text: t(Translations.USER_PREFERENCE_CLOSE_BUTTON, language),
             style: ButtonStyle.DANGER,
         },
         {
@@ -142,7 +143,7 @@ export async function UserPreferenceModal({
         type: UIKitSurfaceType.MODAL,
         title: {
             type: TextObjectType.PLAIN_TEXT,
-            text: t('User_Preference_Title', language),
+            text: t(Translations.USER_PREFERENCE_TITLE, language),
         },
         blocks: blocks,
         close: closeButton,

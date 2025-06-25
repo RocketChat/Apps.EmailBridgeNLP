@@ -11,6 +11,14 @@ export const de = {
     OAuth_Redirect_URI_Label: "OAuth Redirect URI",
     OAuth_Redirect_URI_Description: "OAuth Redirect URI - sollte enden mit /api/apps/public/[app-id]/oauth-callback",
     
+    // Outlook OAuth Settings
+    Outlook_OAuth_Client_ID_Label: "Outlook OAuth Client ID",
+    Outlook_OAuth_Client_ID_Description: "OAuth Client ID für Outlook/Microsoft-Authentifizierung",
+    Outlook_OAuth_Client_Secret_Label: "Outlook OAuth Client Secret",
+    Outlook_OAuth_Client_Secret_Description: "OAuth Client Secret für Outlook/Microsoft-Authentifizierung",
+    Outlook_OAuth_Redirect_URI_Label: "Outlook OAuth Redirect URI",
+    Outlook_OAuth_Redirect_URI_Description: "OAuth Redirect URI für Outlook - sollte enden mit /api/apps/public/[app-id]/oauth-callback",
+    
     // Commands
     Email_Command_Params: "verbinden, status, trennen, hilfe",
     Email_Command_Description: "Verbinden und verwalten Sie Ihre E-Mail-Konto-Integration mit KI-Unterstützung.",
@@ -96,8 +104,93 @@ export const de = {
     Config_Error: "Konfigurationsfehler: __error__",
     
     // Provider change messages
-    Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__**",
+    Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__** abgemeldet",
     Provider_Change_Warning: "⚠️ Warnung: Das Ändern Ihres E-Mail-Anbieters wird Sie automatisch von Ihrem aktuellen Konto abmelden.",
     
+    // Granular Error Messages (inspired by QuickReplies)
+    Error_Fill_Required_Fields: "Fehler beim Verarbeiten der Anfrage. Bitte füllen Sie alle erforderlichen Felder aus ❌",
+    Error_Fail_Internal: "Interner Fehler. Bitte versuchen Sie es später erneut.",
+    Error_Network_Failure: "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    Error_Invalid_Credentials: "Ungültige Anmeldedaten bereitgestellt. Bitte überprüfen Sie Ihre OAuth-Einstellungen.",
+    Error_Token_Expired: "Ihr Authentifizierungs-Token ist abgelaufen. Bitte melden Sie sich erneut an.",
+    Error_Token_Invalid: "Authentifizierungs-Token ist ungültig. Bitte melden Sie sich erneut an.",
+    Error_Missing_Configuration: "Erforderliche Konfiguration fehlt. Bitte kontaktieren Sie Ihren Administrator.",
+    Error_Service_Unavailable: "E-Mail-Service ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
+    Error_Rate_Limit_Exceeded: "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    Error_Permission_Denied: "Berechtigung verweigert. Bitte überprüfen Sie Ihre Kontoberechtigung.",
+    Error_User_Info_Missing: "Fehler beim Abrufen der Benutzerinformationen. Bitte versuchen Sie sich erneut anzumelden.",
+    Error_Connection_Lost: "Verbindung zum E-Mail-Service verloren. Bitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
+    Error_OAuth_Callback_Failed: "OAuth-Callback fehlgeschlagen. Bitte versuchen Sie den Authentifizierungsprozess erneut.",
+    Error_Settings_Not_Found: "E-Mail-Einstellungen nicht konfiguriert. Bitte kontaktieren Sie Ihren Administrator.",
+    Error_Provider_Mismatch: "E-Mail-Anbieter-Konfigurationsfehler. Bitte kontaktieren Sie Ihren Administrator.",
+    
+    // Success Messages
+    Success_Connection_Established: "E-Mail-Verbindung erfolgreich hergestellt ✅",
+    Success_User_Info_Retrieved: "Benutzerinformationen erfolgreich abgerufen ✅",
+    Success_Token_Refreshed: "Authentifizierungs-Token erfolgreich aktualisiert ✅",
+    Success_Logout_Complete: "Erfolgreich von Ihrem E-Mail-Konto abgemeldet ✅",
+    Success_Configuration_Updated: "E-Mail-Konfiguration erfolgreich aktualisiert ✅",
+    
+    // OAuth Specific Errors
+    OAuth_Error_Authorization_Denied: "Autorisierung wurde verweigert. Bitte versuchen Sie es erneut und gewähren Sie die erforderlichen Berechtigungen.",
+    OAuth_Error_Invalid_State: "Ungültiger OAuth-Status-Parameter. Dies könnte ein Sicherheitsproblem sein. Bitte versuchen Sie es erneut.",
+    OAuth_Error_Code_Exchange_Failed: "Fehler beim Austausch des Autorisierungscodes gegen Tokens. Bitte versuchen Sie es erneut.",
+    OAuth_Error_Invalid_Grant: "Ungültiger OAuth-Grant. Ihr Autorisierungscode könnte abgelaufen sein. Bitte versuchen Sie es erneut.",
+    OAuth_Error_Scope_Insufficient: "Unzureichende OAuth-Scope-Berechtigungen. Bitte kontaktieren Sie Ihren Administrator.",
+    
+    // User-Friendly Error Messages
+    User_Friendly_Auth_Error: "**Authentifizierungsfehler**\n\nWir konnten keine Verbindung zu Ihrem E-Mail-Konto herstellen. Dies könnte daran liegen, dass:\n• Ihre Anmeldedaten abgelaufen sind\n• Der Service vorübergehend nicht verfügbar ist\n• Es ein Konfigurationsproblem gibt\n\nBitte versuchen Sie es erneut oder kontaktieren Sie Ihren Administrator, wenn das Problem weiterhin besteht.",
+    User_Friendly_Network_Error: "**Verbindungsproblem**\n\nWir haben Probleme bei der Verbindung zum E-Mail-Service. Bitte:\n• Überprüfen Sie Ihre Internetverbindung\n• Versuchen Sie es in wenigen Augenblicken erneut\n• Kontaktieren Sie den Support, wenn das Problem weiterhin besteht",
+    User_Friendly_Config_Error: "**Konfigurationsproblem**\n\nEs gibt ein Problem mit der E-Mail-Service-Konfiguration. Bitte kontaktieren Sie Ihren Administrator, um dieses Problem zu lösen.",
+    
+    // Modal Error Messages
+    Modal_Error_Failed_To_Open: "Fehler beim Öffnen des Einstellungsmodals. Bitte versuchen Sie es erneut.",
+    Modal_Error_Save_Failed: "Fehler beim Speichern der Einstellungen. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+    Modal_Error_Invalid_Input: "Ungültige Eingabe bereitgestellt. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+    
+    // Form Validation Messages
+    Validation_Email_Required: "E-Mail-Adresse ist erforderlich.",
+    Validation_Email_Invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    Validation_Field_Required: "Dieses Feld ist erforderlich.",
+    Validation_Field_Too_Long: "Eingabe ist zu lang. Maximale Länge ist __max__ Zeichen.",
+    Validation_Field_Too_Short: "Eingabe ist zu kurz. Minimale Länge ist __min__ Zeichen.",
+    
+    // OAuth Endpoint Error Messages
+    OAuth_Endpoint_Error_Obtaining_Token: "Fehler beim Abrufen des Zugangs-Tokens: __error__",
+    OAuth_Endpoint_General_Error: "Ein Fehler ist aufgetreten: __error__",
+    OAuth_Endpoint_Missing_Parameters: "Erforderliche Parameter fehlen (Code oder Status)",
+    OAuth_Endpoint_Invalid_State: "Ungültige oder abgelaufene Autorisierungsanfrage",
+    OAuth_Endpoint_Authentication_Failed: "Authentifizierung fehlgeschlagen",
+    OAuth_Endpoint_OAuth_Error: "OAuth-Fehler: __error__ - __description__",
+    OAuth_Endpoint_Enhanced_Error: "__prefix__: __message__",
+    
+    // Modal and UI Error Messages
+    Error_Modal_Creation_Failed: "Fehler beim Erstellen des Benutzereinstellungs-Modals",
+    Error_Trigger_ID_Missing: "Trigger-ID nicht verfügbar zum Öffnen des Modals",
+    
+    // Storage Error Messages
+    Storage_Failed_Save_Credentials: "Fehler beim Speichern der OAuth-Anmeldedaten",
+    Storage_Failed_Delete_Credentials: "Fehler beim Löschen der OAuth-Anmeldedaten", 
+    Storage_Failed_Save_State: "Fehler beim Speichern des OAuth-Status",
+    
+    // Generic Account Reference
+    Generic_Account: "Ihr Konto",
+    
+    // OAuth Endpoint Short Keys (shorter names as requested)
+    OAuth_Redir_Err: "Redirect-URI-Konflikt. Stellen Sie sicher, dass Ihre Azure-App-Registrierung die exakte URI enthält: __uri__",
+    OAuth_SSL_Err: "SSL/TLS-Protokoll-Fehler. Für localhost-Entwicklung stellen Sie sicher, dass die Azure-App-Registrierung HTTP (nicht HTTPS) Redirect-URI enthält",
+    Provider_Label: "__provider__",
+    
+    // Logger Messages (ultra-short keys)
+    Log_Logout_Err: "Fehler während Logout-Cleanup-Versuch",
+    Log_Async_Logout: "Fehler bei asynchroner Logout-Aktion", 
+    Log_Async_Pref: "Fehler bei asynchroner Benutzereinstellungsaktion",
+    Log_Pref_Handle: "Fehler in handleUserPreferenceAction",
+    Log_Auto_Logout: "Fehler während automatischem Logout bei Anbieterwechsel",
+    Log_Pref_Submit: "Fehler in handleUserPreferenceSubmit",
+    Log_Notif_Err: "Fehler beim Senden der Fehlerbenachrichtigung",
+    Log_Success_Err: "Fehler beim Senden der Erfolgsbenachrichtigung", 
+    Log_Btn_Fallback: "Fehler beim Erstellen der Benachrichtigung mit Login-Button, Rückgriff auf Textbenachrichtigung",
+    Log_Fallback_Err: "Fehler beim Senden der Fallback-Textbenachrichtigung",
     
 }; 

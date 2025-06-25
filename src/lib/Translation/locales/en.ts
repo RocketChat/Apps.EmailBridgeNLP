@@ -11,6 +11,14 @@ export const en = {
     OAuth_Redirect_URI_Label: "OAuth Redirect URI",
     OAuth_Redirect_URI_Description: "OAuth redirect URI - should end with /api/apps/public/[app-id]/oauth-callback",
     
+    // Outlook OAuth Settings
+    Outlook_OAuth_Client_ID_Label: "Outlook OAuth Client ID",
+    Outlook_OAuth_Client_ID_Description: "OAuth client ID for Outlook/Microsoft authentication",
+    Outlook_OAuth_Client_Secret_Label: "Outlook OAuth Client Secret",
+    Outlook_OAuth_Client_Secret_Description: "OAuth client secret for Outlook/Microsoft authentication",
+    Outlook_OAuth_Redirect_URI_Label: "Outlook OAuth Redirect URI",
+    Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/oauth-callback",
+    
     // Commands
     Email_Command_Params: "connect, status, disconnect, help",
     Email_Command_Description: "Connect and manage your email account integration with AI assistance.",
@@ -99,5 +107,90 @@ export const en = {
     Provider_Changed_Auto_Logout: "You have been automatically logged out from **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Warning: Changing your email provider will automatically log you out from your current account.",
     
+    // Granular Error Messages (inspired by QuickReplies)
+    Error_Fill_Required_Fields: "Failed to process request. Please fill all the required fields ❌",
+    Error_Fail_Internal: "Internal error. Please try again later.",
+    Error_Network_Failure: "Network connection failed. Please check your internet connection and try again.",
+    Error_Invalid_Credentials: "Invalid credentials provided. Please check your OAuth settings.",
+    Error_Token_Expired: "Your authentication token has expired. Please login again.",
+    Error_Token_Invalid: "Authentication token is invalid. Please login again.",
+    Error_Missing_Configuration: "Missing required configuration. Please contact your administrator.",
+    Error_Service_Unavailable: "Email service is currently unavailable. Please try again later.",
+    Error_Rate_Limit_Exceeded: "Too many requests. Please wait a moment and try again.",
+    Error_Permission_Denied: "Permission denied. Please check your account permissions.",
+    Error_User_Info_Missing: "Failed to retrieve user information. Please try logging in again.",
+    Error_Connection_Lost: "Connection to email service lost. Please check your network and try again.",
+    Error_OAuth_Callback_Failed: "OAuth callback failed. Please try the authentication process again.",
+    Error_Settings_Not_Found: "Email settings not configured. Please contact your administrator.",
+    Error_Provider_Mismatch: "Email provider configuration mismatch. Please contact your administrator.",
+    
+    // Success Messages
+    Success_Connection_Established: "Email connection established successfully ✅",
+    Success_User_Info_Retrieved: "User information retrieved successfully ✅",
+    Success_Token_Refreshed: "Authentication token refreshed successfully ✅",
+    Success_Logout_Complete: "Successfully logged out from your email account ✅",
+    Success_Configuration_Updated: "Email configuration updated successfully ✅",
+    
+    // OAuth Specific Errors
+    OAuth_Error_Authorization_Denied: "Authorization was denied. Please try again and grant the necessary permissions.",
+    OAuth_Error_Invalid_State: "Invalid OAuth state parameter. This might be a security issue. Please try again.",
+    OAuth_Error_Code_Exchange_Failed: "Failed to exchange authorization code for tokens. Please try again.",
+    OAuth_Error_Invalid_Grant: "Invalid OAuth grant. Your authorization code may have expired. Please try again.",
+    OAuth_Error_Scope_Insufficient: "Insufficient OAuth scope permissions. Please contact your administrator.",
+    
+    // User-Friendly Error Messages
+    User_Friendly_Auth_Error: "**Authentication Failed**\n\nWe couldn't connect to your email account. This might be because:\n• Your credentials have expired\n• The service is temporarily unavailable\n• There's a configuration issue\n\nPlease try again or contact your administrator if the problem persists.",
+    User_Friendly_Network_Error: "**Connection Problem**\n\nWe're having trouble connecting to the email service. Please:\n• Check your internet connection\n• Try again in a few moments\n• Contact support if the problem continues",
+    User_Friendly_Config_Error: "**Configuration Issue**\n\nThere's a problem with the email service configuration. Please contact your administrator to resolve this issue.",
+    
+    // Modal Error Messages
+    Modal_Error_Failed_To_Open: "Failed to open preferences modal. Please try again.",
+    Modal_Error_Save_Failed: "Failed to save preferences. Please check your input and try again.",
+    Modal_Error_Invalid_Input: "Invalid input provided. Please check your entries and try again.",
+    
+    // Form Validation Messages
+    Validation_Email_Required: "Email address is required.",
+    Validation_Email_Invalid: "Please enter a valid email address.",
+    Validation_Field_Required: "This field is required.",
+    Validation_Field_Too_Long: "Input is too long. Maximum length is __max__ characters.",
+    Validation_Field_Too_Short: "Input is too short. Minimum length is __min__ characters.",
+    
+    // OAuth Endpoint Error Messages
+    OAuth_Endpoint_Error_Obtaining_Token: "Error obtaining access token: __error__",
+    OAuth_Endpoint_General_Error: "An error occurred: __error__",
+    OAuth_Endpoint_Missing_Parameters: "Missing required parameters (code or state)",
+    OAuth_Endpoint_Invalid_State: "Invalid or expired authorization request",
+    OAuth_Endpoint_Authentication_Failed: "Authentication failed",
+    OAuth_Endpoint_OAuth_Error: "OAuth Error: __error__ - __description__",
+    OAuth_Endpoint_Enhanced_Error: "__prefix__: __message__",
+    
+    // Modal and UI Error Messages
+    Error_Modal_Creation_Failed: "Failed to create user preference modal",
+    Error_Trigger_ID_Missing: "Trigger ID not available for modal opening",
+    
+    // Storage Error Messages
+    Storage_Failed_Save_Credentials: "Failed to save OAuth credentials",
+    Storage_Failed_Delete_Credentials: "Failed to delete OAuth credentials", 
+    Storage_Failed_Save_State: "Failed to save OAuth state",
+    
+    // Generic Account Reference
+    Generic_Account: "your account",
+    
+    // OAuth Endpoint Short Keys (shorter names as requested)
+    OAuth_Redir_Err: "Redirect URI mismatch. Please ensure your Azure app registration includes the exact URI: __uri__",
+    OAuth_SSL_Err: "SSL/TLS Protocol Error. For localhost development, ensure Azure app registration includes HTTP (not HTTPS) redirect URI",
+    Provider_Label: "__provider__",
+    
+    // Logger Messages (ultra-short keys)
+    Log_Logout_Err: "Error during logout cleanup attempt",
+    Log_Async_Logout: "Error in async logout action", 
+    Log_Async_Pref: "Error in async user preference action",
+    Log_Pref_Handle: "Error in handleUserPreferenceAction",
+    Log_Auto_Logout: "Error during automatic logout on provider change",
+    Log_Pref_Submit: "Error in handleUserPreferenceSubmit",
+    Log_Notif_Err: "Failed to send error notification",
+    Log_Success_Err: "Failed to send success notification", 
+    Log_Btn_Fallback: "Failed to create notification with login button, falling back to text notification",
+    Log_Fallback_Err: "Failed to send fallback text notification",
     
 }; 

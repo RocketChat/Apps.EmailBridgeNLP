@@ -8,6 +8,8 @@ import {
 } from '@rocket.chat/apps-engine/definition/metadata';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { IOAuthCredentials } from '../definition/auth/IAuth';
+import { Translations } from '../constants/Translations';
+import { t } from '../lib/Translation/translation';
 
 export class OAuthStorage {
     constructor(
@@ -51,7 +53,7 @@ export class OAuthStorage {
             const associations = this.getCredentialsAssociations(userId);
             await this.persistence.updateByAssociations(associations, credentials, true);
         } catch (error) {
-            throw new Error('Failed to save OAuth credentials');
+            throw new Error(t(Translations.STORAGE_FAILED_SAVE_CREDENTIALS));
         }
     }
 
@@ -70,7 +72,7 @@ export class OAuthStorage {
             const associations = this.getCredentialsAssociations(userId);
             await this.persistence.removeByAssociations(associations);
         } catch (error) {
-            throw new Error('Failed to delete OAuth credentials');
+            throw new Error(t(Translations.STORAGE_FAILED_DELETE_CREDENTIALS));
         }
     }
 
@@ -94,7 +96,7 @@ export class OAuthStorage {
             };
             await this.persistence.updateByAssociations(associations, stateData, true);
         } catch (error) {
-            throw new Error('Failed to save OAuth state');
+            throw new Error(t(Translations.STORAGE_FAILED_SAVE_STATE));
         }
     }
 
@@ -129,7 +131,7 @@ export class OAuthStorage {
     /**
      * Clean up expired OAuth states (optional cleanup method)
      */
-    public async cleanupExpiredStates(): Promise<void> { // TODO: 
+    public async cleanupExpiredStates(): Promise<void> {
         // This would require a more complex query to find all states
         // For now, states are cleaned up when validated and found to be expired
     }

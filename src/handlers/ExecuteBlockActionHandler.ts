@@ -12,7 +12,7 @@ import {
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { getUserPreferredLanguage } from '../helper/userPreference';
-import { t } from '../lib/Translation/translation';
+import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
@@ -20,6 +20,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
+import { Translations } from '../constants/Translations';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -47,7 +48,12 @@ export class ExecuteBlockActionHandler {
                     try {
                         await this.handleLogoutAction(user, room);
                     } catch (error) {
-                        // Silent error handling for async action
+                        const language = await getUserPreferredLanguage(
+                            this.read.getPersistenceReader(),
+                            this.persistence,
+                            user.id,
+                        );
+                        this.app.getLogger().error(t(Translations.LOG_ASYNC_LOGOUT, language), error);
                     }
                 });
             }
@@ -72,7 +78,12 @@ export class ExecuteBlockActionHandler {
                     try {
                         await this.handleUserPreferenceAction(user, triggerId);
                     } catch (error) {
-                        // Silent error handling for async action
+                        const language = await getUserPreferredLanguage(
+                            this.read.getPersistenceReader(),
+                            this.persistence,
+                            user.id,
+                        );
+                        this.app.getLogger().error(t(Translations.LOG_ASYNC_PREF, language), error);
                     }
                 });
             }
@@ -120,7 +131,8 @@ export class ExecuteBlockActionHandler {
                 .openSurfaceView(modal, { triggerId }, user);
 
         } catch (error) {
-            // Silent error handling
+            // For errors in this method, use English as fallback since we can't get user language easily here
+            this.app.getLogger().error(t(Translations.LOG_PREF_HANDLE, Language.en), error);
         }
     }
 
@@ -153,7 +165,7 @@ export class ExecuteBlockActionHandler {
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t('Provider_Not_Supported_Logout', language, { provider: providerName });
+                const message = t(Translations.PROVIDER_NOT_SUPPORTED_LOGOUT, language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
@@ -172,11 +184,11 @@ export class ExecuteBlockActionHandler {
 
             if (success) {
                 const providerName = getProviderDisplayName(emailProvider);
-                messageBuilder.setText(t('Logout_Success', language, { provider: providerName }));
+                messageBuilder.setText(t(Translations.LOGOUT_SUCCESS, language, { provider: providerName }));
                 await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
                 return;
             } else {
-                messageBuilder.setText(t('Logout_Failed', language));
+                messageBuilder.setText(t(Translations.LOGOUT_FAILED, language));
                 await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
                 return;
             }
@@ -188,7 +200,7 @@ export class ExecuteBlockActionHandler {
                 user.id,
             );
             
-            messageBuilder.setText(t('Logout_Error', language, { error: error.message }));
+            messageBuilder.setText(t(Translations.LOGOUT_ERROR, language, { error: error.message }));
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         }
     }

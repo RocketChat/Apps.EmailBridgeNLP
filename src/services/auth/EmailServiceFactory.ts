@@ -4,7 +4,7 @@ import { EmailProviders } from '../../enums/EmailProviders';
 import { GoogleOAuthService } from '../auth/GoogleOAuthService';
 import { OutlookOAuthService } from '../auth/OutlookOAuthService';
 import { getGoogleOAuthSettings, getOutlookOAuthSettings } from '../../config/SettingsManager';
-import { AUTH_ERRORS } from '../../constants/AuthConstants';
+import { Translations } from '../../constants/Translations';
 
 export class EmailServiceFactory {
     /**
@@ -40,7 +40,7 @@ export class EmailServiceFactory {
                 return outlookOAuthService;
 
             default:
-                throw new Error(`Unsupported email provider: ${provider}`);
+                throw new Error(`${Translations.COMMON_UNSUPPORTED_PROVIDER}: ${provider}`);
         }
     }
 
@@ -63,7 +63,7 @@ export class EmailServiceFactory {
         logger: ILogger
     ): Promise<string> {
         if (!this.isProviderSupported(provider)) {
-            throw new Error(AUTH_ERRORS.PROVIDER_NOT_SUPPORTED.replace('{provider}', provider));
+            throw new Error(Translations.AUTH_PROVIDER_NOT_SUPPORTED.replace('{provider}', provider));
         }
 
         const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
@@ -105,7 +105,7 @@ export class EmailServiceFactory {
         logger: ILogger
     ): Promise<any> {
         if (!this.isProviderSupported(provider)) {
-            throw new Error(`Provider ${provider} is not supported`);
+            throw new Error(`${Translations.COMMON_UNSUPPORTED_PROVIDER}: ${provider}`);
         }
 
         const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);

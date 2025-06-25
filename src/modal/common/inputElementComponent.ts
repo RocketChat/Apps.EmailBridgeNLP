@@ -31,7 +31,7 @@ export function inputElementComponent(
     const dispatchActionConfig: Array<InputElementDispatchAction> = [];
     
     if (dispatchActionConfigOnInput) {
-        dispatchActionConfig.push(Modals.dispatchActionConfigOnInput as InputElementDispatchAction);
+        dispatchActionConfig.push(Modals.DISPATCH_ACTION_CONFIG_ON_INPUT as InputElementDispatchAction);
     }
     
     const plainTextInputElement = elementBuilder.createPlainTextInput(
