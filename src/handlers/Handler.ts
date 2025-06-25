@@ -380,7 +380,7 @@ export class Handler implements IHandler {
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t('Report_Provider_Not_Supported', this.language, { provider: providerName });
+                const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
                 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -397,7 +397,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(t('Report_Not_Authenticated', this.language, { provider: getProviderDisplayName(emailProvider) }));
+                messageBuilder.setText(t(Translations.REPORT_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -418,8 +418,8 @@ export class Handler implements IHandler {
             );
 
             // Create a comprehensive report
-            const reportMessage = t('Report_Header', this.language) + '\n\n' +
-                                 t('Report_Statistics', this.language, {
+            const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
+                                 t(Translations.REPORT_STATISTICS, this.language, {
                                      receivedToday: statistics.receivedToday.toString(),
                                      sentToday: statistics.sentToday.toString(),
                                      totalUnread: statistics.unreadEmails.toString()
@@ -431,7 +431,7 @@ export class Handler implements IHandler {
         } catch (error) {
             this.app.getLogger().error('Report generation error:', error);
             messageBuilder.setText(
-                t('Report_Error', this.language, { error: error.message })
+                t(Translations.REPORT_ERROR, this.language, { error: error.message })
             );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }

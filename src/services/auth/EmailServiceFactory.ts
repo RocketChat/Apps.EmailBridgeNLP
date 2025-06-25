@@ -176,7 +176,7 @@ export class EmailServiceFactory {
                     error.message.includes('TOKEN_EXPIRED') ||
                     error.message.includes('USER_NOT_AUTHENTICATED')) {
                     const providerName = getProviderDisplayName(provider);
-                    throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+                    throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
                 }
                 // Re-throw other errors as-is
                 throw error;

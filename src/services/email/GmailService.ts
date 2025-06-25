@@ -4,6 +4,7 @@ import { IEmailStatistics, IEmailStatsParams } from '../../definition/lib/IEmail
 import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
+import { Translations } from '../../constants/Translations';
 
 export class GmailService {
     private oauthService: IOAuthService;
@@ -64,7 +65,7 @@ export class GmailService {
             if (allEmailsResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
                 receivedResponse.statusCode === 401 || sentResponse.statusCode === 401) {
                 const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+                throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
             }
 
             const allEmailsData = JSON.parse(allEmailsResponse.content || '{}');
@@ -96,7 +97,7 @@ export class GmailService {
             if (error.message.includes('expired') || error.message.includes('authentication') ||
                 error.message.includes('TOKEN_EXPIRED') || error.message.includes('USER_NOT_AUTHENTICATED')) {
                 const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-                throw new Error(t('Report_Token_Expired', language, { provider: providerName }));
+                throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
             }
             
             throw new Error(`Failed to get Gmail statistics: ${error.message}`);
