@@ -129,7 +129,7 @@ dist
 .vscode-test
 
 #rules
-.cursorrules
+# .cursorrules
 
 # yarn v2
 .yarn/cache
@@ -140,6 +140,7 @@ dist
 
 # Resources
 resources/
+docs/
 
 ---
 
