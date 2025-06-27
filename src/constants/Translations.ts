@@ -224,4 +224,13 @@ export const Translations = {
     // Development and Log Messages (moved from AuthConstants.ts)
     DEV_HTTPS_TO_HTTP_CONVERSION: 'Development mode: Converting HTTPS redirect URI to HTTP for localhost',
     DEV_OUTLOOK_TOKEN_EXCHANGE_FAILED: 'Outlook OAuth token exchange failed',
+
+    // Report Feature Messages
+    REPORT_COMMAND: 'Report_Command',
+    REPORT_PROVIDER_NOT_SUPPORTED: 'Report_Provider_Not_Supported',
+    REPORT_NOT_AUTHENTICATED: 'Report_Not_Authenticated',
+    REPORT_ERROR: 'Report_Error',
+    REPORT_HEADER: 'Report_Header',
+    REPORT_STATISTICS: 'Report_Statistics',
+    REPORT_TOKEN_EXPIRED: 'Report_Token_Expired',
 } as const; 

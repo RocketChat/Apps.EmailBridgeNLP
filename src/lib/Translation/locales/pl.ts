@@ -20,7 +20,7 @@ export const pl = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI dla Outlook - powinno kończyć się na /api/apps/public/[app-id]/oauth-callback",
     
     // Commands
-    Email_Command_Params: "połącz, status, rozłącz, pomoc",
+    Email_Command_Params: "połącz, status, rozłącz, pomoc, raport",
     Email_Command_Description: "Połącz i zarządzaj integracją swojego konta e-mail z pomocą AI.",
     
     // OAuth Pages
@@ -43,38 +43,35 @@ export const pl = {
     OAuth_Connection_Success: "Pomyślnie połączono z twoim kontem e-mail!",
     OAuth_Connection_Failed: "Nie udało się połączyć z twoim kontem e-mail. Spróbuj ponownie.",
     Email_Not_Connected: "Brak połączonego konta e-mail. Najpierw połącz swoje konto.",
-    Invalid_Email_Provider: "Wybrano nieprawidłowego dostawcę e-mail. Sprawdź swoje ustawienia.",
-    Authentication_Required: "Wymagane uwierzytelnianie. Połącz swoje konto e-mail.",
+    Invalid_Email_Provider: "Wybrano nieprawidłowego dostawcę e-mail. Sprawdź swoją konfigurację.",
+    Authentication_Required: "Wymagane uwierzytelnienie. Połącz swoje konto e-mail.",
     Connection_Status_Connected: "Konto e-mail jest połączone i gotowe do użycia.",
     Connection_Status_Disconnected: "Brak połączonego konta e-mail.",
-    Disconnect_Success: "Pomyślnie rozłączono konto e-mail.",
-    Disconnect_Failed: "Nie udało się rozłączyć konta e-mail.",
+    Disconnect_Success: "Konto e-mail zostało pomyślnie rozłączone.",
+    Disconnect_Failed: "Nie udało się rozłączyć twojego konta e-mail.",
     
     // Handler messages
-    Already_Logged_In: "Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
-    Outlook_Coming_Soon: "**Uwierzytelnianie Outlook już wkrótce!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
-    Provider_Not_Implemented: "**Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwany do uwierzytelniania.\n\n",
+    Already_Logged_In: "Jesteś już zalogowany jako **__provider__** (**__email__**).\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
+    Outlook_Coming_Soon: "**Uwierzytelnianie Outlook będzie wkrótce dostępne!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
+    Provider_Not_Implemented: "**Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwane do uwierzytelniania.\n\n",
     Connect_Account_Message: "**Połącz swoje konto __provider__ z Rocket Chat**",
     Login_With_Provider: "Zaloguj się z __provider__",
-    Error_Processing_Login: "Błąd przetwarzania logowania: __error__",
-    Not_Authenticated: "Nie jesteś obecnie uwierzytelniony z __provider__. Użyj `/email login` aby się zalogować.",
+    Error_Processing_Login: "Błąd podczas logowania: __error__",
+    Not_Authenticated: "Nie jesteś uwierzytelniony z __provider__. Użyj `/email login` do zalogowania.",
     Logout_Confirmation: "**Potwierdzenie wylogowania**\n\nCzy na pewno chcesz się wylogować z konta **__provider__** **__email__**?",
     Confirm_Logout: "Potwierdź wylogowanie",
-    Error_Preparing_Logout: "Błąd przygotowywania wylogowania: __error__",
-    
-    // Logout action messages
-    Provider_Not_Supported_Logout: "**__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
-    Logout_Success: "**Pomyślnie wylogowano z konta __provider__.**",
-    Logout_Failed: "**Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
-    Logout_Error: "**Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
-    
-    // Notification messages
+    Error_Preparing_Logout: "❌ Błąd podczas przygotowywania wylogowania: __error__",
+    Provider_Not_Supported_Logout: "❌ **__provider__ nie jest obsługiwany do wylogowania.**\n\nSkontaktuj się z administratorem po pomoc.",
+    Logout_Success: "**Pomyślnie wylogowano z konta __provider__.**\n\nMożesz teraz zalogować się na inne konto, jeśli to konieczne.",
+    Logout_Failed: "❌ **Nie udało się wylogować z konta e-mail.**\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
+    Logout_Error: "❌ **Wystąpił błąd podczas procesu wylogowania:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Helper_Greeting: "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
     Available_Commands: "",
     Help_Command: "użyj `/email help` - Pokaż tę wiadomość pomocy",
-    Login_Command: "użyj `/email login` - Zaloguj się do swojego konta e-mail",
+    Login_Command: "użyj `/email login` - Zaloguj się na swoje konto e-mail",
     Logout_Command: "użyj `/email logout` - Wyloguj się z konta e-mail",
     Config_Command: "użyj `/email config` - Otwórz preferencje użytkownika i ustawienia",
+    Report_Command: "użyj `/email report` - Pobierz dzienny raport statystyk e-mail",
     Default_Greeting: "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc Ci ze wszystkimi potrzebami e-mail.",
     Use_Help_Command: "Użyj `/email help` aby dowiedzieć się o wszystkich dostępnych funkcjach i poleceniach.",
     Login_Action_Text: "Zaloguj się do swojego konta e-mail",
@@ -193,4 +190,11 @@ export const pl = {
     Log_Btn_Fallback: "Nie udało się utworzyć powiadomienia z przyciskiem logowania, przełączenie na powiadomienie tekstowe",
     Log_Fallback_Err: "Nie udało się wysłać zapasowego powiadomienia tekstowego",
     
+    // Report feature messages
+    Report_Provider_Not_Supported: "❌ **__provider__ nie jest obsługiwany dla raportów.**\n\nSkontaktuj się z administratorem w celu uzyskania pomocy.",
+    Report_Not_Authenticated: "❌ **Nie jesteś uwierzytelniony z __provider__.**\n\nUżyj `/email login`, aby się najpierw zalogować, a następnie spróbuj ponownie wygenerować raport.",
+    Report_Error: "❌ **Błąd podczas generowania raportu e-mail:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
+    Report_Header: "\n📊 **Raport Statystyk E-mail(ostatnie 24 godziny)**",
+    Report_Statistics: "**Otrzymane**: __receivedToday__ e-maili\n**Wysłane**: __sentToday__ e-maili\n**Nieprzeczytane**: __totalUnread__ e-maili",
+    Report_Token_Expired: "❌ **Twoja autentykacja wygasła.**\n\nUżyj `/email login`, aby ponownie połączyć swoje konto __provider__ i spróbuj ponownie.",
 }; 

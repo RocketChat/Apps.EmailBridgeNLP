@@ -89,6 +89,9 @@ export class CommandUtility implements ICommandUtility {
             case CommandParam.CONFIG:
                 await handler.Config();
                 break;
+            case CommandParam.REPORT:
+                await handler.Report();
+                break;
             default: {
                 await handler.sendDefault();
                 break;

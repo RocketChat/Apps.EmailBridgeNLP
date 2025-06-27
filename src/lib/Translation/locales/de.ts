@@ -20,7 +20,7 @@ export const de = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth Redirect URI für Outlook - sollte enden mit /api/apps/public/[app-id]/oauth-callback",
     
     // Commands
-    Email_Command_Params: "verbinden, status, trennen, hilfe",
+    Email_Command_Params: "verbinden, status, trennen, hilfe, bericht",
     Email_Command_Description: "Verbinden und verwalten Sie Ihre E-Mail-Konto-Integration mit KI-Unterstützung.",
     
     // OAuth Pages
@@ -75,6 +75,7 @@ export const de = {
     Login_Command: "verwenden Sie `/email login` - Bei Ihrem E-Mail-Konto anmelden",
     Logout_Command: "verwenden Sie `/email logout` - Von Ihrem E-Mail-Konto abmelden",
     Config_Command: "verwenden Sie `/email config` - Benutzereinstellungen und Konfiguration öffnen",
+    Report_Command: "verwenden Sie `/email report` - Tägliche E-Mail-Statistiken abrufen",
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
     Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
@@ -107,7 +108,7 @@ export const de = {
     Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__** abgemeldet",
     Provider_Change_Warning: "⚠️ Warnung: Das Ändern Ihres E-Mail-Anbieters wird Sie automatisch von Ihrem aktuellen Konto abmelden.",
     
-    // Granular Error Messages (inspired by QuickReplies)
+    // Granular Error Messages
     Error_Fill_Required_Fields: "Fehler beim Verarbeiten der Anfrage. Bitte füllen Sie alle erforderlichen Felder aus ❌",
     Error_Fail_Internal: "Interner Fehler. Bitte versuchen Sie es später erneut.",
     Error_Network_Failure: "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
@@ -193,4 +194,11 @@ export const de = {
     Log_Btn_Fallback: "Fehler beim Erstellen der Benachrichtigung mit Login-Button, Rückgriff auf Textbenachrichtigung",
     Log_Fallback_Err: "Fehler beim Senden der Fallback-Textbenachrichtigung",
     
+    // Report feature messages
+    Report_Provider_Not_Supported: "❌ **__provider__ wird für Berichte nicht unterstützt.**\n\nBitte wenden Sie sich für Hilfe an Ihren Administrator.",
+    Report_Not_Authenticated: "❌ **Sie sind nicht bei __provider__ authentifiziert.**\n\nVerwenden Sie `/email login`, um sich zuerst anzumelden, und versuchen Sie dann erneut, den Bericht zu erstellen.",
+    Report_Error: "❌ **Fehler beim Erstellen des E-Mail-Berichts:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    Report_Header: "\n📊 **E-Mail-Statistikbericht(letzte 24 Stunden)**",
+    Report_Statistics: "**Empfangen**: __receivedToday__ E-Mails\n**Gesendet**: __sentToday__ E-Mails\n**Ungelesen**: __totalUnread__ E-Mails",
+    Report_Token_Expired: "❌ **Ihre Authentifizierung ist abgelaufen.**\n\nVerwenden Sie `/email login`, um Ihr __provider__-Konto erneut zu verbinden und versuchen Sie es erneut.",
 }; 

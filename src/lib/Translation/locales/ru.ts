@@ -1,7 +1,7 @@
 export const ru = {
     // Settings
-    Email_Provider_Label: "Поставщик Email",
-    Email_Provider_Description: "Выберите поставщика услуг электронной почты для аутентификации",
+    Email_Provider_Label: "Провайдер электронной почты",
+    Email_Provider_Description: "Выберите своего провайдера электронной почты для аутентификации",
     Gmail_Label: "Gmail",
     Outlook_Label: "Outlook/Hotmail",
     Google_OAuth_Client_ID_Label: "Google OAuth Client ID",
@@ -20,7 +20,7 @@ export const ru = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI для Outlook - должен заканчиваться на /api/apps/public/[app-id]/oauth-callback",
     
     // Commands
-    Email_Command_Params: "подключить, статус, отключить, помощь",
+    Email_Command_Params: "подключить, статус, отключить, помощь, отчет",
     Email_Command_Description: "Подключите и управляйте интеграцией вашей учетной записи электронной почты с помощью ИИ.",
     
     // OAuth Pages
@@ -36,48 +36,45 @@ export const ru = {
     Connect_Email_Action_Label: "Подключить учетную запись электронной почты",
     Check_Status_Action_Label: "Проверить статус подключения",
     Disconnect_Email_Action_Label: "Отключить электронную почту",
-    Send_Email_Action_Label: "Отправить электронную почту",
+    Send_Email_Action_Label: "Отправить письмо",
     View_Inbox_Action_Label: "Просмотреть входящие",
     
     // Messages
     OAuth_Connection_Success: "Успешно подключено к вашей учетной записи электронной почты!",
-    OAuth_Connection_Failed: "Не удалось подключиться к вашей учетной записи электронной почты. Пожалуйста, попробуйте еще раз.",
-    Email_Not_Connected: "Учетная запись электронной почты не подключена. Пожалуйста, сначала подключите свою учетную запись.",
-    Invalid_Email_Provider: "Выбран недопустимый поставщик электронной почты. Пожалуйста, проверьте свои настройки.",
-    Authentication_Required: "Требуется аутентификация. Пожалуйста, подключите свою учетную запись электронной почты.",
+    OAuth_Connection_Failed: "Не удалось подключиться к вашей учетной записи электронной почты. Попробуйте еще раз.",
+    Email_Not_Connected: "Нет подключенной учетной записи электронной почты. Сначала подключите свою учетную запись.",
+    Invalid_Email_Provider: "Выбран недопустимый провайдер электронной почты. Проверьте свою конфигурацию.",
+    Authentication_Required: "Требуется аутентификация. Подключите свою учетную запись электронной почты.",
     Connection_Status_Connected: "Учетная запись электронной почты подключена и готова к использованию.",
-    Connection_Status_Disconnected: "Учетная запись электронной почты не подключена.",
+    Connection_Status_Disconnected: "Нет подключенной учетной записи электронной почты.",
     Disconnect_Success: "Учетная запись электронной почты успешно отключена.",
     Disconnect_Failed: "Не удалось отключить вашу учетную запись электронной почты.",
     
     // Handler messages
-    Already_Logged_In: "Вы уже вошли в систему с **__provider__** как **__email__**.\n\nЕсли хотите выйти, используйте `/email logout`.",
-    Outlook_Coming_Soon: "**Аутентификация Outlook появится в ближайшее время!**\n\nПока что используйте **Gmail** для аутентификации электронной почты.\n\n",
+    Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите отключиться, используйте `/email logout`.",
+    Outlook_Coming_Soon: "**Аутентификация Outlook будет доступна в ближайшее время!**\n\nПока что используйте **Gmail** для аутентификации электронной почты.\n\n",
     Provider_Not_Implemented: "**Аутентификация __provider__ еще не реализована.**\n\nВ настоящее время поддерживается только **Gmail** для аутентификации.\n\n",
     Connect_Account_Message: "**Подключите свою учетную запись __provider__ к Rocket Chat**",
-    Login_With_Provider: "Войти с __provider__",
-    Error_Processing_Login: "Ошибка обработки входа в систему: __error__",
-    Not_Authenticated: "Вы не аутентифицированы с __provider__. Используйте `/email login` для входа в систему.",
+    Login_With_Provider: "Войти через __provider__",
+    Error_Processing_Login: "Ошибка при входе: __error__",
+    Not_Authenticated: "Вы не аутентифицированы в __provider__. Используйте `/email login` для входа.",
     Logout_Confirmation: "**Подтверждение выхода**\n\nВы уверены, что хотите выйти из учетной записи **__provider__** **__email__**?",
     Confirm_Logout: "Подтвердить выход",
-    Error_Preparing_Logout: "Ошибка подготовки выхода: __error__",
-    
-    // Logout action messages
-    Provider_Not_Supported_Logout: "**__provider__ не поддерживается для выхода.**\n\nПожалуйста, обратитесь к администратору за помощью.",
-    Logout_Success: "**Успешно вышли из вашей учетной записи __provider__.**",
-    Logout_Failed: "**Не удалось выйти из вашей учетной записи электронной почты.**\n\nПожалуйста, попробуйте еще раз или обратитесь к администратору.",
-    Logout_Error: "**Произошла ошибка в процессе выхода:**\n__error__\n\nПожалуйста, попробуйте еще раз или обратитесь к администратору.",
-    
-    // Notification messages
-    Helper_Greeting: "Привет __name__! Я Email Bot 👋. Вот несколько быстрых советов для начала работы!",
+    Error_Preparing_Logout: "❌ Ошибка при подготовке к выходу: __error__",
+    Provider_Not_Supported_Logout: "❌ **__provider__ не поддерживается для выхода.**\n\nОбратитесь к администратору за помощью.",
+    Logout_Success: "**Успешно вышли из учетной записи __provider__.**\n\nТеперь вы можете войти в другую учетную запись, если необходимо.",
+    Logout_Failed: "❌ **Не удалось выйти из учетной записи электронной почты.**\n\nПопробуйте еще раз или обратитесь к администратору.",
+    Logout_Error: "❌ **Произошла ошибка в процессе выхода:**\n__error__\n\nПопробуйте еще раз или обратитесь к администратору.",
+    Helper_Greeting: "Привет __name__! Я Email Bot 👋. Вот несколько быстрых советов для начала!",
     Available_Commands: "",
-    Help_Command: "используйте `/email help` - Показать это справочное сообщение",
-    Login_Command: "используйте `/email login` - Войти в вашу учетную запись электронной почты",
-    Logout_Command: "используйте `/email logout` - Выйти из вашей учетной записи электронной почты",
+    Help_Command: "используйте `/email help` - Показать это сообщение помощи",
+    Login_Command: "используйте `/email login` - Войти в свою учетную запись электронной почты",
+    Logout_Command: "используйте `/email logout` - Выйти из учетной записи электронной почты",
     Config_Command: "используйте `/email config` - Открыть пользовательские настройки и конфигурацию",
-    Default_Greeting: "Привет __name__! Я Email Bot 👋. Я могу помочь вам со всеми вашими потребностями в электронной почте.",
+    Report_Command: "используйте `/email report` - Получить ежедневный отчет статистики электронной почты",
+    Default_Greeting: "Привет __name__! Я Email Bot 👋. Я могу помочь вам со всеми вашими потребностями электронной почты.",
     Use_Help_Command: "Используйте `/email help`, чтобы узнать обо всех доступных функциях и командах.",
-    Login_Action_Text: "Войти в вашу учетную запись электронной почты",
+    Login_Action_Text: "Войти в свою учетную запись электронной почты",
     
     // User Preference Modal
     User_Preference_Title: "Пользовательские настройки",
@@ -86,10 +83,10 @@ export const ru = {
     User_Preference_Close_Button: "Закрыть",
     User_Preference_Success: "**Пользовательские настройки успешно обновлены!**",
     Language_Changed: "Язык изменен на: __language__",
-    Email_Provider_Changed: "Поставщик электронной почты изменен на: __provider__",
+    Email_Provider_Changed: "Провайдер электронной почты изменен на: __provider__",
     User_Preference_Error: "**Не удалось обновить пользовательские настройки:**\n__error__",
-    Email_Provider_Preference_Label: "Поставщик электронной почты",
-    Email_Provider_Preference_Description: "Выберите предпочитаемого поставщика электронной почты для аутентификации",
+    Email_Provider_Preference_Label: "Провайдер электронной почты",
+    Email_Provider_Preference_Description: "Выберите предпочтительного провайдера электронной почты для аутентификации",
     
     // Language names
     Language: "Язык",
@@ -193,4 +190,11 @@ export const ru = {
     Log_Btn_Fallback: "Не удалось создать уведомление с кнопкой входа, переход к текстовому уведомлению",
     Log_Fallback_Err: "Не удалось отправить резервное текстовое уведомление",
     
+    // Report feature messages
+    Report_Provider_Not_Supported: "❌ **__provider__ не поддерживается для отчетов.**\n\nПожалуйста, обратитесь к администратору за помощью.",
+    Report_Not_Authenticated: "❌ **Вы не аутентифицированы с __provider__.**\n\nИспользуйте `/email login` для входа в систему сначала, затем попробуйте создать отчет снова.",
+    Report_Error: "❌ **Ошибка при создании отчета электронной почты:**\n__error__\n\nПожалуйста, попробуйте снова или обратитесь к администратору.",
+    Report_Header: "\n📊 **Отчет Статистики Электронной Почты(последние 24 часа)**",
+    Report_Statistics: "**Получено**: __receivedToday__ писем\n**Отправлено**: __sentToday__ писем\n**Непрочитанные**: __totalUnread__ писем",
+    Report_Token_Expired: "❌ **Ваша аутентификация истекла.**\n\nИспользуйте `/email login`, чтобы переподключить свою учетную запись __provider__ и попробуйте снова.",
 }; 
