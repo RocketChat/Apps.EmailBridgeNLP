@@ -296,4 +296,11 @@ export const Translations = {
     // Send email with status
     SEND_EMAIL_SUCCESS_WITH_EMOJI: 'Send_Email_Success_With_Emoji',
     SEND_EMAIL_FAILED_WITH_EMOJI: 'Send_Email_Failed_With_Emoji',
+
+    // New keys
+    EMAIL_SENT_CONFIRMATION: 'EMAIL_SENT_CONFIRMATION',
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: 'SEND_ACTION_TEXT',
+    EDIT_SEND_ACTION_TEXT: 'EDIT_SEND_ACTION_TEXT',
 } as const; 

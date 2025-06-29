@@ -23,4 +23,12 @@ export interface ILLMResponse {
         completion_tokens: number;
         total_tokens: number;
     };
+}
+
+export interface IToolExecutionResult {
+    tool_name: string;
+    success: boolean;
+    message: string;
+    error?: string;
+    modal_opened?: boolean;
 } 

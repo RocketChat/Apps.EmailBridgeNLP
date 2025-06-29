@@ -1,3 +1,5 @@
+import { LlmTools } from "../enums/LlmTools";
+
 export const LlmPrompts = {
 
     SYSTEM_PROMPT: 
@@ -131,13 +133,6 @@ export const LlmPrompts = {
     `
     ,
 
-    AVAILABLE_TOOLS: [
-        'send-email',
-        'count-emails',
-        'search-emails',
-        'get-email-content',
-        'summarize-and-send-email',
-        'report'
-    ],
+    AVAILABLE_TOOLS: [LlmTools.SEND_EMAIL],
 
 };
