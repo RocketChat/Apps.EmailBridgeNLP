@@ -22,22 +22,22 @@ export const LlmPrompts = {
     1. send-email  
     → Sends an email to recipient(s).  
     Fields:
-    - "to": [string] — Required recipient list  
+    - "to": [string] — Optional recipient list  
     - "subject": string — Email subject  
-    - "content": string — Email body content  
+    - "content": string — Email body content. 
     - "cc": [string] — Optional CC list
     
     2. count-emails  
     → Returns the number of emails received in a date range.  
     Fields:
-    - "start_date": string (YYYY-MM-DD)  
-    - "end_date": string (YYYY-MM-DD)
+    - "start_date": string (YYYY-MM-DD) - Required
+    - "end_date": string (YYYY-MM-DD) - Required
     
     3. search-emails  
     → Finds emails matching a keyword, folder, or date range.  
     Fields:
-    - "start_date": string (YYYY-MM-DD) — optional
-    - "end_date": string (YYYY-MM-DD) — optional
+    - "start_date": string (YYYY-MM-DD) — Optional
+    - "end_date": string (YYYY-MM-DD) — Optional
     - "keyword": string — optional
     - "folder": string ("inbox" or "sent") — optional
     
@@ -49,10 +49,10 @@ export const LlmPrompts = {
     5. summarize-and-send-email  
     → Summarizes a conversation in thread/channel and sends it to a recipient(s).  
     Fields:
-    - "to": [string] — Recipient list  
+    - "to": [string] — Optional recipient list  
     - "cc": [string] — Optional CC list
-    - "start_date": string (YYYY-MM-DD) — optional
-    - "end_date": string (YYYY-MM-DD) — optional
+    - "start_date": string (YYYY-MM-DD) — Optional
+    - "end_date": string (YYYY-MM-DD) — Optional
     - "people": [string] — Optional list of usernames starting with @, to consider for extracting messages in conversation
     
     6. report  
@@ -71,8 +71,9 @@ export const LlmPrompts = {
     5. If only one email is given, still use array.
     6. "days" must be an integer number (no quotes).
     7. Populate subject and content fields if possible, according to the user's query.
-    8. For "people" field in summarize-and-send-email:
-       - If usernames have @ prefix (e.g., "@alice", "@bob") → include them: ["@alice", "@bob"]
+    8. The email "content" field MUST be formatted for readability with line breaks
+    9. For "people" field in summarize-and-send-email:
+       - If usernames have @ prefix (e.g., "@alice", "bob") → include them: ["@alice"]
        - If usernames have NO @ prefix (e.g., "alice", "bob") → use empty array: []
     
     ---

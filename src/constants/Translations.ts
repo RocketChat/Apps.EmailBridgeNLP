@@ -244,4 +244,56 @@ export const Translations = {
     // User Preference Modal
     NEW_CATEGORY_LABEL: 'New_Category_Label',
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
+    // Tool Calling Messages
+    LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
+    LLM_TOOL_DETECTED: 'LLM_Tool_Detected', 
+    LLM_NO_TOOL_DETECTED: 'LLM_No_Tool_Detected',
+    LLM_ERROR_PROCESSING: 'LLM_Error_Processing',
+    TOOL_CALL_RESULT: 'Tool_Call_Result',
+    TOOL_NAME_LABEL: 'Tool_Name_Label',
+    TOOL_ARGS_LABEL: 'Tool_Args_Label',
+    QUERY_PROCESSED_SUCCESS: 'Query_Processed_Success',
+    INVALID_TOOL_NAME: 'Invalid_Tool_Name',
+    LLM_PARSING_FAILED: 'LLM_Parsing_Failed',
+    
+    // Tool Names (for user display)
+    TOOL_SEND_EMAIL: 'Tool_Send_Email',
+    TOOL_COUNT_EMAILS: 'Tool_Count_Emails',
+    TOOL_SEARCH_EMAILS: 'Tool_Search_Emails',
+    TOOL_GET_EMAIL_CONTENT: 'Tool_Get_Email_Content',
+    TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
+    TOOL_REPORT: 'Tool_Report',
+
+    // Send Email Modal
+    SEND_EMAIL_MODAL_TITLE: 'Send_Email_Modal_Title',
+    SEND_EMAIL_TO_LABEL: 'Send_Email_To_Label',
+    SEND_EMAIL_TO_PLACEHOLDER: 'Send_Email_To_Placeholder',
+    SEND_EMAIL_CC_LABEL: 'Send_Email_CC_Label',
+    SEND_EMAIL_CC_PLACEHOLDER: 'Send_Email_CC_Placeholder',
+    SEND_EMAIL_SUBJECT_LABEL: 'Send_Email_Subject_Label',
+    SEND_EMAIL_SUBJECT_PLACEHOLDER: 'Send_Email_Subject_Placeholder',
+    SEND_EMAIL_CONTENT_LABEL: 'Send_Email_Content_Label',
+    SEND_EMAIL_CONTENT_PLACEHOLDER: 'Send_Email_Content_Placeholder',
+    SEND_EMAIL_SEND_BUTTON: 'Send_Email_Send_Button',
+    SEND_EMAIL_CANCEL_BUTTON: 'Send_Email_Cancel_Button',
+    SEND_EMAIL_MODAL_OPENED: 'Send_Email_Modal_Opened',
+    
+    // Send Email Button translations
+    EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',
+    EMAIL_SEND_BUTTON: 'Email_Send_Button',
+    EMAIL_EDIT_AND_SEND_BUTTON: 'Email_Edit_And_Send_Button',
+
+    // Send Email Status translations
+    SEND_EMAIL_SUCCESS: 'Send_Email_Success',
+    SEND_EMAIL_FAILED: 'Send_Email_Failed',
+    SEND_EMAIL_ERROR_NO_FROM_EMAIL: 'Send_Email_Error_No_From_Email',
+
+    // Send Email Validation translations
+    SEND_EMAIL_VALIDATION_TO_REQUIRED: 'Send_Email_Validation_To_Required',
+    SEND_EMAIL_VALIDATION_SUBJECT_REQUIRED: 'Send_Email_Validation_Subject_Required',
+    SEND_EMAIL_VALIDATION_CONTENT_REQUIRED: 'Send_Email_Validation_Content_Required',
+
+    // Send email with status
+    SEND_EMAIL_SUCCESS_WITH_EMOJI: 'Send_Email_Success_With_Emoji',
+    SEND_EMAIL_FAILED_WITH_EMOJI: 'Send_Email_Failed_With_Emoji',
 } as const; 
