@@ -60,23 +60,13 @@ export class CommandUtility implements ICommandUtility {
             language,
         });
 
-        switch (this.params.length) {
-            case 0: {
-                await handler.sendDefault();
-                break;
-            }
-            case 1: {
-                await this.handleSingleParam(handler);
-                break;
-            }
-            default: {
-                await handler.sendDefault();
-            }
+        if (this.params.length === 0) {
+            await handler.sendDefault();
+            return;
         }
-    }
 
-    private async handleSingleParam(handler: Handler): Promise<void> {
-        switch (this.params[0].toLowerCase()) {
+        const command = this.params[0].toLowerCase();
+        switch (command) {
             case CommandParam.HELP:
                 await handler.Help();
                 break;
@@ -93,7 +83,8 @@ export class CommandUtility implements ICommandUtility {
                 await handler.Report();
                 break;
             default: {
-                await handler.sendDefault();
+                const query = this.params.join(' ');
+                await handler.ProcessNaturalLanguageQuery(query);
                 break;
             }
         }
