@@ -22,10 +22,6 @@ import { Handler } from './Handler';
 import { SendEmailModal } from '../modal/SendEmailModal';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
-import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
-import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
-import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
-import { EmailProviders } from '../enums/EmailProviders';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;

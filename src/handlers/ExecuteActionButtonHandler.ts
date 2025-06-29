@@ -55,7 +55,7 @@ export class ExecuteActionButtonHandler {
             }
         } catch (error) {
             // Log error but don't throw to avoid breaking the interaction
-            console.error('Error handling action button:', error);
+            this.app.getLogger().error('Error handling action button:', error);
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -178,7 +178,7 @@ export class ExecuteActionButtonHandler {
             
             return null;
         } catch (error) {
-            console.error('Error retrieving stored email data:', error);
+            this.app.getLogger().error('Error retrieving stored email data:', error);
             return null;
         }
     }
@@ -198,7 +198,7 @@ export class ExecuteActionButtonHandler {
 
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         } catch (error) {
-            console.error('Error showing message:', error);
+            this.app.getLogger().error('Error showing message:', error);
         }
     }
 } 

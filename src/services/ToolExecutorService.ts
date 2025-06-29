@@ -238,17 +238,24 @@ export class ToolExecutorService {
             }
 
             // Send the email
-            const success = await this.sendEmailWithProvider(emailData, accessToken, fromEmail, emailProvider);
-
-            if (success) {
-                return {
-                    success: true,
-                    message: 'Email sent successfully.',
-                };
-            } else {
+            try {
+                const success = await this.sendEmailWithProvider(emailData, accessToken, fromEmail, emailProvider);
+                
+                if (success) {
+                    return {
+                        success: true,
+                        message: 'Email sent successfully.',
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: 'Failed to send email due to an unknown error.',
+                    };
+                }
+            } catch (sendError) {
                 return {
                     success: false,
-                    message: 'Failed to send email due to an unknown error.',
+                    message: `Failed to send email: ${sendError.message}`,
                 };
             }
 
@@ -276,8 +283,8 @@ export class ToolExecutorService {
                     throw new Error(`Unsupported provider: ${provider}`);
             }
         } catch (error) {
-            console.error('Error sending email with provider:', error);
-            return false;
+            this.app.getLogger().error('Error sending email with provider:', error);
+            throw error;
         }
     }
 
@@ -318,10 +325,24 @@ export class ToolExecutorService {
                 }
             });
 
-            return response.statusCode === 200;
+            // Check response status
+            if (response.statusCode === 200) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.app.getLogger().error('Gmail API error:', errorMessage);
+                throw new Error(`Gmail API error: ${errorMessage}`);
+            }
         } catch (error) {
-            console.error('Error sending email via Gmail:', error);
-            return false;
+            this.app.getLogger().error('Error sending email via Gmail:', error);
+            throw error;
         }
     }
 
@@ -332,7 +353,7 @@ export class ToolExecutorService {
     ): Promise<boolean> {
         try {
             // Create the email payload for Outlook API
-            const emailPayload = {
+            const emailPayload: any = {
                 message: {
                     subject: emailData.subject,
                     body: {
@@ -343,14 +364,18 @@ export class ToolExecutorService {
                         emailAddress: {
                             address: email
                         }
-                    })),
-                    ccRecipients: emailData.cc ? emailData.cc.map(email => ({
-                        emailAddress: {
-                            address: email
-                        }
-                    })) : undefined
+                    }))
                 }
             };
+
+            // Only add ccRecipients if there are CC recipients
+            if (emailData.cc && emailData.cc.length > 0) {
+                emailPayload.message.ccRecipients = emailData.cc.map(email => ({
+                    emailAddress: {
+                        address: email
+                    }
+                }));
+            }
 
             // Send the email using Outlook API
             const response = await this.http.post(MicrosoftOauthUrls.SEND_EMAIL, {
@@ -361,10 +386,24 @@ export class ToolExecutorService {
                 data: emailPayload
             });
 
-            return response.statusCode === 202;
+            // Check response status
+            if (response.statusCode === 202) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.app.getLogger().error('Outlook API error:', errorMessage);
+                throw new Error(`Outlook API error: ${errorMessage}`);
+            }
         } catch (error) {
-            console.error('Error sending email via Outlook:', error);
-            return false;
+            this.app.getLogger().error('Error sending email via Outlook:', error);
+            throw error;
         }
     }
 } 
