@@ -9,4 +9,8 @@ export enum ActionIds {
     // Modal Actions (if needed for consistency)
     USER_PREFERENCE_SUBMIT = 'prefs_submit',
     USER_PREFERENCE_CLOSE = 'prefs_close',
+    
+    // Send Email Actions
+    SEND_EMAIL_DIRECT_ACTION = 'send_email_direct',
+    SEND_EMAIL_EDIT_ACTION = 'send_email_edit',
 } 

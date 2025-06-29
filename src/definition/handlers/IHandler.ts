@@ -8,6 +8,7 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
 import { Language } from '../../lib/Translation/translation';
+import { ISendEmailData } from '../../modal/SendEmailModal';
 
 export interface IHandlerParams {
     app: EmailBridgeNlpApp;
@@ -38,4 +39,7 @@ export interface IHandler {
     Login(): Promise<void>;
     Logout(): Promise<void>;
     Report(): Promise<void>;
+    Config(): Promise<void>;
+    ProcessNaturalLanguageQuery(query: string): Promise<void>;
+    OpenSendEmailModal(emailData: ISendEmailData): Promise<void>;
 } 
