@@ -25,6 +25,9 @@ import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
+import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
+import { ToolExecutorService } from '../services/ToolExecutorService';
+import { ISendEmailData } from '../modal/SendEmailModal';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -45,6 +48,10 @@ export class ExecuteViewSubmitHandler {
 
         if (view.id === UserPreferenceModalEnum.VIEW_ID) {
             return await this.handleUserPreferenceSubmit(user, view);
+        }
+
+        if (view.id === SendEmailModalEnum.VIEW_ID) {
+            return await this.handleSendEmailSubmit(user, view);
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -209,6 +216,101 @@ export class ExecuteViewSubmitHandler {
         }
     }
 
+    private async handleSendEmailSubmit(user: any, view: any): Promise<IUIKitResponse> {
+        let room: IRoom | undefined;
+        
+        try {
+            // Get room context
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            room = roomId ? await this.read.getRoomReader().getById(roomId) : undefined;
+
+            // Parse form data
+            const toValue = this.getFormValue(view.state, SendEmailModalEnum.TO_ACTION_ID);
+            const ccValue = this.getFormValue(view.state, SendEmailModalEnum.CC_ACTION_ID);
+            const subjectValue = this.getFormValue(view.state, SendEmailModalEnum.SUBJECT_ACTION_ID);
+            const contentValue = this.getFormValue(view.state, SendEmailModalEnum.CONTENT_ACTION_ID);
+
+            // Get user's current language
+            const userLanguage = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Validate required fields
+            if (!toValue || !subjectValue || !contentValue) {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.ERROR_FILL_REQUIRED_FIELDS, userLanguage)
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Parse email addresses (comma separated)
+            const toEmails = toValue.split(',').map((email: string) => email.trim()).filter((email: string) => email);
+            const ccEmails = ccValue ? ccValue.split(',').map((email: string) => email.trim()).filter((email: string) => email) : undefined;
+
+            // Create email data object
+            const emailData: ISendEmailData = {
+                to: toEmails,
+                cc: ccEmails,
+                subject: subjectValue,
+                content: contentValue,
+            };
+
+            // Send email using ToolExecutorService
+            const toolExecutorService = new ToolExecutorService(
+                this.app,
+                this.read,
+                this.modify,
+                this.http,
+                this.persistence
+            );
+
+            const result = await toolExecutorService.sendEmail(emailData, user);
+
+            // Notify user about result
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: result.message
+                });
+            }
+
+            if (result.success) {
+                return this.context.getInteractionResponder().successResponse();
+            } else {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+        } catch (error) {
+            // Get user's current language for error message
+            const currentLanguage = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+            this.app.getLogger().error('Send email error:', error);
+
+            try {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.SEND_EMAIL_FAILED, currentLanguage, { error: error.message })
+                    });
+                }
+            } catch (notificationError) {
+                this.app.getLogger().error(t(Translations.LOG_NOTIF_ERR, currentLanguage), notificationError);
+            }
+
+            return this.context.getInteractionResponder().errorResponse();
+        }
+    }
+
     private async sendSuccessNotification(
         user: any, 
         room: any, 
@@ -320,64 +422,36 @@ export class ExecuteViewSubmitHandler {
 
     private async sendNotificationWithLoginButton(
         user: any, 
-        room: any, 
+        room: IRoom, 
         message: string, 
         provider: EmailProviders, 
         language: Language
     ): Promise<void> {
-        try {
-            const appUser = await this.read.getUserReader().getAppUser();
-            const messageBuilder = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser!)
-                .setRoom(room)
-                .setGroupable(false);
+        const blockBuilder = this.modify.getCreator().getBlockBuilder();
+        blockBuilder.addSectionBlock({
+            text: blockBuilder.newMarkdownTextObject(message)
+        });
 
-            // Generate the authorization URL for the new provider
-            const authUrl = await EmailServiceFactory.getAuthenticationUrl(
-                provider,
-                user.id,
-                this.http,
-                this.persistence,
-                this.read,
-                this.app.getLogger()
-            );
+        blockBuilder.addActionsBlock({
+            blockId: 'login-block',
+            elements: [
+                blockBuilder.newButtonElement({
+                    actionId: ActionIds.EMAIL_LOGIN_ACTION,
+                    text: blockBuilder.newPlainTextObject(t(Translations.LOGIN_ACTION_TEXT, language)),
+                    style: ButtonStyle.PRIMARY
+                }),
+            ]
+        });
 
-            // Create a UI block with the message and login button
-            const block = this.modify.getCreator().getBlockBuilder();
+        const appUser = await this.read.getUserReader().getAppUser();
+        if (!appUser) return;
+        
+        const messageBuilder = this.modify.getCreator().startMessage()
+            .setSender(appUser)
+            .setRoom(room)
+            .setGroupable(false)
+            .setBlocks(blockBuilder.getBlocks());
 
-            // Add the success message as a section
-            block.addSectionBlock({
-                text: block.newMarkdownTextObject(message),
-            });
-
-            // Add the login button
-            block.addActionsBlock({
-                elements: [
-                    block.newButtonElement({
-                        actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                        text: block.newPlainTextObject(t(Translations.LOGIN_WITH_PROVIDER, language, { provider: getProviderDisplayName(provider) })),
-                        url: authUrl,
-                        style: ButtonStyle.PRIMARY,
-                    }),
-                ],
-            });
-
-            messageBuilder.setBlocks(block.getBlocks());
-            await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-        } catch (error) {
-            // Log the button creation failure and fallback to regular text notification
-            this.app.getLogger().warn(t(Translations.LOG_BTN_FALLBACK, language), error);
-            
-            try {
-                await sendNotification(this.read, this.modify, user, room, {
-                    message: message
-                });
-            } catch (fallbackError) {
-                this.app.getLogger().error(t(Translations.LOG_FALLBACK_ERR, language), fallbackError);
-                throw fallbackError;
-            }
-        }
+        await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
     }
 } 

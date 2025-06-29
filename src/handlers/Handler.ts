@@ -6,11 +6,16 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
+import {
+    RocketChatAssociationModel,
+    RocketChatAssociationRecord,
+} from '@rocket.chat/apps-engine/definition/metadata';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
 import {
     sendDefaultNotification,
     sendHelperNotification,
+    sendNotification,
 } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
@@ -22,6 +27,10 @@ import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
 import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
+import { LLMService } from '../services/LLMService';
+import { ToolExecutorService } from '../services/ToolExecutorService';
+import { SendEmailModal, ISendEmailData } from '../modal/SendEmailModal';
+import { IToolCall } from '../definition/services/ILLMService';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -448,6 +457,229 @@ export class Handler implements IHandler {
                 t(Translations.REPORT_ERROR, this.language, { error: error.message })
             );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async OpenSendEmailModal(emailData: ISendEmailData): Promise<void> {
+        try {
+            // Store room ID for later use in ExecuteViewSubmitHandler
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
+            const modal = await SendEmailModal({
+                app: this.app,
+                modify: this.modify,
+                language: this.language,
+                emailData,
+                context: 'llm',
+            });
+
+            if (!modal) {
+                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
+            }
+
+            if (!this.triggerId) {
+                throw new Error(t(Translations.ERROR_TRIGGER_ID_MISSING, this.language));
+            }
+
+            await this.modify
+                .getUiController()
+                .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
+
+        } catch (error) {
+            const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+            const messageBuilder = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser)
+                .setRoom(this.room)
+                .setGroupable(false);
+
+            messageBuilder.setText(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async ProcessNaturalLanguageQuery(query: string): Promise<void> {
+        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+        const messageBuilder = this.modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(this.room)
+            .setGroupable(false);
+
+        try {
+            // Show processing message first
+            messageBuilder.setText(t(Translations.LLM_PROCESSING_QUERY, this.language, { query }));
+            await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
+            // Process query with LLM
+            const llmService = new LLMService(this.http);
+            const { toolCalls } = await llmService.processNaturalLanguageQuery(query);
+
+            // Create new message for results
+            const resultMessageBuilder = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser)
+                .setRoom(this.room)
+                .setGroupable(false);
+
+            if (toolCalls && toolCalls.length > 0) {
+                const toolCall = toolCalls[0];
+                const toolDisplayName = this.getToolDisplayName(toolCall.function.name);
+                const args = JSON.parse(toolCall.function.arguments);
+                
+                // Handle send-email tool with buttons instead of immediate modal
+                if (toolCall.function.name === 'send-email') {
+                    // Store email data for later use in button handlers
+                    const emailData: ISendEmailData = {
+                        to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
+                        cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                        subject: args.subject || '',
+                        content: args.content || '',
+                    };
+
+                    // Store email data in room interaction storage for button handlers
+                    const roomInteractionStorage = new RoomInteractionStorage(
+                        this.persis,
+                        this.read.getPersistenceReader(),
+                        this.sender.id,
+                    );
+                    await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+                    // Store email data with room interaction
+                    await this.persis.updateByAssociation(
+                        new RocketChatAssociationRecord(
+                            RocketChatAssociationModel.ROOM,
+                            this.room.id,
+                        ),
+                        { emailData },
+                        true,
+                    );
+
+                    // Show simplified email ready message with buttons
+                    const block = this.modify.getCreator().getBlockBuilder();
+                    
+                    block.addSectionBlock({
+                        text: block.newMarkdownTextObject(
+                            t(Translations.EMAIL_READY_TO_SEND, this.language)
+                        ),
+                    });
+
+                    block.addActionsBlock({
+                        elements: [
+                            block.newButtonElement({
+                                actionId: ActionIds.SEND_EMAIL_DIRECT_ACTION,
+                                text: block.newPlainTextObject(t(Translations.EMAIL_SEND_BUTTON, this.language)),
+                            }),
+                            block.newButtonElement({
+                                actionId: ActionIds.SEND_EMAIL_EDIT_ACTION,
+                                text: block.newPlainTextObject(t(Translations.EMAIL_EDIT_AND_SEND_BUTTON, this.language)),
+                                style: ButtonStyle.PRIMARY,
+                            }),
+                        ],
+                    });
+
+                    resultMessageBuilder.setBlocks(block.getBlocks());
+                    return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+                }
+
+                // Use the ToolExecutorService for all other tools
+                const toolExecutorService = new ToolExecutorService(
+                    this.app,
+                    this.read,
+                    this.modify,
+                    this.http,
+                    this.persis
+                );
+                
+                const result = await toolExecutorService.executeTool(
+                    toolCall,
+                    this.sender,
+                    this.room,
+                    this.triggerId
+                );
+                
+                // Create formatted message showing the tool execution result
+                const block = this.modify.getCreator().getBlockBuilder();
+                
+                if (result.success) {
+                block.addSectionBlock({
+                    text: block.newMarkdownTextObject(
+                        t(Translations.LLM_TOOL_DETECTED, this.language, { 
+                            query,
+                            tool: toolDisplayName 
+                        })
+                    ),
+                });
+
+                    if (result.modal_opened) {
+                        block.addSectionBlock({
+                            text: block.newMarkdownTextObject(
+                                `✅ ${result.message}`
+                            ),
+                        });
+                    } else {
+                block.addSectionBlock({
+                    text: block.newMarkdownTextObject(
+                        `**${t(Translations.TOOL_NAME_LABEL, this.language)}:** ${toolDisplayName}\n` +
+                                `**${t(Translations.TOOL_ARGS_LABEL, this.language)}:** \`${JSON.stringify(args, null, 2)}\`\n` +
+                                `**Result:** ${result.message}`
+                            ),
+                        });
+                    }
+                } else {
+                    block.addSectionBlock({
+                        text: block.newMarkdownTextObject(
+                            `❌ **Tool Execution Failed**\n` +
+                            `**Tool:** ${toolDisplayName}\n` +
+                            `**Error:** ${result.error || result.message}`
+                    ),
+                });
+                }
+
+                resultMessageBuilder.setBlocks(block.getBlocks());
+            } else {
+                resultMessageBuilder.setText(
+                    t(Translations.LLM_NO_TOOL_DETECTED, this.language, { query })
+                );
+            }
+
+            return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+
+        } catch (error) {
+            messageBuilder.setText(
+                t(Translations.LLM_ERROR_PROCESSING, this.language, { 
+                    query, 
+                    error: error.message 
+                })
+            );
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    private getToolDisplayName(toolName: string): string {
+        switch (toolName) {
+            case 'send-email':
+                return t(Translations.TOOL_SEND_EMAIL, this.language);
+            case 'count-emails':
+                return t(Translations.TOOL_COUNT_EMAILS, this.language);
+            case 'search-emails':
+                return t(Translations.TOOL_SEARCH_EMAILS, this.language);
+            case 'get-email-content':
+                return t(Translations.TOOL_GET_EMAIL_CONTENT, this.language);
+            case 'summarize-and-send-email':
+                return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
+            case 'report':
+                return t(Translations.TOOL_REPORT, this.language);
+            default:
+                return toolName;
         }
     }
 } 
