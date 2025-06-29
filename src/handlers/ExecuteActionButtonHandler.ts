@@ -20,8 +20,8 @@ import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
-import { SendEmailModal, ISendEmailData } from '../modal/SendEmailModal';
-import { sendNotification } from '../helper/notification';
+import { SendEmailModal } from '../modal/SendEmailModal';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
 
 export class ExecuteActionButtonHandler {
     private context: UIKitActionButtonInteractionContext;
@@ -51,12 +51,11 @@ export class ExecuteActionButtonHandler {
                     break;
                     
                 default:
-                    // No action needed for unknown actionIds
                     break;
             }
         } catch (error) {
-            const language = await getUserPreferredLanguage(this.read.getPersistenceReader(), this.persistence, user.id);
-            await sendNotification(this.read, this.modify, user, room, { message: t(Translations.ERROR_FAIL_INTERNAL, language) });
+            // Log error but don't throw to avoid breaking the interaction
+            console.error('Error handling action button:', error);
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -91,7 +90,7 @@ export class ExecuteActionButtonHandler {
             await this.showMessage(
                 user,
                 room,
-                result.success ? `✅ ${result.message}` : `❌ ${result.message}`,
+                result.success ? `${result.message}` : `${result.message}`,
                 language
             );
 
@@ -100,7 +99,7 @@ export class ExecuteActionButtonHandler {
             await this.showMessage(
                 user,
                 room,
-                `❌ ${t(Translations.SEND_EMAIL_FAILED, language, { error: 'Unknown error' })}`,
+                `${t(Translations.SEND_EMAIL_FAILED, language, { error: 'Unknown error' })}`,
                 language
             );
         }
@@ -155,7 +154,7 @@ export class ExecuteActionButtonHandler {
             await this.showMessage(
                 user,
                 room,
-                `❌ ${t(Translations.ERROR_MODAL_CREATION_FAILED, language)}`,
+                `${t(Translations.ERROR_MODAL_CREATION_FAILED, language)}`,
                 language
             );
         }
@@ -179,7 +178,7 @@ export class ExecuteActionButtonHandler {
             
             return null;
         } catch (error) {
-            this.app.getLogger().error('Error retrieving stored email data:', error);
+            console.error('Error retrieving stored email data:', error);
             return null;
         }
     }
@@ -199,7 +198,7 @@ export class ExecuteActionButtonHandler {
 
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         } catch (error) {
-            this.app.getLogger().error('Error showing message:', error);
+            console.error('Error showing message:', error);
         }
     }
 } 

@@ -1,5 +1,3 @@
-import { LlmTools } from "../enums/LlmTools";
-
 export const LlmPrompts = {
 
     SYSTEM_PROMPT: 
@@ -132,7 +130,5 @@ export const LlmPrompts = {
     - JSON must be valid and exactly match field types.
     `
     ,
-
-    AVAILABLE_TOOLS: [LlmTools.SEND_EMAIL],
 
 };

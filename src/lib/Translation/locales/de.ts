@@ -63,10 +63,11 @@ export const de = {
     Error_Preparing_Logout: "Fehler beim Vorbereiten der Abmeldung: __error__",
     
     // Logout action messages
-    Provider_Not_Supported_Logout: "**__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator für Unterstützung.",
-    Logout_Success: "**Erfolgreich von Ihrem __provider__-Konto abgemeldet.**",
-    Logout_Failed: "**Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
-    Logout_Error: "**Fehler beim Abmeldeprozess aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Abmelden fehlgeschlagen. Der E-Mail-Anbieter '__provider__' wird nicht unterstützt.",
+    LOGOUT_SUCCESS: "Sie wurden erfolgreich von __provider__ abgemeldet.",
+    LOGOUT_FAILED: "Abmelden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    LOGOUT_ERROR: "Beim Abmelden ist ein Fehler aufgetreten: __error__",
+    EMAIL_SENT_CONFIRMATION: "E-Mail gesendet.",
     
     // Notification messages
     Helper_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Hier sind einige schnelle Tipps für den Einstieg!",
@@ -79,6 +80,7 @@ export const de = {
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
     Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
+    SUCCESS_CONFIGURATION_UPDATED: "Ihre Einstellungen wurden erfolgreich aktualisiert.",
     
     // User Preference Modal
     User_Preference_Title: "Benutzereinstellungen",
@@ -258,6 +260,10 @@ export const de = {
     Email_Edit_And_Send_Button: "Bearbeiten & Senden",
     
     // Send Email with Status
-    Send_Email_Success_With_Emoji: "✅ E-Mail erfolgreich gesendet",
-    Send_Email_Failed_With_Emoji: "❌ Fehler beim Senden der E-Mail: __error__",
+    Send_Email_Success_With_Emoji: "E-Mail erfolgreich gesendet",
+    Send_Email_Failed_With_Emoji: "Fehler beim Senden der E-Mail: __error__",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Senden",
+    EDIT_SEND_ACTION_TEXT: "Bearbeiten & Senden",
 }; 

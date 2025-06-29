@@ -1,7 +1,8 @@
 import { IHttp, IHttpRequest } from '@rocket.chat/apps-engine/definition/accessors';
 import { LlmConfig, LlmErrors } from '../constants/AuthConstants';
 import { LlmPrompts } from '../constants/prompts';
-import { IToolCall, ILLMResponse } from '../definition/services/ILLMService';
+import { IToolCall, ILLMResponse } from '../definition/lib/ToolInterfaces';
+import { LlmTools } from '../enums/LlmTools';
 
 export class LLMService {
     private readonly llmEndpoint: string;
@@ -102,7 +103,7 @@ export class LLMService {
                 const toolName = parsed.function_call.name;
                 
                 // Validate tool name
-                if (!LlmPrompts.AVAILABLE_TOOLS.includes(toolName)) {
+                if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
                     return [];
                 }
 
@@ -118,7 +119,7 @@ export class LLMService {
                 return [toolCall];
             }
         } catch (e) {
-            // Ignore parsing errors
+            console.error('Error parsing content for tools:', e);
         }
 
         return [];

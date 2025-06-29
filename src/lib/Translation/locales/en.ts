@@ -257,6 +257,16 @@ export const en = {
     Email_Edit_And_Send_Button: "Edit & Send",
     
     // Send Email with Status
-    Send_Email_Success_With_Emoji: "✅ Email sent successfully",
-    Send_Email_Failed_With_Emoji: "❌ Failed to send email: __error__",
+    Send_Email_Success_With_Emoji: "Email sent successfully",
+    Send_Email_Failed_With_Emoji: "Failed to send email: __error__",
+
+    // New translations
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Logout failed. The email provider '__provider__' is not supported.",
+    LOGOUT_SUCCESS: "You have been successfully logged out from __provider__.",
+    LOGOUT_FAILED: "Logout failed. Please try again.",
+    LOGOUT_ERROR: "An error occurred during logout: __error__",
+    EMAIL_SENT_CONFIRMATION: "Email sent.",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Send",
 }; 

@@ -256,4 +256,14 @@ export const pt = {
     // Send Email with Status
     Send_Email_Success_With_Emoji: "✅ E-mail enviado com sucesso",
     Send_Email_Failed_With_Emoji: "❌ Falha ao enviar e-mail: __error__",
+
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Falha ao fazer logout. O provedor de email '__provider__' não é suportado.",
+    LOGOUT_SUCCESS: "Você foi desconectado com sucesso do __provider__.",
+    LOGOUT_FAILED: "Falha ao fazer logout. Por favor, tente novamente.",
+    LOGOUT_ERROR: "Ocorreu um erro durante o logout: __error__",
+    EMAIL_SENT_CONFIRMATION: "Email enviado.",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Enviar",
+    EDIT_SEND_ACTION_TEXT: "Editar e Enviar",
 }; 

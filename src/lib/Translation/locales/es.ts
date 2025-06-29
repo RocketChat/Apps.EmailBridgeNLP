@@ -261,5 +261,15 @@ export const es = {
     
     // Send Email with Status
     Send_Email_Success_With_Emoji: '✅ Correo enviado exitosamente',
-    Send_Email_Failed_With_Emoji: '❌ Error al enviar correo: __error__',
+    Send_Email_Failed_With_Emoji: 'Error al enviar correo: __error__',
+
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Error al cerrar sesión. El proveedor de correo '__provider__' no es compatible.",
+    LOGOUT_SUCCESS: "Has cerrado sesión correctamente en __provider__.",
+    LOGOUT_FAILED: "Error al cerrar sesión. Por favor, inténtalo de nuevo.",
+    LOGOUT_ERROR: "Ocurrió un error durante el cierre de sesión: __error__",
+    EMAIL_SENT_CONFIRMATION: "Email enviado.",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Enviar",
+    EDIT_SEND_ACTION_TEXT: "Editar y Enviar",
 }; 

@@ -15,7 +15,6 @@ import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
 import {
     sendDefaultNotification,
     sendHelperNotification,
-    sendNotification,
 } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
@@ -29,8 +28,10 @@ import { Translations } from '../constants/Translations';
 import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 import { LLMService } from '../services/LLMService';
 import { ToolExecutorService } from '../services/ToolExecutorService';
-import { SendEmailModal, ISendEmailData } from '../modal/SendEmailModal';
-import { IToolCall } from '../definition/services/ILLMService';
+import { SendEmailModal } from '../modal/SendEmailModal';
+import { IToolCall } from '../definition/lib/ToolInterfaces';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { LlmTools } from '../enums/LlmTools';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -666,17 +667,17 @@ export class Handler implements IHandler {
 
     private getToolDisplayName(toolName: string): string {
         switch (toolName) {
-            case 'send-email':
+            case LlmTools.SEND_EMAIL:
                 return t(Translations.TOOL_SEND_EMAIL, this.language);
-            case 'count-emails':
+            case LlmTools.COUNT_EMAILS:
                 return t(Translations.TOOL_COUNT_EMAILS, this.language);
-            case 'search-emails':
+            case LlmTools.SEARCH_EMAILS:
                 return t(Translations.TOOL_SEARCH_EMAILS, this.language);
-            case 'get-email-content':
+            case LlmTools.GET_EMAIL_CONTENT:
                 return t(Translations.TOOL_GET_EMAIL_CONTENT, this.language);
-            case 'summarize-and-send-email':
+            case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
                 return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
-            case 'report':
+            case LlmTools.REPORT:
                 return t(Translations.TOOL_REPORT, this.language);
             default:
                 return toolName;

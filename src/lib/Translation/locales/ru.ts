@@ -256,4 +256,14 @@ export const ru = {
     // Send Email with Status
     Send_Email_Success_With_Emoji: "✅ Письмо успешно отправлено",
     Send_Email_Failed_With_Emoji: "❌ Ошибка при отправке письма: __error__",
+
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Не удалось выйти. Почтовый провайдер '__provider__' не поддерживается.",
+    LOGOUT_SUCCESS: "Вы успешно вышли из __provider__.",
+    LOGOUT_FAILED: "Не удалось выйти. Пожалуйста, попробуйте еще раз.",
+    LOGOUT_ERROR: "Произошла ошибка во время выхода: __error__",
+    EMAIL_SENT_CONFIRMATION: "Электронное письмо отправлено.",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Отправить",
+    EDIT_SEND_ACTION_TEXT: "Редактировать и отправить",
 }; 

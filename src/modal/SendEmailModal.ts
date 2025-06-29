@@ -11,13 +11,7 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
-
-export interface ISendEmailData {
-    to: string[];
-    cc?: string[];
-    subject: string;
-    content: string;
-}
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
 
 export async function SendEmailModal({
     app,

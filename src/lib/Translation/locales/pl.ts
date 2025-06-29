@@ -256,4 +256,8 @@ export const pl = {
     // Send Email with Status
     Send_Email_Success_With_Emoji: "✅ E-mail wysłany pomyślnie",
     Send_Email_Failed_With_Emoji: "❌ Nie udało się wysłać e-maila: __error__",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Wyślij",
+    EDIT_SEND_ACTION_TEXT: "Edytuj i wyślij",
 }; 

@@ -27,7 +27,7 @@ import { Translations } from '../constants/Translations';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { ToolExecutorService } from '../services/ToolExecutorService';
-import { ISendEmailData } from '../modal/SendEmailModal';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -46,11 +46,11 @@ export class ExecuteViewSubmitHandler {
     public async handleActions(): Promise<IUIKitResponse> {
         const { user, view } = this.context.getInteractionData();
 
-        if (view.id === UserPreferenceModalEnum.VIEW_ID) {
+        if (view.id.startsWith(UserPreferenceModalEnum.VIEW_ID)) {
             return await this.handleUserPreferenceSubmit(user, view);
         }
 
-        if (view.id === SendEmailModalEnum.VIEW_ID) {
+        if (view.id.startsWith(SendEmailModalEnum.VIEW_ID)) {
             return await this.handleSendEmailSubmit(user, view);
         }
 
@@ -160,7 +160,7 @@ export class ExecuteViewSubmitHandler {
                 if (oldEmailProvider !== emailProviderValue && wasLoggedOut) {
                     // Provider changed and user was logged out - show login button for new provider
                     const message = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
-                        oldProvider: this.getProviderDisplayName(oldEmailProvider, userLanguage)
+                        oldProvider: getProviderDisplayName(oldEmailProvider)
                     });
                     
                     await this.sendNotificationWithLoginButton(
@@ -278,125 +278,53 @@ export class ExecuteViewSubmitHandler {
             // Notify user about result
             if (room) {
                 await sendNotification(this.read, this.modify, user, room, {
-                    message: result.message
+                    message: result.success ? t(Translations.SEND_EMAIL_SUCCESS, userLanguage) : t(Translations.SEND_EMAIL_FAILED, userLanguage, { error: result.message })
                 });
             }
 
             if (result.success) {
+                // Get the messageId from persistence
+                const roomInteractionStorage = new RoomInteractionStorage(this.persistence, this.read.getPersistenceReader(), user.id);
+                const messageId = await roomInteractionStorage.getInteractionMessageId();
+
+                if (messageId) {
+                    const appUser = await this.read.getUserReader().getAppUser();
+                    if (!appUser) return this.context.getInteractionResponder().successResponse();
+
+                    const message = await this.read.getMessageReader().getById(messageId);
+                    if (!message) return this.context.getInteractionResponder().successResponse();
+                    
+                    // Replace the buttons with a confirmation message
+                    const messageBuilder = await this.modify.getUpdater().message(messageId, appUser);
+                    const blockBuilder = this.modify.getCreator().getBlockBuilder();
+                    
+                    blockBuilder.addSectionBlock({
+                        text: blockBuilder.newMarkdownTextObject('Email sent.')
+                    });
+
+                    messageBuilder.setEditor(appUser).setBlocks(blockBuilder.getBlocks());
+                    await this.modify.getUpdater().finish(messageBuilder);
+                }
+
                 return this.context.getInteractionResponder().successResponse();
             } else {
                 return this.context.getInteractionResponder().errorResponse();
             }
 
         } catch (error) {
-            // Get user's current language for error message
-            const currentLanguage = await getUserPreferredLanguage(
+            this.app.getLogger().error('Error in handleSendEmailSubmit:', error);
+            const userLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
                 this.persistence,
                 user.id,
             );
-            this.app.getLogger().error('Send email error:', error);
 
-            try {
-                if (room) {
-                    await sendNotification(this.read, this.modify, user, room, {
-                        message: t(Translations.SEND_EMAIL_FAILED, currentLanguage, { error: error.message })
-                    });
-                }
-            } catch (notificationError) {
-                this.app.getLogger().error(t(Translations.LOG_NOTIF_ERR, currentLanguage), notificationError);
-            }
-
-            return this.context.getInteractionResponder().errorResponse();
-        }
-    }
-
-    private async sendSuccessNotification(
-        user: any, 
-        room: any, 
-        oldPreference: IPreference | null, 
-        newPreference: IPreference, 
-        language: Language,
-        wasLoggedOut: boolean = false,
-        providerChanged: boolean = false
-    ): Promise<void> {
-        try {
-            // Build detailed success message showing what changed
-            let message = t(Translations.SUCCESS_CONFIGURATION_UPDATED, language);
-            
-            // Add details about what changed
-            const changes: string[] = [];
-            
-            if (!oldPreference || oldPreference.language !== newPreference.language) {
-                changes.push(t(Translations.LANGUAGE_CHANGED, language, { 
-                    language: this.getLanguageDisplayName(newPreference.language, language) 
-                }));
-            }
-            
-            if (!oldPreference || oldPreference.emailProvider !== newPreference.emailProvider) {
-                changes.push(t(Translations.EMAIL_PROVIDER_CHANGED, language, { 
-                    provider: this.getProviderDisplayName(newPreference.emailProvider, language) 
-                }));
-            }
-
-            if (changes.length > 0) {
-                message += '\n' + changes.join('\n');
-            }
-
-            // If provider changed and user was logged out, show login message
-            if (wasLoggedOut && oldPreference && oldPreference.emailProvider !== newPreference.emailProvider) {
-                message += '\n' + t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, language, {
-                    oldProvider: this.getProviderDisplayName(oldPreference.emailProvider, language),
-                    newProvider: this.getProviderDisplayName(newPreference.emailProvider, language)
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: t(Translations.ERROR_FAIL_INTERNAL, userLanguage)
                 });
             }
-
-            // Send notification using room context
-            if (room) {
-                if (providerChanged && wasLoggedOut) {
-                    // Send message with login button for provider change
-                    await this.sendNotificationWithLoginButton(user, room, message, newPreference.emailProvider, language);
-                } else {
-                    // Send regular text notification
-                    await sendNotification(this.read, this.modify, user, room, {
-                        message: message
-                    });
-                }
-            }
-        } catch (error) {
-            this.app.getLogger().error(t(Translations.LOG_SUCCESS_ERR, Language.en), error);
-        }
-    }
-
-    private getLanguageDisplayName(targetLanguage: Language, displayLanguage: Language): string {
-        // Use proper translation keys for language names
-        switch (targetLanguage) {
-            case Language.en:
-                return t(Translations.LANGUAGE_EN, displayLanguage);
-            case Language.es:
-                return t(Translations.LANGUAGE_ES, displayLanguage);
-            case Language.ru:
-                return t(Translations.LANGUAGE_RU, displayLanguage);
-            case Language.de:
-                return t(Translations.LANGUAGE_DE, displayLanguage);
-            case Language.pl:
-                return t(Translations.LANGUAGE_PL, displayLanguage);
-            case Language.pt:
-                return t(Translations.LANGUAGE_PT, displayLanguage);
-            default:
-                return targetLanguage;
-        }
-    }
-
-    private getProviderDisplayName(provider: EmailProviders, displayLanguage: Language): string {
-        // Use proper translation keys for provider names
-        switch (provider) {
-            case EmailProviders.GMAIL:
-                return t(Translations.GMAIL_LABEL, displayLanguage);
-            case EmailProviders.OUTLOOK:
-                return t(Translations.OUTLOOK_LABEL, displayLanguage);
-            default:
-                return provider;
+            return this.context.getInteractionResponder().errorResponse();
         }
     }
 
@@ -418,6 +346,17 @@ export class ExecuteViewSubmitHandler {
             }
         }
         return null;
+        if (!viewState) return undefined;
+
+        // Search through all blocks to find the one containing our action ID
+        for (const blockId of Object.keys(viewState)) {
+            const block = viewState[blockId];
+            if (block && typeof block === 'object' && actionId in block) {
+                return block[actionId];
+            }
+        }
+
+        return undefined;
     }
 
     private async sendNotificationWithLoginButton(
@@ -427,29 +366,31 @@ export class ExecuteViewSubmitHandler {
         provider: EmailProviders, 
         language: Language
     ): Promise<void> {
+        const appUser = await this.read.getUserReader().getAppUser();
+        if (!appUser) {
+            this.app.getLogger().error('App user not found');
+            return;
+        }
+
         const blockBuilder = this.modify.getCreator().getBlockBuilder();
-        blockBuilder.addSectionBlock({
-            text: blockBuilder.newMarkdownTextObject(message)
-        });
 
         blockBuilder.addActionsBlock({
-            blockId: 'login-block',
             elements: [
                 blockBuilder.newButtonElement({
                     actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                    text: blockBuilder.newPlainTextObject(t(Translations.LOGIN_ACTION_TEXT, language)),
-                    style: ButtonStyle.PRIMARY
+                    text: blockBuilder.newPlainTextObject(
+                        t(Translations.LOGIN_ACTION_TEXT, language, { provider: getProviderDisplayName(provider) })
+                    ),
+                    style: ButtonStyle.PRIMARY,
                 }),
-            ]
+            ],
         });
 
-        const appUser = await this.read.getUserReader().getAppUser();
-        if (!appUser) return;
-        
         const messageBuilder = this.modify.getCreator().startMessage()
             .setSender(appUser)
             .setRoom(room)
             .setGroupable(false)
+            .setText(message)
             .setBlocks(blockBuilder.getBlocks());
 
         await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
