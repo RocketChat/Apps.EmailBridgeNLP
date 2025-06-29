@@ -104,7 +104,7 @@ export const ru = {
     Provider_Changed_Auto_Logout: "Вы автоматически выйдете из системы **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Предупреждение: Изменение поставщика электронной почты автоматически выйдет из вашей текущей учетной записи.",
     
-    // Granular Error Messages (inspired by QuickReplies)
+    // Granular Error Messages
     Error_Fill_Required_Fields: "Ошибка обработки запроса. Пожалуйста, заполните все обязательные поля ❌",
     Error_Fail_Internal: "Внутренняя ошибка. Попробуйте еще раз позже.",
     Error_Network_Failure: "Сбой сетевого подключения. Проверьте подключение к интернету и попробуйте еще раз.",
@@ -208,4 +208,52 @@ export const ru = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Обработка: \"__query__\"...",
+    LLM_Tool_Detected: "**Инструмент Обнаружен** для запроса: \"__query__\"\n\n**Инструмент:** __tool__",
+    LLM_No_Tool_Detected: "Подходящий инструмент для запроса не найден: \"__query__\"",
+    LLM_Error_Processing: "**Ошибка обработки запроса:** \"__query__\"\n\n**Ошибка:** __error__",
+    Tool_Call_Result: "Результат Вызова Инструмента",
+    Tool_Name_Label: "Инструмент",
+    Tool_Args_Label: "Аргументы",
+    Query_Processed_Success: "Запрос успешно обработан",
+    Invalid_Tool_Name: "Обнаружено недопустимое имя инструмента",
+    LLM_Parsing_Failed: "Не удалось разобрать ответ LLM",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Отправить Email",
+    Tool_Count_Emails: "Подсчитать Email",
+    Tool_Search_Emails: "Поиск Email",
+    Tool_Get_Email_Content: "Получить Содержимое Email",
+    Tool_Summarize_And_Send: "Резюмировать и Отправить Email",
+    Tool_Report: "Создать Отчет",
+
+    // Send Email Modal
+    Send_Email_Modal_Title: "Отправить письмо",
+    Send_Email_To_Label: "Кому",
+    Send_Email_To_Placeholder: "Введите адреса электронной почты получателей (через запятую)",
+    Send_Email_CC_Label: "Копия (Необязательно)",
+    Send_Email_CC_Placeholder: "Введите адреса электронной почты для копии (через запятую)",
+    Send_Email_Subject_Label: "Тема",
+    Send_Email_Subject_Placeholder: "Введите тему письма",
+    Send_Email_Content_Label: "Сообщение",
+    Send_Email_Content_Placeholder: "Введите содержимое вашего сообщения",
+    Send_Email_Send_Button: "Отправить письмо",
+    Send_Email_Cancel_Button: "Отмена",
+    Send_Email_Modal_Opened: "Модальное окно создания письма успешно открыто",
+    Send_Email_Success: "Письмо успешно отправлено",
+    Send_Email_Failed: "Ошибка при отправке письма: __error__",
+    Send_Email_Error_No_From_Email: "Невозможно определить адрес электронной почты отправителя",
+    Send_Email_Validation_To_Required: "Адрес электронной почты получателя обязателен",
+    Send_Email_Validation_Subject_Required: "Тема письма обязательна",
+    Send_Email_Validation_Content_Required: "Содержание письма обязательно",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "Письмо готово к отправке",
+    Email_Send_Button: "Отправить",
+    Email_Edit_And_Send_Button: "Редактировать и отправить",
+
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "✅ Письмо успешно отправлено",
+    Send_Email_Failed_With_Emoji: "❌ Ошибка при отправке письма: __error__",
 }; 

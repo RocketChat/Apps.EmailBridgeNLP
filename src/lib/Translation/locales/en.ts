@@ -104,7 +104,7 @@ export const en = {
     Provider_Changed_Auto_Logout: "You have been automatically logged out from **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Warning: Changing your email provider will automatically log you out from your current account.",
     
-    // Granular Error Messages
+    // Granular Error Messages 
     Error_Fill_Required_Fields: "Failed to process request. Please fill all the required fields ❌",
     Error_Fail_Internal: "Internal error. Please try again later.",
     Error_Network_Failure: "Network connection failed. Please check your internet connection and try again.",
@@ -209,4 +209,54 @@ export const en = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Processing: \"__query__\"...",
+    LLM_Tool_Detected: "**Tool Detected** for query: \"__query__\"\n\n**Tool:** __tool__",
+    LLM_No_Tool_Detected: "No suitable tool found for query: \"__query__\"",
+    LLM_Error_Processing: "**Error processing query:** \"__query__\"\n\n**Error:** __error__",
+    Tool_Call_Result: "Tool Call Result",
+    Tool_Name_Label: "Tool",
+    Tool_Args_Label: "Arguments",
+    Query_Processed_Success: "Query processed successfully",
+    Invalid_Tool_Name: "Invalid tool name detected",
+    LLM_Parsing_Failed: "Failed to parse LLM response",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Send Email",
+    Tool_Count_Emails: "Count Emails",
+    Tool_Search_Emails: "Search Emails",
+    Tool_Get_Email_Content: "Get Email Content",
+    Tool_Summarize_And_Send: "Summarize & Send Email",
+    Tool_Report: "Generate Report",
+    
+    // Send Email Modal
+    Send_Email_Modal_Title: "Send Email",
+    Send_Email_To_Label: "To",
+    Send_Email_To_Placeholder: "Enter recipient email addresses (comma separated)",
+    Send_Email_CC_Label: "CC",
+    Send_Email_CC_Placeholder: "Enter CC email addresses (comma separated)",
+    Send_Email_Subject_Label: "Subject",
+    Send_Email_Subject_Placeholder: "Enter email subject",
+    Send_Email_Content_Label: "Content",
+    Send_Email_Content_Placeholder: "Enter email content",
+    Send_Email_Send_Button: "Send",
+    Send_Email_Cancel_Button: "Cancel",
+    Send_Email_Modal_Opened: "Email composition modal opened",
+    Send_Email_Success: "Email sent successfully",
+    Send_Email_Failed: "Failed to send email: __error__",
+    Send_Email_Error_No_From_Email: "Unable to determine sender email address",
+
+    // Send Email Validation
+    Send_Email_Validation_To_Required: "Recipient email address is required",
+    Send_Email_Validation_Subject_Required: "Email subject is required",
+    Send_Email_Validation_Content_Required: "Email content is required",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "Email Ready to Send",
+    Email_Send_Button: "Send",
+    Email_Edit_And_Send_Button: "Edit & Send",
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "✅ Email sent successfully",
+    Send_Email_Failed_With_Emoji: "❌ Failed to send email: __error__",
 }; 

@@ -107,7 +107,7 @@ export const es = {
     Provider_Changed_Auto_Logout: "Ha sido automáticamente desconectado de **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Advertencia: Cambiar su proveedor de email lo desconectará automáticamente de su cuenta actual.",
     
-    // Granular Error Messages (inspired by QuickReplies)
+    // Granular Error Messages 
     Error_Fill_Required_Fields: "Error al procesar solicitud. Por favor complete todos los campos requeridos ❌",
     Error_Fail_Internal: "Error interno. Por favor intente de nuevo más tarde.",
     Error_Network_Failure: "Fallo de conexión de red. Por favor verifique su conexión a internet e intente de nuevo.",
@@ -212,4 +212,54 @@ export const es = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Procesando: \"__query__\"...",
+    LLM_Tool_Detected: "**Herramienta Detectada** para consulta: \"__query__\"\n\n**Herramienta:** __tool__",
+    LLM_No_Tool_Detected: "No se encontró herramienta adecuada para consulta: \"__query__\"",
+    LLM_Error_Processing: "**Error procesando consulta:** \"__query__\"\n\n**Error:** __error__",
+    Tool_Call_Result: "Resultado de Llamada de Herramienta",
+    Tool_Name_Label: "Herramienta",
+    Tool_Args_Label: "Argumentos",
+    Query_Processed_Success: "Consulta procesada exitosamente",
+    Invalid_Tool_Name: "Nombre de herramienta inválido detectado",
+    LLM_Parsing_Failed: "Error al analizar respuesta del LLM",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Enviar Email",
+    Tool_Count_Emails: "Contar Emails",
+    Tool_Search_Emails: "Buscar Emails",
+    Tool_Get_Email_Content: "Obtener Contenido de Email",
+    Tool_Summarize_And_Send: "Resumir y Enviar Email",
+    Tool_Report: "Generar Reporte",
+
+    // Send Email Modal
+    Send_Email_Modal_Title: 'Enviar Correo',
+    Send_Email_To_Label: 'Para',
+    Send_Email_To_Placeholder: 'Ingrese direcciones de correo destinatarias (separadas por comas)',
+    Send_Email_CC_Label: 'CC',
+    Send_Email_CC_Placeholder: 'Ingrese direcciones de correo CC (separadas por comas)',
+    Send_Email_Subject_Label: 'Asunto',
+    Send_Email_Subject_Placeholder: 'Ingrese el asunto del correo',
+    Send_Email_Content_Label: 'Contenido',
+    Send_Email_Content_Placeholder: 'Ingrese el contenido del correo',
+    Send_Email_Send_Button: 'Enviar',
+    Send_Email_Cancel_Button: 'Cancelar',
+    Send_Email_Success: 'Correo enviado exitosamente',
+    Send_Email_Failed: 'Error al enviar correo: __error__',
+    Send_Email_Modal_Opened: 'Modal de composición de correo abierto',
+    Send_Email_Error_No_From_Email: 'No se puede determinar la dirección de correo del remitente',
+
+    // Send Email Validation
+    Send_Email_Validation_To_Required: "La dirección de correo del destinatario es obligatoria",
+    Send_Email_Validation_Subject_Required: "El asunto del correo es obligatorio",
+    Send_Email_Validation_Content_Required: "El contenido del correo es obligatorio",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: 'Correo listo para enviar',
+    Email_Send_Button: 'Enviar',
+    Email_Edit_And_Send_Button: 'Editar y Enviar',
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: '✅ Correo enviado exitosamente',
+    Send_Email_Failed_With_Emoji: '❌ Error al enviar correo: __error__',
 }; 

@@ -104,7 +104,7 @@ export const pl = {
     Provider_Changed_Auto_Logout: "Zostałeś automatycznie wylogowany z **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Ostrzeżenie: Zmiana dostawcy poczty e-mail automatycznie wyloguje Cię z bieżącego konta.",
     
-    // Granular Error Messages (inspired by QuickReplies)
+    // Granular Error Messages
     Error_Fill_Required_Fields: "Błąd podczas przetwarzania żądania. Proszę wypełnić wszystkie wymagane pola ❌",
     Error_Fail_Internal: "Błąd wewnętrzny. Spróbuj ponownie później.",
     Error_Network_Failure: "Błąd połączenia sieciowego. Sprawdź połączenie internetowe i spróbuj ponownie.",
@@ -208,4 +208,52 @@ export const pl = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Przetwarzanie: \"__query__\"...",
+    LLM_Tool_Detected: "**Narzędzie Wykryte** dla zapytania: \"__query__\"\n\n**Narzędzie:** __tool__",
+    LLM_No_Tool_Detected: "Nie znaleziono odpowiedniego narzędzia dla zapytania: \"__query__\"",
+    LLM_Error_Processing: "**Błąd przetwarzania zapytania:** \"__query__\"\n\n**Błąd:** __error__",
+    Tool_Call_Result: "Wynik Wywołania Narzędzia",
+    Tool_Name_Label: "Narzędzie",
+    Tool_Args_Label: "Argumenty",
+    Query_Processed_Success: "Zapytanie przetworzone pomyślnie",
+    Invalid_Tool_Name: "Wykryto nieprawidłową nazwę narzędzia",
+    LLM_Parsing_Failed: "Nie udało się przeanalizować odpowiedzi LLM",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Wyślij Email",
+    Tool_Count_Emails: "Policz Emaile",
+    Tool_Search_Emails: "Szukaj Emaile",
+    Tool_Get_Email_Content: "Pobierz Zawartość Emaila",
+    Tool_Summarize_And_Send: "Podsumuj i Wyślij Email",
+    Tool_Report: "Generuj Raport",
+
+    // Send Email Modal
+    Send_Email_Modal_Title: "Wyślij e-mail",
+    Send_Email_To_Label: "Do",
+    Send_Email_To_Placeholder: "Wprowadź adresy e-mail odbiorców (oddzielone przecinkami)",
+    Send_Email_CC_Label: "DW (Opcjonalnie)",
+    Send_Email_CC_Placeholder: "Wprowadź adresy e-mail DW (oddzielone przecinkami)",
+    Send_Email_Subject_Label: "Temat",
+    Send_Email_Subject_Placeholder: "Wprowadź temat e-maila",
+    Send_Email_Content_Label: "Wiadomość",
+    Send_Email_Content_Placeholder: "Wprowadź treść wiadomości",
+    Send_Email_Send_Button: "Wyślij e-mail",
+    Send_Email_Cancel_Button: "Anuluj",
+    Send_Email_Modal_Opened: "Modal kompozycji e-maila pomyślnie otwarty",
+    Send_Email_Success: "E-mail wysłany pomyślnie",
+    Send_Email_Failed: "Nie udało się wysłać e-maila: __error__",
+    Send_Email_Error_No_From_Email: "Nie można określić adresu e-mail nadawcy",
+    Send_Email_Validation_To_Required: "Adres e-mail odbiorcy jest wymagany",
+    Send_Email_Validation_Subject_Required: "Temat wiadomości e-mail jest wymagany",
+    Send_Email_Validation_Content_Required: "Treść wiadomości e-mail jest wymagana",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "E-mail gotowy do wysłania",
+    Email_Send_Button: "Wyślij",
+    Email_Edit_And_Send_Button: "Edytuj i Wyślij",
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "✅ E-mail wysłany pomyślnie",
+    Send_Email_Failed_With_Emoji: "❌ Nie udało się wysłać e-maila: __error__",
 }; 
