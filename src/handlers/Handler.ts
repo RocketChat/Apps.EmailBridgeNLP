@@ -14,7 +14,6 @@ import {
 } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
-import { EmailProviders } from '../enums/EmailProviders';
 import { t, Language } from '../lib/Translation/translation';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
@@ -376,6 +375,7 @@ export class Handler implements IHandler {
             );
             const userPreference = await userPreferenceStorage.getUserPreference();
             const emailProvider = userPreference.emailProvider;
+            const categories = userPreference.reportCategories;
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
@@ -404,7 +404,8 @@ export class Handler implements IHandler {
             // Get email statistics for last 24 hours
             const statsParams: IEmailStatsParams = {
                 userId: this.sender.id,
-                hoursBack: 24
+                hoursBack: 24,
+                categories,
             };
 
             const statistics = await EmailServiceFactory.getEmailStatistics(
@@ -417,13 +418,26 @@ export class Handler implements IHandler {
                 this.language
             );
 
+            let categoryReport = '';
+            if (statistics.categoryStats) {
+                for (const category in statistics.categoryStats) {
+                    if (statistics.categoryStats.hasOwnProperty(category)) {
+                        const stats = statistics.categoryStats[category];
+                        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+                        categoryReport += `**${categoryName}**: ${stats.total} emails (${stats.unread} unread)\n`;
+                    }
+                }
+            }
+
             // Create a comprehensive report
             const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
                                  t(Translations.REPORT_STATISTICS, this.language, {
                                      receivedToday: statistics.receivedToday.toString(),
-                                     sentToday: statistics.sentToday.toString(),
-                                     totalUnread: statistics.unreadEmails.toString()
-                                 });
+                                     receivedUnreadToday: statistics.receivedUnreadToday.toString(),
+                                     sentToday: statistics.sentToday.toString()
+                                 }) + '\n\n' +
+                                 categoryReport +
+                                 '---';
             messageBuilder.setText(reportMessage);
             
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());

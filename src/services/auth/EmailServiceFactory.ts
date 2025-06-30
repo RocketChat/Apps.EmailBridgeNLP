@@ -158,57 +158,28 @@ export class EmailServiceFactory {
         language: Language = Language.en
     ): Promise<IEmailStatistics> {
         if (!this.isProviderSupported(provider)) {
-            throw new Error(`Provider ${provider} is not supported for statistics`);
+            throw new Error(t(Translations.STATISTICS_PROVIDER_NOT_SUPPORTED, language, { provider }));
         }
 
+        const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
+        
+        let userInfo;
         try {
-            const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
-            
-            // Try to get user info, which will automatically refresh tokens if needed
-            let userInfo;
-            try {
-                userInfo = await oauthService.getUserInfo(params.userId);
-            } catch (error) {
-                // If getUserInfo fails, it's likely due to expired/invalid tokens
-                if (error.message.includes('expired') || 
-                    error.message.includes('invalid') || 
-                    error.message.includes('authentication') ||
-                    error.message.includes('TOKEN_EXPIRED') ||
-                    error.message.includes('USER_NOT_AUTHENTICATED')) {
-                    const providerName = getProviderDisplayName(provider);
-                    throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
-                }
-                // Re-throw other errors as-is
-                throw error;
-            }
-            
-            switch (provider) {
-                case EmailProviders.GMAIL:
-                    const gmailService = new GmailService(oauthService, http, logger);
-                    return await gmailService.getEmailStatistics(params, userInfo, language);
-                case EmailProviders.OUTLOOK:
-                    const outlookService = new OutlookService(oauthService, http, logger);
-                    return await outlookService.getEmailStatistics(params, userInfo, language);
-                default:
-                    throw new Error(`Statistics not implemented for provider: ${provider}`);
-            }
+            userInfo = await oauthService.getUserInfo(params.userId);
         } catch (error) {
-            // Log the original error for debugging
-            logger.error('EmailServiceFactory.getEmailStatistics error:', error);
-            
-            // If it's already a user-friendly message, pass it through
-            if (error.message.includes('authentication has expired') || 
-                error.message.includes('/email login') ||
-                error.message.includes('autenticación ha expirado') ||
-                error.message.includes('Authentifizierung ist abgelaufen') ||
-                error.message.includes('autentykacja wygasła') ||
-                error.message.includes('autenticação expirou') ||
-                error.message.includes('аутентификация истекла')) {
-                throw error;
-            }
-            
-            // For other errors, provide a generic message but preserve details for logging
-            throw new Error(`Failed to generate email statistics. Please try again or use '/email login' to refresh your authentication.`);
+            const providerName = getProviderDisplayName(provider);
+            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+        }
+        
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                const gmailService = new GmailService(oauthService, http, logger);
+                return await gmailService.getEmailStatistics(params, userInfo, language);
+            case EmailProviders.OUTLOOK:
+                const outlookService = new OutlookService(oauthService, http, logger);
+                return await outlookService.getEmailStatistics(params, userInfo, language);
+            default:
+                throw new Error(t(Translations.STATISTICS_NOT_IMPLEMENTED, language, { provider }));
         }
     }
 } 
