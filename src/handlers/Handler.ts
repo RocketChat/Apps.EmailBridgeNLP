@@ -30,7 +30,7 @@ import { LLMService } from '../services/LLMService';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { SendEmailModal } from '../modal/SendEmailModal';
 import { IToolCall } from '../definition/lib/ToolInterfaces';
-import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
 
 export class Handler implements IHandler {
@@ -522,7 +522,7 @@ export class Handler implements IHandler {
 
             // Process query with LLM
             const llmService = new LLMService(this.http);
-            const { toolCalls } = await llmService.processNaturalLanguageQuery(query);
+            const { toolCalls, error } = await llmService.processNaturalLanguageQuery(query);
 
             // Create new message for results
             const resultMessageBuilder = this.modify
@@ -532,20 +532,106 @@ export class Handler implements IHandler {
                 .setRoom(this.room)
                 .setGroupable(false);
 
+            if (error) {
+                resultMessageBuilder.setText(error);
+                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+            }
+
             if (toolCalls && toolCalls.length > 0) {
                 const toolCall = toolCalls[0];
                 const toolDisplayName = this.getToolDisplayName(toolCall.function.name);
                 const args = JSON.parse(toolCall.function.arguments);
                 
-                // Handle send-email tool with buttons instead of immediate modal
-                if (toolCall.function.name === 'send-email') {
-                    // Store email data for later use in button handlers
-                    const emailData: ISendEmailData = {
-                        to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                        cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
-                        subject: args.subject || '',
-                        content: args.content || '',
-                    };
+                // Handle send-email and summarize-and-send-email tools with buttons instead of immediate modal
+                if (toolCall.function.name === 'send-email' || toolCall.function.name === 'summarize-and-send-email') {
+                    let emailData: ISendEmailData;
+                    
+                    if (toolCall.function.name === 'send-email') {
+                        // Store email data for later use in button handlers
+                        emailData = {
+                            to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
+                            cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                            subject: args.subject || '',
+                            content: args.content || '',
+                        };
+                    } else {
+                        // Handle summarize-and-send-email tool
+                        try {
+                            // Create summarize parameters
+                            const summarizeParams: ISummarizeParams = {
+                                start_date: args.start_date,
+                                end_date: args.end_date,
+                                people: args.people,
+                                format: args.format,
+                            };
+
+                            // Calculate days if date range is provided
+                            if (args.start_date && args.end_date) {
+                                const startDate = new Date(args.start_date);
+                                const endDate = new Date(args.end_date);
+                                const timeDiff = endDate.getTime() - startDate.getTime();
+                                summarizeParams.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                            }
+
+                            // Create services
+                            const { MessageService } = await import('../services/MessageService');
+                            const messageService = new MessageService();
+                            const llmService = new LLMService(this.http);
+
+                            // Retrieve messages from the current room
+                            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
+
+                            if (messages.length === 0) {
+                                resultMessageBuilder.setText('No messages found to summarize based on your criteria.');
+                                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+                            }
+
+                            // Format messages for summarization
+                            const formattedMessages = messageService.formatMessagesForSummary(messages);
+
+                            // Generate summary using LLM
+                            const channelName = this.room.displayName || 'Channel';
+                            const summary = await llmService.generateSummary(formattedMessages, channelName);
+
+                            if (!summary || summary === "Failed to generate summary due to an error.") {
+                                resultMessageBuilder.setText('Unable to generate a summary of the messages. Please try again.');
+                                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+                            }
+
+                            // Prepare email content
+                            const subject = args.subject || `Summary of ${channelName} conversation`;
+                            
+                            let emailContent = `CONVERSATION SUMMARY: ${channelName}\n\n`;
+                            emailContent += `${summary}\n\n`;
+                            emailContent += `--------------------------------------------------\n\n`;
+                            emailContent += `SUMMARY DETAILS:\n`;
+                            emailContent += `- Messages included: ${messages.length}\n`;
+                            emailContent += `- Channel: ${channelName}\n`;
+                            
+                            if (args.people && args.people.length > 0) {
+                                emailContent += `- Participants: ${args.people.join(', ')}\n`;
+                            }
+                            
+                            if (summarizeParams.days) {
+                                emailContent += `- Time period: Last ${summarizeParams.days} day(s)\n`;
+                            } else if (args.start_date && args.end_date) {
+                                emailContent += `- Time period: ${args.start_date} to ${args.end_date}\n`;
+                            }
+                            
+                            emailContent += `\nThis summary was generated automatically by EmailBridge NLP.`;
+
+                            emailData = {
+                                to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
+                                cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                                subject,
+                                content: emailContent,
+                            };
+
+                        } catch (error) {
+                            resultMessageBuilder.setText(`Failed to generate summary: ${error.message}`);
+                            return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+                        }
+                    }
 
                     // Store email data in room interaction storage for button handlers
                     const roomInteractionStorage = new RoomInteractionStorage(
@@ -567,10 +653,12 @@ export class Handler implements IHandler {
                     // Show simplified email ready message with buttons
                     const block = this.modify.getCreator().getBlockBuilder();
                     
+                    const messageText = toolCall.function.name === 'summarize-and-send-email' 
+                        ? 'Summary Generated Successfully'
+                        : t(Translations.EMAIL_READY_TO_SEND, this.language);
+                    
                     block.addSectionBlock({
-                        text: block.newMarkdownTextObject(
-                            t(Translations.EMAIL_READY_TO_SEND, this.language)
-                        ),
+                        text: block.newMarkdownTextObject(messageText),
                     });
 
                     block.addActionsBlock({

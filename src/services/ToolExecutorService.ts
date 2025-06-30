@@ -34,7 +34,13 @@ export class ToolExecutorService {
         try {
             switch (toolName) {
                 case LlmTools.SEND_EMAIL:
-                    return await this.executeSendEmailTool(toolCall, user, room, triggerId);
+                case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
+                    // This tool is now handled directly in Handler.ts with buttons
+                    return {
+                        tool_name: toolName,
+                        success: false,
+                        message: `Tool \`${toolName}\` should be handled with buttons, not through ToolExecutorService.`,
+                    };
                 default:
                     return {
                         tool_name: toolName,
@@ -48,97 +54,6 @@ export class ToolExecutorService {
                 success: false,
                 error: error.message,
                 message: `Error processing tool '${toolName}': ${error.message}`,
-            };
-        }
-    }
-
-    private async executeSendEmailTool(
-        toolCall: IToolCall,
-        user: IUser,
-        room: IRoom,
-        triggerId?: string
-    ): Promise<IToolExecutionResult> {
-
-        if (!triggerId) {
-            return {
-                tool_name: LlmTools.SEND_EMAIL,
-                success: false,
-                error: 'Trigger ID is missing',
-                message: 'A trigger ID is required to open the email modal.',
-            };
-        }
-
-        try {
-            const language = await getUserPreferredLanguage(this.read.getPersistenceReader(), this.persistence, user.id);
-            // Store room ID for later use in ExecuteViewSubmitHandler (like Config method does)
-            const roomInteractionStorage = new RoomInteractionStorage(
-                this.persistence,
-                this.read.getPersistenceReader(),
-                user.id,
-            );
-
-            await roomInteractionStorage.storeInteractionRoomId(room.id);
-
-            // Parse tool call arguments
-            const args = JSON.parse(toolCall.function.arguments);
-
-            // Prepare email data from LLM arguments
-            const emailData: ISendEmailData = {
-                to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
-                subject: args.subject || '',
-                content: args.content || '',
-            };
-
-            // Create and validate the modal
-            const modal = await SendEmailModal({
-                app: this.app,
-                modify: this.modify,
-                language,
-                emailData,
-            });
-
-            if (!modal || !modal.id) {
-                return {
-                    tool_name: LlmTools.SEND_EMAIL,
-                    success: false,
-                    error: 'Modal creation failed',
-                    message: 'Failed to create the send email modal.',
-                };
-            }
-
-            if (triggerId) {
-                try {
-                    await this.modify.getUiController().openSurfaceView(modal, { triggerId }, user);
-
-                    return {
-                        tool_name: LlmTools.SEND_EMAIL,
-                        success: true,
-                        message: 'Send email modal opened successfully.',
-                        modal_opened: true,
-                    };
-                } catch (modalError) {
-                    return {
-                        tool_name: LlmTools.SEND_EMAIL,
-                        success: false,
-                        error: `Failed to open modal: ${modalError.message}`,
-                        message: 'Failed to open the send email modal.',
-                    };
-                }
-            } else {
-                return {
-                    tool_name: LlmTools.SEND_EMAIL,
-                    success: false,
-                    error: 'Trigger ID is missing',
-                    message: 'A trigger ID is required to open the email modal.',
-                };
-            }
-        } catch (error) {
-            return {
-                tool_name: LlmTools.SEND_EMAIL,
-                success: false,
-                error: error.message,
-                message: 'Failed to open the send email modal.',
             };
         }
     }

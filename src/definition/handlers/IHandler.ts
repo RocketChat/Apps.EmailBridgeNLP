@@ -8,7 +8,7 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
 import { Language } from '../../lib/Translation/translation';
-import { ISendEmailData } from '../../modal/SendEmailModal';
+import { ISendEmailData } from '../lib/IEmailUtils';
 
 export interface IHandlerParams {
     app: EmailBridgeNlpApp;

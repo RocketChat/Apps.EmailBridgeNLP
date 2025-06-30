@@ -34,7 +34,7 @@ export class LLMService {
         };
     }
 
-    public async processNaturalLanguageQuery(query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse }> {
+    public async processNaturalLanguageQuery(query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
         // Generate date placeholders
         const dateReplacements = this.generateDateReplacements();
         
@@ -81,30 +81,84 @@ export class LLMService {
 
             const choice = llmResponse.choices[0];
             let toolCalls = choice.message.tool_calls || [];
+            let error: string | undefined;
 
             // Simple parsing - only try to parse JSON from content if no tool_calls
             if (toolCalls.length === 0 && choice.message.content) {
-                toolCalls = this.parseContentForTools(choice.message.content);
+                const parsed = this.parseContentForTools(choice.message.content);
+                toolCalls = parsed.tools;
+                error = parsed.error;
             }
 
-            return { toolCalls, rawResponse: llmResponse };
+            return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
             throw new Error(`${LlmErrors.REQUEST_FAILED}: ${error.message}`);
         }
     }
 
-    private parseContentForTools(content: string): IToolCall[] {
+    public async generateSummary(messages: string, channelName: string): Promise<string> {
+        const prompt = LlmPrompts.SUMMARIZE_PROMPT
+            .replace('__channelName__', channelName)
+            .replace('__messages__', messages);
+
+        const payload = {
+            model: LlmConfig.MODEL_PATH,
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt,
+                },
+            ],
+            stream: false,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: payload,
+        };
+
+        try {
+            const response = await this.http.post(this.llmEndpoint, request);
+
+            if (!response || !response.data) {
+                throw new Error('Failed to get response from LLM API');
+            }
+
+            const llmResponse = response.data as ILLMResponse;
+
+            if (!llmResponse.choices || llmResponse.choices.length === 0) {
+                throw new Error('No choices in LLM response');
+            }
+
+            const choice = llmResponse.choices[0];
+            const content = choice.message.content || '';
+            
+            return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || "Failed to generate summary.";
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            return "Failed to generate summary due to an error.";
+        }
+    }
+
+    private parseContentForTools(content: string): { tools: IToolCall[], error?: string } {
         const trimmed = content.trim();
         
         // Simple JSON parsing - parse function_call format only
         try {
             const parsed = JSON.parse(trimmed);
+
+            if(parsed.error) {
+                return { tools: [], error: parsed.error };
+            }
+
             if (parsed.function_call?.name) {
                 const toolName = parsed.function_call.name;
                 
                 // Validate tool name
                 if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
-                    return [];
+                    return { tools: [] };
                 }
 
                 const toolCall: IToolCall = {
@@ -116,12 +170,12 @@ export class LLMService {
                     },
                 };
                 
-                return [toolCall];
+                return { tools: [toolCall] };
             }
         } catch (e) {
             console.error('Error parsing content for tools:', e);
         }
 
-        return [];
+        return { tools: [] };
     }
 } 

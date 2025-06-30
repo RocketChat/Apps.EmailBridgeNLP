@@ -13,7 +13,7 @@ export const LlmPrompts = {
     }
     
     If the request does not match any known tool, return:
-    {"error": "I can't understand your request. Please rewrite your query with more details."}
+    {"error": "I can't understand that request. Could you please rephrase it with more details?"}
     
     ---
     
@@ -65,7 +65,7 @@ export const LlmPrompts = {
     FORMAT RULES:
     1. Convert natural language periods into absolute dates:
     "last 3 days" → "start_date": "{CURRENT_DATE_MINUS_3}", "end_date": "{CURRENT_DATE}"
-    2. If no date is provided, use the _current date_.
+    2. If no date range or time period (like "last 5 days") is mentioned, DO NOT include the "start_date" or "end_date" fields. The system will default to the most recent messages.
     3. Dates must be formatted "YYYY-MM-DD".
     4. to and cc must be arrays (e.g., ["a@b.com"]).
     5. If only one email is given, still use array.
@@ -130,5 +130,18 @@ export const LlmPrompts = {
     - JSON must be valid and exactly match field types.
     `
     ,
+
+    SUMMARIZE_PROMPT: `You are an AI assistant specializing in clear and concise conversation summaries. Your task is to summarize the following Rocket.Chat conversation from the channel "__channelName__".
+
+The summary should be easy for anyone to read, even if they were not part of the conversation. Structure your response as follows:
+
+1.  **MAIN POINTS:** Start with a brief, one or two-sentence overview of the entire conversation.
+2.  **KEY TOPICS & DECISIONS:** Use bullet points to list the main topics discussed and any decisions that were made.
+3.  **ACTION ITEMS:** If any, list clear action items and who they are assigned to in a separate bulleted list.
+
+Here is the conversation:
+__messages__
+
+Generate the summary based on these instructions.`
 
 };
