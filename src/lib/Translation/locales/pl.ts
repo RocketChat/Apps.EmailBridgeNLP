@@ -195,6 +195,17 @@ export const pl = {
     Report_Not_Authenticated: "❌ **Nie jesteś uwierzytelniony z __provider__.**\n\nUżyj `/email login`, aby się najpierw zalogować, a następnie spróbuj ponownie wygenerować raport.",
     Report_Error: "❌ **Błąd podczas generowania raportu e-mail:**\n__error__\n\nSpróbuj ponownie lub skontaktuj się z administratorem.",
     Report_Header: "\n📊 **Raport Statystyk E-mail(ostatnie 24 godziny)**",
-    Report_Statistics: "**Otrzymane**: __receivedToday__ e-maili\n**Wysłane**: __sentToday__ e-maili\n**Nieprzeczytane**: __totalUnread__ e-maili",
-    Report_Token_Expired: "❌ **Twoja autentykacja wygasła.**\n\nUżyj `/email login`, aby ponownie połączyć swoje konto __provider__ i spróbuj ponownie.",
+    Report_Statistics: "**Odebrane**: __receivedToday__ e-maile\n**Wysłane**: __sentToday__ e-maile\n**Nieprzeczytane**: __totalUnread__ e-maile",
+    Report_Token_Expired: "❌ **Twoja autentykacja wygasła.**\n\nUżyj `/email login`, aby ponownie połączyć swoje konto __provider__ i spróbować ponownie.",
+    Report_Categories_Label: "Report Categories",
+
+    // Statistics Service Errors
+    Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
+    Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",
+    Gmail_Stats_Failed: "Failed to get Gmail statistics: __error__",
+    Outlook_Stats_Failed: "Failed to get Outlook statistics: __error__",
+
+    // User Preference Modal
+    New_Category_Label: "New Category",
+    New_Categories_Placeholder: "Add new categories, comma-separated...",
 }; 

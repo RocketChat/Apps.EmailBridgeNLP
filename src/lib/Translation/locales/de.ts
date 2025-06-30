@@ -200,5 +200,16 @@ export const de = {
     Report_Error: "❌ **Fehler beim Erstellen des E-Mail-Berichts:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
     Report_Header: "\n📊 **E-Mail-Statistikbericht(letzte 24 Stunden)**",
     Report_Statistics: "**Empfangen**: __receivedToday__ E-Mails\n**Gesendet**: __sentToday__ E-Mails\n**Ungelesen**: __totalUnread__ E-Mails",
-    Report_Token_Expired: "❌ **Ihre Authentifizierung ist abgelaufen.**\n\nVerwenden Sie `/email login`, um Ihr __provider__-Konto erneut zu verbinden und versuchen Sie es erneut.",
+    Report_Token_Expired: "❌ **Ihre Authentifizierung ist abgelaufen.**\n\nVerwenden Sie `/email login`, um Ihr __provider__-Konto erneut zu verbinden und es erneut zu versuchen.",
+    Report_Categories_Label: "Report Categories",
+
+    // Statistics Service Errors
+    Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
+    Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",
+    Gmail_Stats_Failed: "Failed to get Gmail statistics: __error__",
+    Outlook_Stats_Failed: "Failed to get Outlook statistics: __error__",
+
+    // User Preference Modal
+    New_Category_Label: "New Category",
+    New_Categories_Placeholder: "Add new categories, comma-separated...",
 }; 

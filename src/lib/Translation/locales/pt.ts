@@ -195,6 +195,17 @@ export const pt = {
     Report_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar o relatório novamente.",
     Report_Error: "❌ **Erro ao gerar relatório de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
     Report_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
-    Report_Statistics: "**Recebidos**: __receivedToday__ e-mails\n**Enviados**: __sentToday__ e-mails\n**Não lidos**: __totalUnread__ e-mails",
+    Report_Statistics: "**Recebidos**: __receivedToday__ emails\n**Enviados**: __sentToday__ emails\n**Não lidos**: __totalUnread__ emails",
     Report_Token_Expired: "❌ **Sua autenticação expirou.**\n\nUse `/email login` para reconectar sua conta __provider__ e tente novamente.",
+    Report_Categories_Label: "Report Categories",
+
+    // Statistics Service Errors
+    Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
+    Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",
+    Gmail_Stats_Failed: "Failed to get Gmail statistics: __error__",
+    Outlook_Stats_Failed: "Failed to get Outlook statistics: __error__",
+
+    // User Preference Modal
+    New_Category_Label: "New Category",
+    New_Categories_Placeholder: "Add new categories, comma-separated...",
 }; 

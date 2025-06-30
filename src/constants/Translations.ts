@@ -233,4 +233,15 @@ export const Translations = {
     REPORT_HEADER: 'Report_Header',
     REPORT_STATISTICS: 'Report_Statistics',
     REPORT_TOKEN_EXPIRED: 'Report_Token_Expired',
+    REPORT_CATEGORIES_LABEL: 'Report_Categories_Label',
+
+    // Statistics Service Errors
+    STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',
+    STATISTICS_NOT_IMPLEMENTED: 'Statistics_Not_Implemented',
+    GMAIL_STATS_FAILED: 'Gmail_Stats_Failed',
+    OUTLOOK_STATS_FAILED: 'Outlook_Stats_Failed',
+
+    // User Preference Modal
+    NEW_CATEGORY_LABEL: 'New_Category_Label',
+    NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
 } as const; 
