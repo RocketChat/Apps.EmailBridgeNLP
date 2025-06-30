@@ -7,48 +7,9 @@ import {
     PlainTextInputElement,
     Option,
     OverflowElement,
+    MultiStaticSelectElement,
 } from '@rocket.chat/ui-kit';
-
-export interface ButtonParam {
-    text: string;
-    url?: string;
-    value?: string;
-    style?: ButtonStyle;
-}
-
-export interface ElementInteractionParam {
-    blockId: string;
-    actionId: string;
-}
-
-export interface PlainTextInputParam {
-    text: string;
-    initialValue?: string;
-    multiline?: boolean;
-    minLength?: number;
-    maxLength?: number;
-    dispatchActionConfig?: any[];
-}
-
-export interface StaticSelectElementParam {
-    placeholder: string;
-    options?: Option[];
-    optionGroups?: any[];
-    initialOption?: Option;
-    initialValue?: string;
-    dispatchActionConfig?: any[];
-}
-
-export interface StaticSelectOptionsParam extends Array<{
-    text: string;
-    value: string;
-    description?: string;
-    url?: string;
-}> {}
-
-export interface OverflowElementParam {
-    options: Option[];
-}
+import { ButtonParam, ElementInteractionParam, MultiStaticSelectElementParam, OverflowElementParam, PlainTextInputParam, StaticSelectElementParam, StaticSelectOptionsParam } from '../definition/lib/IElementBuilder';
 
 export class ElementBuilder {
     constructor(private readonly appId: string) {}
@@ -142,6 +103,38 @@ export class ElementBuilder {
         if (initialValue) dropDown.initialValue = initialValue;
         if (dispatchActionConfig) dropDown.dispatchActionConfig = dispatchActionConfig;
         
+        return dropDown;
+    }
+
+    public addMultiSelectDropDown(
+        param: MultiStaticSelectElementParam,
+        interaction: ElementInteractionParam,
+    ): MultiStaticSelectElement {
+        const {
+            placeholder,
+            options,
+            optionGroups,
+            initialValue,
+            dispatchActionConfig,
+        } = param;
+        const { blockId, actionId } = interaction;
+
+        const dropDown: MultiStaticSelectElement = {
+            type: BlockElementType.MULTI_STATIC_SELECT,
+            placeholder: {
+                type: TextObjectType.PLAIN_TEXT,
+                text: placeholder,
+            },
+            options: options || [],
+            appId: this.appId,
+            blockId,
+            actionId,
+        };
+
+        if (optionGroups) dropDown.optionGroups = optionGroups;
+        if (initialValue) dropDown.initialValue = initialValue;
+        if (dispatchActionConfig) dropDown.dispatchActionConfig = dispatchActionConfig;
+
         return dropDown;
     }
 

@@ -2,7 +2,7 @@ import {
     IModify,
     IUIKitSurfaceViewParam,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { TextObjectType, InputBlock, DividerBlock, SectionBlock } from '@rocket.chat/ui-kit';
+import { TextObjectType, InputBlock, DividerBlock, SectionBlock, ActionsBlock } from '@rocket.chat/ui-kit';
 
 import {
     ButtonStyle,
@@ -33,7 +33,7 @@ export async function UserPreferenceModal({
     const viewId = UserPreferenceModalEnum.VIEW_ID;
     const { elementBuilder, blockBuilder } = app.getUtils();
     const language = existingPreference.language as Language;
-    const blocks: (InputBlock | DividerBlock | SectionBlock)[] = [];
+    const blocks: (InputBlock | DividerBlock | SectionBlock | ActionsBlock)[] = [];
 
     // Language Selection
     const languageOptions = supportedLanguageList.map((lang) => ({
@@ -60,13 +60,12 @@ export async function UserPreferenceModal({
 
     blocks.push(
         blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID,
             text: t(Translations.LANGUAGE, existingPreference.language),
             element: languageDropDown,
             optional: false,
         }),
     );
-
-    blocks.push(blockBuilder.createDividerBlock());
 
     // Email Provider Selection
     const emailProviderOptions = [
@@ -99,10 +98,61 @@ export async function UserPreferenceModal({
 
     blocks.push(
         blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID,
             text: t(Translations.EMAIL_PROVIDER_PREFERENCE_LABEL, language),
             element: emailProviderDropDown,
             optional: false,
         }),
+    );
+
+    // Report Categories Selection
+    const allCategories = [...new Set(existingPreference.reportCategories || [])];
+    const categoryOptions = allCategories.map((category) => ({
+        text: category.charAt(0).toUpperCase() + category.slice(1),
+        value: category,
+    }));
+    
+    const categoryDropdownOptions = elementBuilder.createDropDownOptions(categoryOptions);
+
+    const categoryMultiSelect = elementBuilder.addMultiSelectDropDown(
+        {
+            placeholder: t(Translations.REPORT_CATEGORIES_LABEL, language),
+            options: categoryDropdownOptions,
+            initialValue: existingPreference.reportCategories || [],
+        },
+        {
+            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID,
+        },
+    );
+
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
+            text: t(Translations.REPORT_CATEGORIES_LABEL, language),
+            element: categoryMultiSelect,
+            optional: true,
+        }),
+    );
+
+    // New Category Input
+    const newCategoryInput = elementBuilder.createPlainTextInput(
+        {
+            text: t(Translations.NEW_CATEGORIES_PLACEHOLDER, language),
+        },
+        {
+            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID,
+        },
+    );
+
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
+            text: t(Translations.NEW_CATEGORY_LABEL, language),
+            element: newCategoryInput,
+            optional: true,
+        })
     );
 
     // Show warning if provider change will cause logout
