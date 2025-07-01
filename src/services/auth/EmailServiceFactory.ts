@@ -5,6 +5,11 @@ import { GoogleOAuthService } from '../auth/GoogleOAuthService';
 import { OutlookOAuthService } from '../auth/OutlookOAuthService';
 import { getGoogleOAuthSettings, getOutlookOAuthSettings } from '../../config/SettingsManager';
 import { Translations } from '../../constants/Translations';
+import { IEmailStatistics, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
+import { GmailService } from '../email/GmailService';
+import { OutlookService } from '../email/OutlookService';
+import { t, Language } from '../../lib/Translation/translation';
+import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 
 export class EmailServiceFactory {
     /**
@@ -87,8 +92,13 @@ export class EmailServiceFactory {
 
         try {
             const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
-            return await oauthService.isAuthenticated(userId);
+            
+            // Don't just check if authenticated, but actually try to get a valid token
+            // This will automatically refresh expired tokens or fail if refresh is not possible
+            await oauthService.getValidAccessToken(userId);
+            return true;
         } catch (error) {
+            // If we can't get a valid access token, user is not properly authenticated
             return false;
         }
     }
@@ -132,6 +142,44 @@ export class EmailServiceFactory {
             return await oauthService.revokeToken(userId);
         } catch (error) {
             return false;
+        }
+    }
+
+    /**
+     * Get email statistics for the specified time period
+     */
+    public static async getEmailStatistics(
+        provider: EmailProviders,
+        params: IEmailStatsParams,
+        http: IHttp,
+        persistence: IPersistence,
+        read: IRead,
+        logger: ILogger,
+        language: Language = Language.en
+    ): Promise<IEmailStatistics> {
+        if (!this.isProviderSupported(provider)) {
+            throw new Error(t(Translations.STATISTICS_PROVIDER_NOT_SUPPORTED, language, { provider }));
+        }
+
+        const oauthService = await this.createOAuthService(provider, http, persistence, read, logger);
+        
+        let userInfo;
+        try {
+            userInfo = await oauthService.getUserInfo(params.userId);
+        } catch (error) {
+            const providerName = getProviderDisplayName(provider);
+            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+        }
+        
+        switch (provider) {
+            case EmailProviders.GMAIL:
+                const gmailService = new GmailService(oauthService, http, logger);
+                return await gmailService.getEmailStatistics(params, userInfo, language);
+            case EmailProviders.OUTLOOK:
+                const outlookService = new OutlookService(oauthService, http, logger);
+                return await outlookService.getEmailStatistics(params, userInfo, language);
+            default:
+                throw new Error(t(Translations.STATISTICS_NOT_IMPLEMENTED, language, { provider }));
         }
     }
 } 

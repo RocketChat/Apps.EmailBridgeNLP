@@ -14,7 +14,6 @@ import {
 } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
-import { EmailProviders } from '../enums/EmailProviders';
 import { t, Language } from '../lib/Translation/translation';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
@@ -22,6 +21,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
+import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -352,6 +352,101 @@ export class Handler implements IHandler {
                 .setGroupable(false);
 
             messageBuilder.setText(t(Translations.CONFIG_ERROR, this.language, { error: error.message }));
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async Report(): Promise<void> {
+        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+
+        const messageBuilder = this.modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(this.room)
+            .setGroupable(false);
+
+        try {
+            // Get user's preferred email provider from their personal settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+            const categories = userPreference.reportCategories;
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
+                
+                messageBuilder.setText(message);
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Check if user is authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailProvider,
+                this.sender.id,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                messageBuilder.setText(t(Translations.REPORT_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
+                return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            }
+
+            // Get email statistics for last 24 hours
+            const statsParams: IEmailStatsParams = {
+                userId: this.sender.id,
+                hoursBack: 24,
+                categories,
+            };
+
+            const statistics = await EmailServiceFactory.getEmailStatistics(
+                emailProvider,
+                statsParams,
+                this.http,
+                this.persis,
+                this.read,
+                this.app.getLogger(),
+                this.language
+            );
+
+            let categoryReport = '';
+            if (statistics.categoryStats) {
+                for (const category in statistics.categoryStats) {
+                    if (statistics.categoryStats.hasOwnProperty(category)) {
+                        const stats = statistics.categoryStats[category];
+                        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+                        categoryReport += `**${categoryName}**: ${stats.total} emails (${stats.unread} unread)\n`;
+                    }
+                }
+            }
+
+            // Create a comprehensive report
+            const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
+                                 t(Translations.REPORT_STATISTICS, this.language, {
+                                     receivedToday: statistics.receivedToday.toString(),
+                                     receivedUnreadToday: statistics.receivedUnreadToday.toString(),
+                                     sentToday: statistics.sentToday.toString()
+                                 }) + '\n\n' +
+                                 categoryReport +
+                                 '---';
+            messageBuilder.setText(reportMessage);
+            
+            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
+        } catch (error) {
+            this.app.getLogger().error('Report generation error:', error);
+            messageBuilder.setText(
+                t(Translations.REPORT_ERROR, this.language, { error: error.message })
+            );
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }

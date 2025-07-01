@@ -224,4 +224,24 @@ export const Translations = {
     // Development and Log Messages (moved from AuthConstants.ts)
     DEV_HTTPS_TO_HTTP_CONVERSION: 'Development mode: Converting HTTPS redirect URI to HTTP for localhost',
     DEV_OUTLOOK_TOKEN_EXCHANGE_FAILED: 'Outlook OAuth token exchange failed',
+
+    // Report Feature Messages
+    REPORT_COMMAND: 'Report_Command',
+    REPORT_PROVIDER_NOT_SUPPORTED: 'Report_Provider_Not_Supported',
+    REPORT_NOT_AUTHENTICATED: 'Report_Not_Authenticated',
+    REPORT_ERROR: 'Report_Error',
+    REPORT_HEADER: 'Report_Header',
+    REPORT_STATISTICS: 'Report_Statistics',
+    REPORT_TOKEN_EXPIRED: 'Report_Token_Expired',
+    REPORT_CATEGORIES_LABEL: 'Report_Categories_Label',
+
+    // Statistics Service Errors
+    STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',
+    STATISTICS_NOT_IMPLEMENTED: 'Statistics_Not_Implemented',
+    GMAIL_STATS_FAILED: 'Gmail_Stats_Failed',
+    OUTLOOK_STATS_FAILED: 'Outlook_Stats_Failed',
+
+    // User Preference Modal
+    NEW_CATEGORY_LABEL: 'New_Category_Label',
+    NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
 } as const; 

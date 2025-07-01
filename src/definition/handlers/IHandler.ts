@@ -37,4 +37,5 @@ export interface IHandler {
     sendDefault(): Promise<void>;
     Login(): Promise<void>;
     Logout(): Promise<void>;
+    Report(): Promise<void>;
 } 

@@ -29,6 +29,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
             userId: this.userId,
             language: preference.language || currentPreference.language,
             emailProvider: preference.emailProvider || currentPreference.emailProvider,
+            reportCategories: preference.reportCategories || currentPreference.reportCategories,
         };
 
         const association = new RocketChatAssociationRecord(
@@ -58,6 +59,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
                 userId: this.userId,
                 language: Language.en,
                 emailProvider: EmailProviders.GMAIL,
+                reportCategories: ['github', 'calendar', 'social'],
             };
             return preference;
         }

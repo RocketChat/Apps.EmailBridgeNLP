@@ -63,9 +63,15 @@ export class ExecuteViewSubmitHandler {
             const roomId = await roomInteractionStorage.getInteractionRoomId();
             room = roomId ? await this.read.getRoomReader().getById(roomId) : undefined;
 
-            // Parse form data - use a more robust approach to handle dynamic block IDs
+            // Parse form data
             const languageValue = this.getFormValue(view.state, UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID);
             const emailProviderValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID);
+            const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID) || [];
+            const newCategoriesRaw = this.getFormValue(view.state, UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID) || "";
+
+            // Process and combine categories
+            const newCategories = newCategoriesRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
+            const combinedCategories = [...selectedCategories, ...newCategories];
 
             // Validate required fields
             if (!languageValue || !emailProviderValue) {
@@ -97,6 +103,7 @@ export class ExecuteViewSubmitHandler {
                 userId: user.id,
                 language: languageValue,
                 emailProvider: emailProviderValue as EmailProviders,
+                reportCategories: [...new Set(combinedCategories as string[])],
             };
 
             // Update user preference
@@ -292,17 +299,23 @@ export class ExecuteViewSubmitHandler {
     }
 
     private getFormValue(viewState: any, actionId: string): any {
-        if (!viewState) return undefined;
-        
-        // Search through all blocks to find the one containing our action ID
-        for (const blockId of Object.keys(viewState)) {
-            const block = viewState[blockId];
-            if (block && typeof block === 'object' && actionId in block) {
-                return block[actionId];
+        for (const blockId in viewState) {
+            if (viewState.hasOwnProperty(blockId) && viewState[blockId][actionId]) {
+                const value = viewState[blockId][actionId];
+                if (typeof value === 'object' && value && value.hasOwnProperty('value')) {
+                    return value.value;
+                }
+                // Handle multi-select which can be an array of strings or an empty object if nothing is selected
+                if (Array.isArray(value)) {
+                    return value;
+                }
+                if (typeof value === 'object' && Object.keys(value).length === 0) {
+                    return [];
+                }
+                return value;
             }
         }
-        
-        return undefined;
+        return null;
     }
 
     private async sendNotificationWithLoginButton(

@@ -20,7 +20,7 @@ export const pt = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI para Outlook - deve terminar com /api/apps/public/[app-id]/oauth-callback",
     
     // Commands
-    Email_Command_Params: "conectar, status, desconectar, ajuda",
+    Email_Command_Params: "conectar, status, desconectar, ajuda, relatório",
     Email_Command_Description: "Conecte e gerencie a integração da sua conta de email com assistência de IA.",
     
     // OAuth Pages
@@ -41,43 +41,40 @@ export const pt = {
     
     // Messages
     OAuth_Connection_Success: "Conectado com sucesso à sua conta de email!",
-    OAuth_Connection_Failed: "Falha ao conectar à sua conta de email. Por favor, tente novamente.",
-    Email_Not_Connected: "Nenhuma conta de email conectada. Por favor, conecte sua conta primeiro.",
-    Invalid_Email_Provider: "Provedor de email inválido selecionado. Por favor, verifique suas configurações.",
-    Authentication_Required: "Autenticação necessária. Por favor, conecte sua conta de email.",
+    OAuth_Connection_Failed: "Falha ao conectar à sua conta de email. Tente novamente.",
+    Email_Not_Connected: "Nenhuma conta de email conectada. Conecte sua conta primeiro.",
+    Invalid_Email_Provider: "Provedor de email inválido selecionado. Verifique sua configuração.",
+    Authentication_Required: "Autenticação necessária. Conecte sua conta de email.",
     Connection_Status_Connected: "Conta de email está conectada e pronta para uso.",
-    Connection_Status_Disconnected: "Nenhuma conta de email conectada.",
+    Connection_Status_Disconnected: "Nenhuma conta de email está conectada.",
     Disconnect_Success: "Conta de email desconectada com sucesso.",
     Disconnect_Failed: "Falha ao desconectar sua conta de email.",
     
     // Handler messages
-    Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser sair, use `/email logout`.",
-    Outlook_Coming_Soon: "**Autenticação Outlook em breve!**\n\nPor enquanto, use **Gmail** para autenticação de email.\n\n",
-    Provider_Not_Implemented: "**Autenticação __provider__ ainda não foi implementada.**\n\nAtualmente apenas **Gmail** é suportado para autenticação.\n\n",
+    Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser desconectar, use `/email logout`.",
+    Outlook_Coming_Soon: "**Autenticação do Outlook estará disponível em breve!**\n\nPor enquanto, use **Gmail** para autenticação de email.\n\n",
+    Provider_Not_Implemented: "**Autenticação __provider__ ainda não está implementada.**\n\nAtualmente apenas **Gmail** é suportado para autenticação.\n\n",
     Connect_Account_Message: "**Conecte sua conta __provider__ ao Rocket Chat**",
     Login_With_Provider: "Entrar com __provider__",
     Error_Processing_Login: "Erro ao processar login: __error__",
     Not_Authenticated: "Você não está autenticado com __provider__. Use `/email login` para entrar.",
     Logout_Confirmation: "**Confirmação de Logout**\n\nTem certeza de que deseja sair da conta **__provider__** **__email__**?",
     Confirm_Logout: "Confirmar Logout",
-    Error_Preparing_Logout: "Erro ao preparar logout: __error__",
-    
-    // Logout action messages
-    Provider_Not_Supported_Logout: "**__provider__ não é suportado para logout.**\n\nPor favor, entre em contato com seu administrador para assistência.",
-    Logout_Success: "**Logout bem-sucedido da sua conta __provider__.**",
-    Logout_Failed: "**Falha ao fazer logout da sua conta de email.**\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
-    Logout_Error: "**Erro ocorreu durante o processo de logout:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
-    
-    // Notification messages
+    Error_Preparing_Logout: "❌ Erro ao preparar logout: __error__",
+    Provider_Not_Supported_Logout: "❌ **__provider__ não é suportado para logout.**\n\nEntre em contato com seu administrador para assistência.",
+    Logout_Success: "**Logout realizado com sucesso da sua conta __provider__.**\n\nVocê pode agora fazer login com uma conta diferente se necessário.",
+    Logout_Failed: "❌ **Falha ao fazer logout da sua conta de email.**\n\nTente novamente ou entre em contato com seu administrador.",
+    Logout_Error: "❌ **Erro ocorreu durante o processo de logout:**\n__error__\n\nTente novamente ou entre em contato com seu administrador.",
     Helper_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Aqui estão algumas dicas rápidas para começar!",
     Available_Commands: "",
     Help_Command: "use `/email help` - Mostrar esta mensagem de ajuda",
-    Login_Command: "use `/email login` - Entrar na sua conta de email",
-    Logout_Command: "use `/email logout` - Sair da sua conta de email",
+    Login_Command: "use `/email login` - Fazer login na sua conta de email",
+    Logout_Command: "use `/email logout` - Fazer logout da conta de email",
     Config_Command: "use `/email config` - Abrir preferências do usuário e configurações",
+    Report_Command: "use `/email report` - Obter relatório de estatísticas diárias de email",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
-    Login_Action_Text: "Entrar na sua conta de email",
+    Login_Action_Text: "Fazer login na sua conta de email",
     
     // User Preference Modal
     User_Preference_Title: "Preferências do Usuário",
@@ -193,4 +190,22 @@ export const pt = {
     Log_Btn_Fallback: "Falha ao criar notificação com botão de login, recorrendo à notificação de texto",
     Log_Fallback_Err: "Falha ao enviar notificação de texto de fallback",
     
+    // Report feature messages
+    Report_Provider_Not_Supported: "❌ **__provider__ não é suportado para relatórios.**\n\nPor favor, entre em contato com seu administrador para assistência.",
+    Report_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar o relatório novamente.",
+    Report_Error: "❌ **Erro ao gerar relatório de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
+    Report_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
+    Report_Statistics: "**Recebidos**: __receivedToday__ emails\n**Enviados**: __sentToday__ emails\n**Não lidos**: __totalUnread__ emails",
+    Report_Token_Expired: "❌ **Sua autenticação expirou.**\n\nUse `/email login` para reconectar sua conta __provider__ e tente novamente.",
+    Report_Categories_Label: "Report Categories",
+
+    // Statistics Service Errors
+    Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
+    Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",
+    Gmail_Stats_Failed: "Failed to get Gmail statistics: __error__",
+    Outlook_Stats_Failed: "Failed to get Outlook statistics: __error__",
+
+    // User Preference Modal
+    New_Category_Label: "New Category",
+    New_Categories_Placeholder: "Add new categories, comma-separated...",
 }; 
