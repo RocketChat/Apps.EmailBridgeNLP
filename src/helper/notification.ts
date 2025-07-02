@@ -19,6 +19,7 @@ ${t(Translations.HELP_COMMAND, language)}
 ${t(Translations.LOGIN_COMMAND, language)}
 ${t(Translations.LOGOUT_COMMAND, language)}
 ${t(Translations.CONFIG_COMMAND, language)}
+${t(Translations.REPORT_COMMAND, language)}
     `;
 
     const helperMessage = modify

@@ -201,6 +201,7 @@ export const es = {
     Report_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
     Report_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
     Report_Categories_Label: "Report Categories",
+    Report_Command: "usa `/email report` - Obtener informe diario de estadísticas de correo",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",

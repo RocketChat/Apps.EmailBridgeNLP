@@ -6,7 +6,9 @@ import {
     MicrosoftOauthUrls,
     MicrosoftOauthScopes,
     OauthConfig,
-    ProtocolConstants
+    ProtocolConstants,
+    ContentTypes,
+    HttpHeaders
 } from '../../constants/AuthConstants';
 import { Translations } from '../../constants/Translations';
 
@@ -134,7 +136,7 @@ export class OutlookOAuthService implements IOAuthService {
 
             const response = await this.http.post(MicrosoftOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
+                    [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_FORM_URLENCODED,
                 },
                 content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(finalRedirectUri)}&grant_type=${OauthConfig.GRANT_TYPE_AUTHORIZATION_CODE}`,
             });
@@ -184,7 +186,7 @@ export class OutlookOAuthService implements IOAuthService {
         try {
             const response = await this.http.get(MicrosoftOauthUrls.USER_INFO, {
                 headers: {
-                    'Authorization': `${OauthConfig.AUTHORIZATION_HEADER_PREFIX} ${accessToken}`
+                    [HttpHeaders.AUTHORIZATION]: `${OauthConfig.AUTHORIZATION_HEADER_PREFIX} ${accessToken}`
                 }
             });
 
@@ -292,7 +294,7 @@ export class OutlookOAuthService implements IOAuthService {
 
             const response = await this.http.post(MicrosoftOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
+                    [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_FORM_URLENCODED,
                 },
                 content: `client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&refresh_token=${encodeURIComponent(refreshToken)}&grant_type=${OauthConfig.GRANT_TYPE_REFRESH_TOKEN}`,
             });

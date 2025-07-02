@@ -14,7 +14,7 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { GoogleOAuthService } from '../services/auth/GoogleOAuthService';
 import { oauthErrorHtml, oauthSuccessHtml } from '../templates/OAuthHtmlTemplates';
 import { getGoogleOAuthSettings } from '../config/SettingsManager';
-import { OauthEndpointPaths } from '../constants/AuthConstants';
+import { OauthEndpointPaths, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
 import { Translations } from '../constants/Translations';
 import { t, Language } from '../lib/Translation/translation';
 
@@ -75,7 +75,7 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         return {
             status: 400,
             headers: {
-                'Content-Type': 'text/html',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: oauthErrorHtml(errorMessage)
         };
@@ -88,7 +88,7 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         return {
             status: 200,
             headers: {
-                'Content-Type': 'text/html',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: oauthSuccessHtml(email)
         };

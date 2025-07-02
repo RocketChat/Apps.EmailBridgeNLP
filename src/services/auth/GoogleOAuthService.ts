@@ -5,7 +5,9 @@ import { OAuthStorage } from '../../storage/OAuthStorage';
 import {
     GoogleOauthUrls,
     GoogleOauthScopes,
-    OauthConfig
+    OauthConfig,
+    ContentTypes,
+    HttpHeaders
 } from '../../constants/AuthConstants';
 import { Translations } from '../../constants/Translations';
 
@@ -116,7 +118,7 @@ export class GoogleOAuthService implements IOAuthService {
 
             const response = await this.http.post(GoogleOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
+                    [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_FORM_URLENCODED,
                 },
                 content: `code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&redirect_uri=${encodeURIComponent(this.redirectUri)}&grant_type=${OauthConfig.GRANT_TYPE_AUTHORIZATION_CODE}`,
             });
@@ -159,7 +161,7 @@ export class GoogleOAuthService implements IOAuthService {
         try {
             const response = await this.http.get(GoogleOauthUrls.USER_INFO, {
                 headers: {
-                    'Authorization': `${OauthConfig.AUTHORIZATION_HEADER_PREFIX} ${accessToken}`
+                    [HttpHeaders.AUTHORIZATION]: `${OauthConfig.AUTHORIZATION_HEADER_PREFIX} ${accessToken}`
                 }
             });
 
@@ -265,7 +267,7 @@ export class GoogleOAuthService implements IOAuthService {
 
             const response = await this.http.post(GoogleOauthUrls.TOKEN, {
                 headers: {
-                    'Content-Type': OauthConfig.CONTENT_TYPE_FORM_URLENCODED,
+                    [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_FORM_URLENCODED,
                 },
                 content: `refresh_token=${encodeURIComponent(refreshToken)}&client_id=${encodeURIComponent(this.clientId)}&client_secret=${encodeURIComponent(this.clientSecret)}&grant_type=${OauthConfig.GRANT_TYPE_REFRESH_TOKEN}`,
             });

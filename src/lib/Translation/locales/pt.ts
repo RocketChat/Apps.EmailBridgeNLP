@@ -71,7 +71,7 @@ export const pt = {
     Login_Command: "use `/email login` - Fazer login na sua conta de email",
     Logout_Command: "use `/email logout` - Fazer logout da conta de email",
     Config_Command: "use `/email config` - Abrir preferências do usuário e configurações",
-    Report_Command: "use `/email report` - Obter relatório de estatísticas diárias de email",
+    Report_Command: "use `/email report` - Obter relatório diário de estatísticas de email",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
     Login_Action_Text: "Fazer login na sua conta de email",

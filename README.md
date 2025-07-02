@@ -1,26 +1,8 @@
 # EmailBridgeNLP
-Natural Language Bridge to Legacy Email System for Rocket Chat Powered by Modern LLMs
+Natural Language Bridge to Legacy Email System for Rocket.Chat Powered by Modern LLMs
 
 ## Getting Started
-Now that you have generated a blank default Rocket.Chat App, what are you supposed to do next?
-Start developing! Open up your favorite editor, our recommended one is Visual Studio code,
-and start working on your App. Once you have something ready to test, you can either
-package it up and manually deploy it to your test instance or you can use the CLI to do so.
-Here are some commands to get started:
-- `rc-apps package`: this command will generate a packaged app file (zip) which can be installed **if** it compiles with TypeScript
-- `rc-apps deploy`: this will do what `package` does but will then ask you for your server url, username, and password to deploy it for you
 
-## Documentation
-Here are some links to examples and documentation:
-- [Rocket.Chat Apps TypeScript Definitions Documentation](https://rocketchat.github.io/Rocket.Chat.Apps-engine/)
-- [Rocket.Chat Apps TypeScript Definitions Repository](https://github.com/RocketChat/Rocket.Chat.Apps-engine)
-- [Example Rocket.Chat Apps](https://github.com/graywolf336/RocketChatApps)
-- Community Forums
-  - [App Requests](https://forums.rocket.chat/c/rocket-chat-apps/requests)
-  - [App Guides](https://forums.rocket.chat/c/rocket-chat-apps/guides)
-  - [Top View of Both Categories](https://forums.rocket.chat/c/rocket-chat-apps)
-- [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
-=======
 <div align="center">
 <img width=30% src="https://github.com/user-attachments/assets/a92f27b9-5101-4725-8311-a0e6ada0edc7" alt="rocket-mail-illustration">
 </div>
@@ -33,14 +15,6 @@ Say goodbye to context switching between your email client and team chat! With R
     <img width=60% src="https://github.com/user-attachments/assets/a8f4c5b3-9e2a-4c6d-8f1b-d2e3a4b5c6d7">
 </div>
 
-<h2>Features 🚀</h2>
-
-- **Natural Language Email Commands**: Simply ask for emails, send messages, or generate reports using everyday language
-- **Smart Email Summaries**: Get AI-powered summaries of email threads and conversations 
-- **Intelligent Contact Management**: Save contacts and refer to them by name in your commands
-- **Comprehensive Email Analytics**: Detailed insights about your email habits and inbox health
-- **Thread Integration**: Summarize Rocket.Chat threads and email them to your team
-- **Gmail Integration**: Seamless connection with Gmail using OAuth authentication
 
 ## 📜 Getting Started
 
@@ -82,16 +56,23 @@ Say goodbye to context switching between your email client and team chat! With R
 
 <h2>Usage 💬</h2>
 
-### Natural Language Commands
-- **/rocket-mail send an email to my boss about tomorrow's meeting** - Compose and send emails
-- **/rocket-mail generate a report of my emails from last week** - Get detailed analytics
-- **/rocket-mail summarize this thread and email it to the team** - Share thread summaries
-- **/rocket-mail count how many emails I received on Friday** - Quick email statistics
+👋 Need some help with your /email?
 
-### Standard Commands
-- **/rocket-mail login/logout** - Authenticate with your Gmail account
-- **/rocket-mail help** - Display comprehensive help
-- **/rocket-mail report <days>** - Generate email reports for specified time period
+- **`/email help`**: Show this help message  
+- **`/email login`**: Login to your email account  
+- **`/email logout`**: Logout from your email account  
+- **`/email config`**: Open user preferences and settings  
+- **`/email report`**: Get daily email statistics report
+
+Natural Language command exmples:
+
+- **`/email summarize this thread/channel and send it as email to boss@rc.com who refuses to use chat`**: summarize thread/channel and send as email to specified recipient(s) 
+- **`/email post in the channel for everyone the budget for 2025 email pdf received between 5/1/2025 and 6/24/2025`**: searchs the emails, extracts the attachment and upload it in channel. 
+- **`/email please give me report for yesterday`**: Get daily email statistics report
+
+### User Preferences Modal:
+User can go to User Preferences by entering `/email config` or by clicking "User Preferences" button in helper message. User can config email provider, language, categories to keep in report , adding new categories etc in it.
+
 
 <h2>Development & Debugging 🐛</h2>
 

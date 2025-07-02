@@ -14,7 +14,7 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { OutlookOAuthService } from '../services/auth/OutlookOAuthService';
 import { OAuthHtmlTemplates } from '../templates/OAuthHtmlTemplates';
 import { getOutlookOAuthSettings } from '../config/SettingsManager';
-import { OauthEndpointPaths } from '../constants/AuthConstants';
+import { OauthEndpointPaths, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
 import { Translations } from '../constants/Translations';
 import { t, Language } from '../lib/Translation/translation';
 
@@ -83,7 +83,7 @@ export class OutlookOAuthEndpoint implements IApiEndpoint {
         return {
             status: 400,
             headers: {
-                'Content-Type': 'text/html',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: OAuthHtmlTemplates.createErrorPage(errorMessage, false),
         };
@@ -96,7 +96,7 @@ export class OutlookOAuthEndpoint implements IApiEndpoint {
         return {
             status: 200,
             headers: {
-                'Content-Type': 'text/html',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: OAuthHtmlTemplates.createSuccessPage(email, 'Outlook'),
         };

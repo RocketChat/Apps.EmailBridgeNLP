@@ -35,14 +35,58 @@ export async function UserPreferenceModal({
     const language = existingPreference.language as Language;
     const blocks: (InputBlock | DividerBlock | SectionBlock | ActionsBlock)[] = [];
 
+    // Report Categories Selection
+    const allCategories = [...new Set(existingPreference.reportCategories || [])];
+    const categoryOptions = allCategories.map((category) => ({
+        text: category.charAt(0).toUpperCase() + category.slice(1),
+        value: category,
+    }));
+    const categoryDropdownOptions = elementBuilder.createDropDownOptions(categoryOptions);
+    const categoryMultiSelect = elementBuilder.addMultiSelectDropDown(
+        {
+            placeholder: t(Translations.REPORT_CATEGORIES_LABEL, language),
+            options: categoryDropdownOptions,
+            initialValue: existingPreference.reportCategories || [],
+        },
+        {
+            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
+            text: t(Translations.REPORT_CATEGORIES_LABEL, language),
+            element: categoryMultiSelect,
+            optional: true,
+        }),
+    );
+    // New Category Input
+    const newCategoryInput = elementBuilder.createPlainTextInput(
+        {
+            text: t(Translations.NEW_CATEGORIES_PLACEHOLDER, language),
+        },
+        {
+            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
+            text: t(Translations.NEW_CATEGORY_LABEL, language),
+            element: newCategoryInput,
+            optional: true,
+        })
+    );
+    // Divider
+    blocks.push(blockBuilder.createDividerBlock());
     // Language Selection
     const languageOptions = supportedLanguageList.map((lang) => ({
         text: getLanguageDisplayTextFromCode(lang, existingPreference.language),
         value: lang,
     }));
-
     const languageDropDownOption = elementBuilder.createDropDownOptions(languageOptions);
-
     const languageDropDown = elementBuilder.addDropDown(
         {
             placeholder: t(Translations.LANGUAGE, existingPreference.language),
@@ -57,7 +101,6 @@ export async function UserPreferenceModal({
             actionId: UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID,
         },
     );
-
     blocks.push(
         blockBuilder.createInputBlock({
             blockId: UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_BLOCK_ID,
@@ -66,7 +109,6 @@ export async function UserPreferenceModal({
             optional: false,
         }),
     );
-
     // Email Provider Selection
     const emailProviderOptions = [
         {
@@ -78,9 +120,7 @@ export async function UserPreferenceModal({
             value: EmailProviders.OUTLOOK,
         },
     ];
-
     const emailProviderDropDownOption = elementBuilder.createDropDownOptions(emailProviderOptions);
-
     const emailProviderDropDown = elementBuilder.addDropDown(
         {
             placeholder: t(Translations.EMAIL_PROVIDER_PREFERENCE_DESCRIPTION, language),
@@ -95,7 +135,6 @@ export async function UserPreferenceModal({
             actionId: UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID,
         },
     );
-
     blocks.push(
         blockBuilder.createInputBlock({
             blockId: UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_BLOCK_ID,
@@ -103,56 +142,6 @@ export async function UserPreferenceModal({
             element: emailProviderDropDown,
             optional: false,
         }),
-    );
-
-    // Report Categories Selection
-    const allCategories = [...new Set(existingPreference.reportCategories || [])];
-    const categoryOptions = allCategories.map((category) => ({
-        text: category.charAt(0).toUpperCase() + category.slice(1),
-        value: category,
-    }));
-    
-    const categoryDropdownOptions = elementBuilder.createDropDownOptions(categoryOptions);
-
-    const categoryMultiSelect = elementBuilder.addMultiSelectDropDown(
-        {
-            placeholder: t(Translations.REPORT_CATEGORIES_LABEL, language),
-            options: categoryDropdownOptions,
-            initialValue: existingPreference.reportCategories || [],
-        },
-        {
-            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
-            actionId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID,
-        },
-    );
-
-    blocks.push(
-        blockBuilder.createInputBlock({
-            blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
-            text: t(Translations.REPORT_CATEGORIES_LABEL, language),
-            element: categoryMultiSelect,
-            optional: true,
-        }),
-    );
-
-    // New Category Input
-    const newCategoryInput = elementBuilder.createPlainTextInput(
-        {
-            text: t(Translations.NEW_CATEGORIES_PLACEHOLDER, language),
-        },
-        {
-            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
-            actionId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID,
-        },
-    );
-
-    blocks.push(
-        blockBuilder.createInputBlock({
-            blockId: UserPreferenceModalEnum.NEW_CATEGORY_INPUT_BLOCK_ID,
-            text: t(Translations.NEW_CATEGORY_LABEL, language),
-            element: newCategoryInput,
-            optional: true,
-        })
     );
 
     // Show warning if provider change will cause logout
