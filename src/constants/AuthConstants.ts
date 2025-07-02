@@ -48,7 +48,6 @@ export const OauthConfig = {
     PROMPT_SELECT_ACCOUNT: 'select_account',
     GRANT_TYPE_AUTHORIZATION_CODE: 'authorization_code',
     GRANT_TYPE_REFRESH_TOKEN: 'refresh_token',
-    CONTENT_TYPE_FORM_URLENCODED: 'application/x-www-form-urlencoded',
     RESPONSE_MODE: 'query',
     TOKEN_TYPE_BEARER: 'Bearer',
     AUTHORIZATION_HEADER_PREFIX: 'Bearer',
@@ -67,3 +66,45 @@ export const OauthEndpointPaths = {
     GOOGLE_CALLBACK: 'oauth-callback',
     OUTLOOK_CALLBACK: 'outlook-oauth-callback',
 } as const; 
+
+// HTTP Headers
+export const HttpHeaders = {
+    AUTHORIZATION: 'Authorization',
+    CONTENT_TYPE: 'Content-Type',
+    CONSISTENCY_LEVEL: 'ConsistencyLevel',
+} as const;
+
+// HTTP Content Types
+export const ContentTypes = {
+    APPLICATION_JSON: 'application/json',
+    APPLICATION_FORM_URLENCODED: 'application/x-www-form-urlencoded',
+    TEXT_HTML: 'text/html',
+} as const;
+
+// Common Header Values
+export const HeaderValues = {
+    CONSISTENCY_LEVEL_EVENTUAL: 'eventual',
+} as const;
+
+// Header Builder Utilities
+export const HeaderBuilders = {
+    createBearerAuthHeader: (accessToken: string) => ({
+        [HttpHeaders.AUTHORIZATION]: `Bearer ${accessToken}`,
+    }),
+    
+    createJsonAuthHeaders: (accessToken: string) => ({
+        [HttpHeaders.AUTHORIZATION]: `Bearer ${accessToken}`,
+        [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+    }),
+    
+    createOutlookHeaders: (accessToken: string) => ({
+        [HttpHeaders.AUTHORIZATION]: `Bearer ${accessToken}`,
+        [HttpHeaders.CONSISTENCY_LEVEL]: HeaderValues.CONSISTENCY_LEVEL_EVENTUAL,
+    }),
+    
+    createOutlookJsonHeaders: (accessToken: string) => ({
+        [HttpHeaders.AUTHORIZATION]: `Bearer ${accessToken}`,
+        [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+        [HttpHeaders.CONSISTENCY_LEVEL]: HeaderValues.CONSISTENCY_LEVEL_EVENTUAL,
+    }),
+} as const;

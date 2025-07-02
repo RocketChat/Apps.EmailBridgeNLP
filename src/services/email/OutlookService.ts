@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
 
 export class OutlookService {
     private oauthService: IOAuthService;
@@ -31,39 +31,23 @@ export class OutlookService {
         
         // Get received emails in the last 24 hours
         const receivedResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$count=true&$top=1`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ConsistencyLevel': 'eventual'
-            }
+            headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
         });
 
         // Get unread emails from the last 24 hours
         const unreadResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(`isRead eq false and ${timeFilter}`)}&$count=true&$top=1`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ConsistencyLevel': 'eventual'
-            }
+            headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
         });
 
         // Get sent emails in the last 24 hours
         const sentTimeFilter = `sentDateTime ge ${yesterday.toISOString()}`;
         const sentResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/sentitems/messages?$filter=${encodeURIComponent(sentTimeFilter)}&$count=true&$top=1`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ConsistencyLevel': 'eventual'
-            }
+            headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
         });
 
         // Get total inbox count
         const totalResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$count=true&$top=1`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-                'ConsistencyLevel': 'eventual'
-            }
+            headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
         });
 
         // Check for API errors
@@ -90,11 +74,11 @@ export class OutlookService {
                 const categoryFilter = `contains(subject, '${category}') or contains(body, '${category}')`;
                 
                 const categoryResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/messages?$filter=${encodeURIComponent(`${timeFilter} and (${categoryFilter})`)}&$count=true&$top=1`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}`, 'ConsistencyLevel': 'eventual' }
+                    headers: HeaderBuilders.createOutlookHeaders(accessToken)
                 });
 
                 const unreadCategoryResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/messages?$filter=${encodeURIComponent(`${timeFilter} and isRead eq false and (${categoryFilter})`)}&$count=true&$top=1`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}`, 'ConsistencyLevel': 'eventual' }
+                    headers: HeaderBuilders.createOutlookHeaders(accessToken)
                 });
 
                 const categoryData = JSON.parse(categoryResponse.content || '{}');

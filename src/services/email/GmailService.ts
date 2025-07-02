@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
 
 export class GmailService {
     private oauthService: IOAuthService;
@@ -31,42 +31,27 @@ export class GmailService {
         
         // Get all emails in the last 24 hours
         const allEmailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
         // Get unread emails count from the last 24 hours
         const unreadResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(`is:unread ${timeQuery}`)}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
         // Get received emails in the last 24 hours (inbox)
         const receivedResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(`in:inbox ${timeQuery}`)}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
         // Get unread received emails in the last 24 hours
         const receivedUnreadResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(`in:inbox is:unread ${timeQuery}`)}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
         // Get sent emails in the last 24 hours
         const sentResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(`in:sent ${timeQuery}`)}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
         const categoryStats: { [category: string]: { total: number, unread: number } } = {};
@@ -87,10 +72,10 @@ export class GmailService {
                 if (categoryQuery) {
                     const query = `${timeQuery} ${categoryQuery}`;
                     const response = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(query)}`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+                        headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
                     });
                     const unreadResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(`${query} is:unread`)}`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+                        headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
                     });
 
                     if (response.statusCode === 401 || unreadResponse.statusCode === 401) {
