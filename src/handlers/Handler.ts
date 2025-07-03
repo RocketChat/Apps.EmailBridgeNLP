@@ -32,6 +32,7 @@ import { SendEmailModal } from '../modal/SendEmailModal';
 import { IToolCall } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
+import { UsernameService } from '../services/UsernameService';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -516,13 +517,18 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
-            // Show processing message first
-            messageBuilder.setText(t(Translations.LLM_PROCESSING_QUERY, this.language, { query }));
+            // Enhance query with email addresses for mentioned users
+            const usernameService = new UsernameService(this.read);
+            const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
+
+            // Show processing message with enhanced query (or original if no enhancement)
+            const displayQuery = enhancedQuery !== query ? enhancedQuery : query;
+            messageBuilder.setText(t(Translations.LLM_PROCESSING_QUERY, this.language, { query: displayQuery }));
             await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
-            // Process query with LLM
+            // Process enhanced query with LLM
             const llmService = new LLMService(this.http);
-            const { toolCalls, error } = await llmService.processNaturalLanguageQuery(query);
+            const { toolCalls, error } = await llmService.processNaturalLanguageQuery(enhancedQuery);
 
             // Create new message for results
             const resultMessageBuilder = this.modify
@@ -757,12 +763,8 @@ export class Handler implements IHandler {
         switch (toolName) {
             case LlmTools.SEND_EMAIL:
                 return t(Translations.TOOL_SEND_EMAIL, this.language);
-            case LlmTools.COUNT_EMAILS:
-                return t(Translations.TOOL_COUNT_EMAILS, this.language);
-            case LlmTools.SEARCH_EMAILS:
-                return t(Translations.TOOL_SEARCH_EMAILS, this.language);
-            case LlmTools.GET_EMAIL_CONTENT:
-                return t(Translations.TOOL_GET_EMAIL_CONTENT, this.language);
+            case LlmTools.EXTRACT_ATTACHMENT:
+                return t(Translations.TOOL_EXTRACT_ATTACHMENT, this.language);
             case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
                 return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
             case LlmTools.REPORT:

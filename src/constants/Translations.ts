@@ -258,9 +258,7 @@ export const Translations = {
     
     // Tool Names (for user display)
     TOOL_SEND_EMAIL: 'Tool_Send_Email',
-    TOOL_COUNT_EMAILS: 'Tool_Count_Emails',
-    TOOL_SEARCH_EMAILS: 'Tool_Search_Emails',
-    TOOL_GET_EMAIL_CONTENT: 'Tool_Get_Email_Content',
+    TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
     TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
     TOOL_REPORT: 'Tool_Report',
 
@@ -296,4 +294,5 @@ export const Translations = {
     // Send email with status
     SEND_EMAIL_SUCCESS_WITH_EMOJI: 'Send_Email_Success_With_Emoji',
     SEND_EMAIL_FAILED_WITH_EMOJI: 'Send_Email_Failed_With_Emoji',
+
 } as const; 

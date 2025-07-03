@@ -41,6 +41,12 @@ export class ToolExecutorService {
                         success: false,
                         message: `Tool \`${toolName}\` should be handled with buttons, not through ToolExecutorService.`,
                     };
+                case LlmTools.EXTRACT_ATTACHMENT:
+                    return {
+                        tool_name: toolName,
+                        success: true,
+                        message: `📎 **Extract Attachments Tool Detected**\n\nThis tool would extract attachments from the specified emails. Implementation coming soon!\n\n**Parameters received:**\n\`\`\`json\n${toolCall.function.arguments}\n\`\`\``,
+                    };
                 default:
                     return {
                         tool_name: toolName,

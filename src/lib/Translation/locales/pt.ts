@@ -222,9 +222,7 @@ export const pt = {
     
     // Tool Names (for user display)
     Tool_Send_Email: "Enviar Email",
-    Tool_Count_Emails: "Contar Emails",
-    Tool_Search_Emails: "Buscar Emails",
-    Tool_Get_Email_Content: "Obter Conteúdo do Email",
+    Tool_Extract_Attachment: "Extrair Anexos",
     Tool_Summarize_And_Send: "Resumir & Enviar Email",
     Tool_Report: "Gerar Relatório",
 
@@ -266,4 +264,5 @@ export const pt = {
     // Send/Edit Action Buttons
     SEND_ACTION_TEXT: "Enviar",
     EDIT_SEND_ACTION_TEXT: "Editar e Enviar",
+
 }; 

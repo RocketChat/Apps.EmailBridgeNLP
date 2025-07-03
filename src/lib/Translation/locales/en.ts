@@ -223,9 +223,7 @@ export const en = {
     
     // Tool Names (for user display)
     Tool_Send_Email: "Send Email",
-    Tool_Count_Emails: "Count Emails",
-    Tool_Search_Emails: "Search Emails",
-    Tool_Get_Email_Content: "Get Email Content",
+    Tool_Extract_Attachment: "Extract Attachments",
     Tool_Summarize_And_Send: "Summarize & Send Email",
     Tool_Report: "Generate Report",
     
@@ -269,4 +267,5 @@ export const en = {
 
     // Send/Edit Action Buttons
     SEND_ACTION_TEXT: "Send",
+    EDIT_SEND_ACTION_TEXT: "Edit & Send",
 }; 

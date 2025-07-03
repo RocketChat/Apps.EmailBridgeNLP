@@ -137,7 +137,6 @@ export class LLMService {
             
             return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || "Failed to generate summary.";
         } catch (error) {
-            console.error('Error generating summary:', error);
             return "Failed to generate summary due to an error.";
         }
     }
@@ -145,20 +144,33 @@ export class LLMService {
     private parseContentForTools(content: string): { tools: IToolCall[], error?: string } {
         const trimmed = content.trim();
         
+        // Remove any markdown formatting or extra text that might interfere
+        let cleanContent = trimmed;
+        if (cleanContent.startsWith('```json')) {
+            cleanContent = cleanContent.replace(/```json\s*/, '').replace(/```\s*$/, '');
+        }
+        if (cleanContent.startsWith('```')) {
+            cleanContent = cleanContent.replace(/```[a-zA-Z]*\s*/, '').replace(/```\s*$/, '');
+        }
+        
+        cleanContent = cleanContent.trim();
+        
         // Simple JSON parsing - parse function_call format only
         try {
-            const parsed = JSON.parse(trimmed);
+            const parsed = JSON.parse(cleanContent);
 
+            // Handle error responses
             if(parsed.error) {
                 return { tools: [], error: parsed.error };
             }
 
+            // Handle function_call format
             if (parsed.function_call?.name) {
                 const toolName = parsed.function_call.name;
                 
                 // Validate tool name
                 if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
-                    return { tools: [] };
+                    return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
                 }
 
                 const toolCall: IToolCall = {
@@ -172,10 +184,12 @@ export class LLMService {
                 
                 return { tools: [toolCall] };
             }
-        } catch (e) {
-            console.error('Error parsing content for tools:', e);
-        }
 
-        return { tools: [] };
+            // If no function_call found but it's valid JSON
+            return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
+
+        } catch (e) {
+            return { tools: [], error: "Failed to parse LLM response. Please try rephrasing your request." };
+        }
     }
 } 

@@ -222,9 +222,7 @@ export const ru = {
     
     // Tool Names (for user display)
     Tool_Send_Email: "Отправить Email",
-    Tool_Count_Emails: "Подсчитать Email",
-    Tool_Search_Emails: "Поиск Email",
-    Tool_Get_Email_Content: "Получить Содержимое Email",
+    Tool_Extract_Attachment: "Извлечь Вложения",
     Tool_Summarize_And_Send: "Резюмировать и Отправить Email",
     Tool_Report: "Создать Отчет",
 
@@ -266,4 +264,5 @@ export const ru = {
     // Send/Edit Action Buttons
     SEND_ACTION_TEXT: "Отправить",
     EDIT_SEND_ACTION_TEXT: "Редактировать и отправить",
+
 }; 
