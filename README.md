@@ -1,19 +1,31 @@
-# EmailBridgeNLP
-Natural Language Bridge to Legacy Email System for Rocket.Chat Powered by Modern LLMs
-
-## Getting Started
-
-<div align="center">
-<img width=30% src="https://github.com/user-attachments/assets/a92f27b9-5101-4725-8311-a0e6ada0edc7" alt="rocket-mail-illustration">
-</div>
-
 <h1 align="center">Rocket.Chat Email Integration App</h1>
 
-Say goodbye to context switching between your email client and team chat! With Rocket Mail, managing emails becomes as natural as having a conversation. This powerful Rocket.Chat app transforms your email workflow using AI-powered natural language commands, keeping you in the flow of collaboration.
+Say goodbye to context switching between your email client and team chat! With **Email Assistant**, managing emails becomes as natural as having a conversation. This powerful Rocket.Chat app transforms your email workflow using AI-powered natural language commands, keeping you in the flow of collaboration.
 
 <div align="center">
-    <img width=60% src="https://github.com/user-attachments/assets/a8f4c5b3-9e2a-4c6d-8f1b-d2e3a4b5c6d7">
+    <img width=60% src="https://github.com/user-attachments/assets/ed5799a0-61fe-48fa-bf9f-90dd185464e9">
 </div>
+
+<h3 align="center">Integrating Gmail & Outlook with Rocket.Chat</h3>
+
+<p align="center">
+  <a href="https://github.com/RocketChat/Apps.EmailBridgeNLP">View Demo</a>
+  ·
+  <a href="https://github.com/RocketChat/Apps.EmailBridgeNLP/issues">Report Bug</a>
+  ·
+  <a href="https://github.com/RocketChat/Apps.EmailBridgeNLP/issues">Request Feature</a>
+</p>
+
+<div align="center">
+
+[![Contributors](https://img.shields.io/github/contributors/RocketChat/Apps.EmailBridgeNLP.svg?style=for-the-badge)](https://github.com/RocketChat/Apps.EmailBridgeNLP/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/RocketChat/Apps.EmailBridgeNLP.svg?style=for-the-badge)](https://github.com/RocketChat/Apps.EmailBridgeNLP/network/members)
+[![Stargazers](https://img.shields.io/github/stars/RocketChat/Apps.EmailBridgeNLP.svg?style=for-the-badge)](https://github.com/RocketChat/Apps.EmailBridgeNLP/stargazers)
+[![Issues](https://img.shields.io/github/issues/RocketChat/Apps.EmailBridgeNLP.svg?style=for-the-badge)](https://github.com/RocketChat/Apps.EmailBridgeNLP/issues)
+[![License](https://img.shields.io/github/license/RocketChat/Apps.EmailBridgeNLP.svg?style=for-the-badge)](https://github.com/RocketChat/Apps.EmailBridgeNLP/blob/main/LICENSE)
+
+</div>
+
 
 
 ## 📜 Getting Started
