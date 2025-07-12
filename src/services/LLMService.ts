@@ -1,5 +1,6 @@
 import { IHttp, IHttpRequest } from '@rocket.chat/apps-engine/definition/accessors';
-import { LlmConfig, LlmErrors } from '../constants/AuthConstants';
+import { LlmConfig } from '../constants/AuthConstants';
+import { Translations } from '../constants/Translations';
 import { LlmPrompts } from '../constants/prompts';
 import { IToolCall, ILLMResponse } from '../definition/lib/ToolInterfaces';
 import { LlmTools } from '../enums/LlmTools';
@@ -7,7 +8,7 @@ import { LlmTools } from '../enums/LlmTools';
 export class LLMService {
     private readonly llmEndpoint: string;
 
-    constructor(private readonly http: IHttp) {
+    constructor(private readonly http: IHttp, private readonly logger?: any) {
         this.llmEndpoint = LlmConfig.ENDPOINT;
     }
 
@@ -69,14 +70,14 @@ export class LLMService {
         try {
             const response = await this.http.post(this.llmEndpoint, request);
 
-            if (!response || !response.data) {
-                throw new Error(LlmErrors.NO_RESPONSE);
+            if (!response?.data) {
+                throw new Error(Translations.LLM_NO_RESPONSE);
             }
 
             const llmResponse = response.data as ILLMResponse;
 
-            if (!llmResponse.choices || llmResponse.choices.length === 0) {
-                throw new Error(LlmErrors.NO_CHOICES);
+            if (!llmResponse.choices?.length) {
+                throw new Error(Translations.LLM_NO_CHOICES);
             }
 
             const choice = llmResponse.choices[0];
@@ -92,7 +93,7 @@ export class LLMService {
 
             return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
-            throw new Error(`${LlmErrors.REQUEST_FAILED}: ${error.message}`);
+            throw new Error(`${Translations.LLM_REQUEST_FAILED}: ${error.message}`);
         }
     }
 
@@ -119,23 +120,25 @@ export class LLMService {
             data: payload,
         };
 
+
+
         try {
             const response = await this.http.post(this.llmEndpoint, request);
 
-            if (!response || !response.data) {
+            if (!response?.data) {
                 throw new Error('Failed to get response from LLM API');
             }
 
             const llmResponse = response.data as ILLMResponse;
 
-            if (!llmResponse.choices || llmResponse.choices.length === 0) {
+            if (!llmResponse.choices?.length) {
                 throw new Error('No choices in LLM response');
             }
 
             const choice = llmResponse.choices[0];
             const content = choice.message.content || '';
-            
             return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || "Failed to generate summary.";
+            
         } catch (error) {
             return "Failed to generate summary due to an error.";
         }
@@ -155,41 +158,69 @@ export class LLMService {
         
         cleanContent = cleanContent.trim();
         
-        // Simple JSON parsing - parse function_call format only
-        try {
-            const parsed = JSON.parse(cleanContent);
+        // Handle unescaped newlines in JSON content - common LLM issue
+        let contentToParseAttempts = [cleanContent];
+        
+        // Create a version with properly escaped newlines as fallback
+        if (cleanContent.includes('"content"') && cleanContent.match(/:\s*"[^"]*\n/)) {
+            let fixedContent = cleanContent;
+            
+            // Find content field and fix unescaped newlines
+            const contentRegex = /("content"\s*:\s*")([^"]*(?:"[^"]*)*?)(")/g;
+            fixedContent = fixedContent.replace(contentRegex, (match, start, content, end) => {
+                // Escape actual newlines and carriage returns in the content
+                const escapedContent = content
+                    .replace(/\\/g, '\\\\')  // Escape backslashes first
+                    .replace(/\n/g, '\\n')   // Escape newlines
+                    .replace(/\r/g, '\\r')   // Escape carriage returns  
+                    .replace(/\t/g, '\\t');  // Escape tabs
+                return start + escapedContent + end;
+            });
+            
+            contentToParseAttempts.unshift(fixedContent); // Try fixed version first
+        }
+        
+        // Try parsing with different content variations
+        for (const contentToParse of contentToParseAttempts) {
+            try {
+                const parsed = JSON.parse(contentToParse);
 
-            // Handle error responses
-            if(parsed.error) {
-                return { tools: [], error: parsed.error };
-            }
-
-            // Handle function_call format
-            if (parsed.function_call?.name) {
-                const toolName = parsed.function_call.name;
-                
-                // Validate tool name
-                if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
-                    return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
+                // Handle error responses
+                if(parsed.error) {
+                    return { tools: [], error: parsed.error };
                 }
 
-                const toolCall: IToolCall = {
-                    id: 'call_' + Date.now(),
-                    type: 'function',
-                    function: {
-                        name: toolName,
-                        arguments: JSON.stringify(parsed.function_call.arguments || {}),
-                    },
-                };
-                
-                return { tools: [toolCall] };
+                // Handle function_call format
+                if (parsed.function_call?.name) {
+                    const toolName = parsed.function_call.name;
+                    
+                    // Validate tool name
+                    if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
+                        return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
+                    }
+
+                    const toolCall: IToolCall = {
+                        id: 'call_' + Date.now(),
+                        type: 'function',
+                        function: {
+                            name: toolName,
+                            arguments: JSON.stringify(parsed.function_call.arguments || {}),
+                        },
+                    };
+                    
+                    return { tools: [toolCall] };
+                }
+
+                // If no function_call found but it's valid JSON
+                return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
+
+            } catch (e) {
+                // Continue to next parsing attempt
+                continue;
             }
-
-            // If no function_call found but it's valid JSON
-            return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
-
-        } catch (e) {
-            return { tools: [], error: "Failed to parse LLM response. Please try rephrasing your request." };
         }
+        
+        // If all parsing attempts failed
+        return { tools: [], error: "Failed to parse LLM response. Please try rephrasing your request." };
     }
 } 

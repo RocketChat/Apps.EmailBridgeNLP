@@ -74,7 +74,7 @@ export const pt = {
     Report_Command: "use `/email report` - Obter relatório diário de estatísticas de email",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
-    Login_Action_Text: "Fazer login na sua conta de email",
+    Login_Action_Text: "Fazer login no __provider__",
     
     // User Preference Modal
     User_Preference_Title: "Preferências do Usuário",
@@ -103,6 +103,7 @@ export const pt = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "Você foi automaticamente desconectado de **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Aviso: Alterar seu provedor de email irá desconectá-lo automaticamente de sua conta atual.",
+    Provider_Changed_Login_Message: "Você pode fazer login na sua conta __provider__",
     
     // Granular Error Messages
     Error_Fill_Required_Fields: "Erro ao processar solicitação. Por favor, preencha todos os campos obrigatórios ❌",
@@ -210,6 +211,9 @@ export const pt = {
     New_Categories_Placeholder: "Add new categories, comma-separated...",
     // Tool Calling Messages
     LLM_Processing_Query: "Processando: \"__query__\"...",
+    LLM_User_Query_Display: "**Sua consulta é:** __query__",
+    LLM_AI_Thinking: "Agente de IA pensando...",
+    LLM_Email_Ready_User: "Olá __name__, seu e-mail intitulado **__subject__** está pronto para enviar.",
     LLM_Tool_Detected: "**Ferramenta Detectada** para consulta: \"__query__\"\n\n**Ferramenta:** __tool__",
     LLM_No_Tool_Detected: "Nenhuma ferramenta adequada encontrada para consulta: \"__query__\"",
     LLM_Error_Processing: "**Erro processando consulta:** \"__query__\"\n\n**Erro:** __error__",
@@ -239,7 +243,7 @@ export const pt = {
     Send_Email_Send_Button: "Enviar e-mail",
     Send_Email_Cancel_Button: "Cancelar",
     Send_Email_Modal_Opened: "Modal de composição de e-mail aberto com sucesso",
-    Send_Email_Success: "E-mail enviado com sucesso",
+    Send_Email_Success: "E-mail enviado com sucesso ✅",
     Send_Email_Failed: "Falha ao enviar e-mail: __error__",
     Send_Email_Error_No_From_Email: "Não é possível determinar o endereço de e-mail do remetente",
     Send_Email_Validation_To_Required: "Pelo menos um destinatário é obrigatório",
@@ -265,4 +269,13 @@ export const pt = {
     SEND_ACTION_TEXT: "Enviar",
     EDIT_SEND_ACTION_TEXT: "Editar e Enviar",
 
+    // LLM Error Messages
+    LLM_No_Response: "Nenhuma resposta recebida do serviço de IA. Tente novamente.",
+    LLM_No_Choices: "O serviço de IA retornou uma resposta vazia. Reformule sua solicitação.",
+    LLM_Request_Failed: "Falha na comunicação com o serviço de IA",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "Nenhuma mensagem encontrada para resumir com base em seus critérios.",
+    Summary_Generation_Failed: "Não foi possível gerar um resumo das mensagens. Tente novamente.",
+    LLM_Summary_Email_Ready_User: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar.",
 }; 

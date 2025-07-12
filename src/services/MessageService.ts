@@ -70,7 +70,6 @@ export class MessageService {
             }));
 
         } catch (error) {
-            console.error('MessageService.getMessages -> Error:', error);
             throw new Error(`Failed to retrieve messages: ${error.message}`);
         }
     }

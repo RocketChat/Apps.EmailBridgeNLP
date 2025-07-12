@@ -120,9 +120,4 @@ export const LlmConfig = {
     TIMEOUT: 30000, // 30 seconds
 } as const;
 
-// LLM Error Messages
-export const LlmErrors = {
-    NO_RESPONSE: 'LLM_No_Response',
-    NO_CHOICES: 'LLM_No_Choices', 
-    REQUEST_FAILED: 'LLM_Request_Failed',
-} as const; 
+ 

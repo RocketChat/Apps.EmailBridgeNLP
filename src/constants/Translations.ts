@@ -107,6 +107,7 @@ export const Translations = {
     // Provider Change Messages
     PROVIDER_CHANGED_AUTO_LOGOUT: 'Provider_Changed_Auto_Logout',
     PROVIDER_CHANGE_WARNING: 'Provider_Change_Warning',
+    PROVIDER_CHANGED_LOGIN_MESSAGE: 'Provider_Changed_Login_Message',
 
     // Error Messages
     ERROR_FILL_REQUIRED_FIELDS: 'Error_Fill_Required_Fields',
@@ -246,6 +247,9 @@ export const Translations = {
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
     // Tool Calling Messages
     LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
+    LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',
+    LLM_AI_THINKING: 'LLM_AI_Thinking',
+    LLM_EMAIL_READY_USER: 'LLM_Email_Ready_User',
     LLM_TOOL_DETECTED: 'LLM_Tool_Detected', 
     LLM_NO_TOOL_DETECTED: 'LLM_No_Tool_Detected',
     LLM_ERROR_PROCESSING: 'LLM_Error_Processing',
@@ -294,5 +298,15 @@ export const Translations = {
     // Send email with status
     SEND_EMAIL_SUCCESS_WITH_EMOJI: 'Send_Email_Success_With_Emoji',
     SEND_EMAIL_FAILED_WITH_EMOJI: 'Send_Email_Failed_With_Emoji',
+
+    // LLM Error Messages
+    LLM_NO_RESPONSE: 'LLM_No_Response',
+    LLM_NO_CHOICES: 'LLM_No_Choices', 
+    LLM_REQUEST_FAILED: 'LLM_Request_Failed',
+
+    // Summarization Messages
+    NO_MESSAGES_TO_SUMMARIZE: 'No_Messages_To_Summarize',
+    SUMMARY_GENERATION_FAILED: 'Summary_Generation_Failed',
+    LLM_SUMMARY_EMAIL_READY_USER: 'LLM_Summary_Email_Ready_User',
 
 } as const; 

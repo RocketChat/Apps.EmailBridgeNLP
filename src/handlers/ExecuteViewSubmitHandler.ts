@@ -19,15 +19,14 @@ import { EmailProviders } from '../enums/EmailProviders';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
-import { Handler } from './Handler';
 import { ActionIds } from '../enums/ActionIds';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
-import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -76,7 +75,7 @@ export class ExecuteViewSubmitHandler {
             const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID) || [];
             const newCategoriesRaw = this.getFormValue(view.state, UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID) || "";
 
-            // Process and combine categories
+            // Process and combine categories - store what user actually selected
             const newCategories = newCategoriesRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
             const combinedCategories = [...selectedCategories, ...newCategories];
 
@@ -155,23 +154,33 @@ export class ExecuteViewSubmitHandler {
                 }
             }
 
+            // Check if anything actually changed before showing success message
+            const hasChanges = (
+                currentPreference.language !== languageValue ||
+                currentPreference.emailProvider !== emailProviderValue ||
+                JSON.stringify(currentPreference.reportCategories?.sort()) !== JSON.stringify(combinedCategories.sort())
+            );
+
             // Notify user about successful update with provider-specific handling
             if (room) {
                 if (oldEmailProvider !== emailProviderValue && wasLoggedOut) {
                     // Provider changed and user was logged out - show login button for new provider
-                    const message = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
+                    const logoutMessage = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
                         oldProvider: getProviderDisplayName(oldEmailProvider)
                     });
+                    const loginMessage = t(Translations.PROVIDER_CHANGED_LOGIN_MESSAGE, userLanguage, { 
+                        provider: getProviderDisplayName(emailProviderValue as EmailProviders)
+                    });
+                    const combinedMessage = `${logoutMessage}\n${loginMessage}`;
                     
                     await this.sendNotificationWithLoginButton(
                         user, 
                         room, 
-                        message, 
+                        combinedMessage, 
                         emailProviderValue as EmailProviders, 
                         userLanguage
                     );
-                } else {
-                    // Regular preference update - show simple success message
+                } else if (hasChanges) {
                     await sendNotification(this.read, this.modify, user, room, {
                         message: t(Translations.SUCCESS_CONFIGURATION_UPDATED, userLanguage)
                     });
@@ -346,17 +355,6 @@ export class ExecuteViewSubmitHandler {
             }
         }
         return null;
-        if (!viewState) return undefined;
-
-        // Search through all blocks to find the one containing our action ID
-        for (const blockId of Object.keys(viewState)) {
-            const block = viewState[blockId];
-            if (block && typeof block === 'object' && actionId in block) {
-                return block[actionId];
-            }
-        }
-
-        return undefined;
     }
 
     private async sendNotificationWithLoginButton(
@@ -366,33 +364,54 @@ export class ExecuteViewSubmitHandler {
         provider: EmailProviders, 
         language: Language
     ): Promise<void> {
-        const appUser = await this.read.getUserReader().getAppUser();
-        if (!appUser) {
-            this.app.getLogger().error('App user not found');
-            return;
+        try {
+            const appUser = await this.read.getUserReader().getAppUser();
+            if (!appUser) {
+                this.app.getLogger().error('App user not found');
+                return;
+            }
+
+            // Generate the OAuth URL for the provider
+            const authUrl = await EmailServiceFactory.getAuthenticationUrl(
+                provider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            const blockBuilder = this.modify.getCreator().getBlockBuilder();
+
+            // Add message section
+            blockBuilder.addSectionBlock({
+                text: blockBuilder.newMarkdownTextObject(message),
+            });
+
+            // Add login button with direct OAuth URL
+            blockBuilder.addActionsBlock({
+                elements: [
+                    blockBuilder.newButtonElement({
+                        text: blockBuilder.newPlainTextObject(
+                            t(Translations.LOGIN_WITH_PROVIDER, language, { provider: getProviderDisplayName(provider) })
+                        ),
+                        url: authUrl,
+                        style: ButtonStyle.PRIMARY,
+                    }),
+                ],
+            });
+
+            const messageBuilder = this.modify.getCreator().startMessage()
+                .setSender(appUser)
+                .setRoom(room)
+                .setGroupable(false)
+                .setBlocks(blockBuilder.getBlocks());
+
+            await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+
+        } catch (error) {
+            // Fallback to simple text notification
+            await sendNotification(this.read, this.modify, user, room, { message });
         }
-
-        const blockBuilder = this.modify.getCreator().getBlockBuilder();
-
-        blockBuilder.addActionsBlock({
-            elements: [
-                blockBuilder.newButtonElement({
-                    actionId: ActionIds.EMAIL_LOGIN_ACTION,
-                    text: blockBuilder.newPlainTextObject(
-                        t(Translations.LOGIN_ACTION_TEXT, language, { provider: getProviderDisplayName(provider) })
-                    ),
-                    style: ButtonStyle.PRIMARY,
-                }),
-            ],
-        });
-
-        const messageBuilder = this.modify.getCreator().startMessage()
-            .setSender(appUser)
-            .setRoom(room)
-            .setGroupable(false)
-            .setText(message)
-            .setBlocks(blockBuilder.getBlocks());
-
-        await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
     }
 } 

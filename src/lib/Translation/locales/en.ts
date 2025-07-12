@@ -74,7 +74,7 @@ export const en = {
     Report_Command: "use `/email report` - Get daily email statistics report",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
-    Login_Action_Text: "Login to your email account",
+    Login_Action_Text: "Login to __provider__",
     
     // User Preference Modal
     User_Preference_Title: "User Preferences",
@@ -103,6 +103,7 @@ export const en = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "You have been automatically logged out from **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Warning: Changing your email provider will automatically log you out from your current account.",
+    Provider_Changed_Login_Message: "You can login to your __provider__ account",
     
     // Granular Error Messages 
     Error_Fill_Required_Fields: "Failed to process request. Please fill all the required fields ❌",
@@ -211,6 +212,9 @@ export const en = {
     New_Categories_Placeholder: "Add new categories, comma-separated...",
     // Tool Calling Messages
     LLM_Processing_Query: "Processing: \"__query__\"...",
+    LLM_User_Query_Display: "**Your query is:** __query__",
+    LLM_AI_Thinking: "AI Agent thinking...",
+    LLM_Email_Ready_User: "Hey __name__, your email titled **__subject__** is ready to send.",
     LLM_Tool_Detected: "**Tool Detected** for query: \"__query__\"\n\n**Tool:** __tool__",
     LLM_No_Tool_Detected: "No suitable tool found for query: \"__query__\"",
     LLM_Error_Processing: "**Error processing query:** \"__query__\"\n\n**Error:** __error__",
@@ -240,7 +244,7 @@ export const en = {
     Send_Email_Send_Button: "Send",
     Send_Email_Cancel_Button: "Cancel",
     Send_Email_Modal_Opened: "Email composition modal opened",
-    Send_Email_Success: "Email sent successfully",
+    Send_Email_Success: "Email sent successfully ✅",
     Send_Email_Failed: "Failed to send email: __error__",
     Send_Email_Error_No_From_Email: "Unable to determine sender email address",
 
@@ -268,4 +272,14 @@ export const en = {
     // Send/Edit Action Buttons
     SEND_ACTION_TEXT: "Send",
     EDIT_SEND_ACTION_TEXT: "Edit & Send",
+
+    // LLM Error Messages
+    LLM_No_Response: "No response received from the AI service. Please try again.",
+    LLM_No_Choices: "AI service returned an empty response. Please try rephrasing your request.",
+    LLM_Request_Failed: "Failed to communicate with AI service",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "No messages found to summarize based on your criteria.",
+    Summary_Generation_Failed: "Unable to generate a summary of the messages. Please try again.",
+    LLM_Summary_Email_Ready_User: "Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send.",
 }; 

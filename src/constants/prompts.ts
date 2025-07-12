@@ -56,7 +56,7 @@ export const LlmPrompts = {
     5. If only one email is given, still use array.
     6. "days" must be an integer number (no quotes).
     7. Populate subject and content fields if possible, according to the user's query.
-    8. The email "content" field MUST be formatted for readability with line breaks
+    8. CRITICAL JSON FORMATTING: The email "content" field must use escaped newlines (\\n) for line breaks. Never use actual line breaks in JSON strings. Example: "content": "Dear Name,\\n\\nThank you for..."
     9. For "people" field in summarize-and-send-email:
        - If usernames have @ prefix (e.g., "@alice", "bob") → include them: ["@alice"]
        - If usernames have NO @ prefix (e.g., "alice", "bob") → use empty array: []
@@ -103,7 +103,7 @@ export const LlmPrompts = {
         "arguments": {
             "to": ["priyan@gmail.com", "bob@outlook.com"],
             "subject": "Congratulations on your resume shortlisting",
-            "content": "Dear <name>,\n\nWe are thrilled to inform you that your resumes have been shortlisted for further consideration. This is a significant step forward in our hiring process, and we are excited to move forward with your applications.\n\nPlease expect further communication from our team in the coming days. Thank you for your interest in joining our team.\n\nBest regards,\n[Your Name]"
+            "content": "Dear <name>,\\n\\nWe are thrilled to inform you that your resumes have been shortlisted for further consideration. This is a significant step forward in our hiring process, and we are excited to move forward with your applications.\\n\\nPlease expect further communication from our team in the coming days. Thank you for your interest in joining our team.\\n\\nBest regards,\\n[Your Name]"
         }       
     }
     }
@@ -115,10 +115,12 @@ export const LlmPrompts = {
     
     ---
     
-    CRITICAL:
-    - Respond with only the JSON. No explanatory text or formatting.
+    CRITICAL JSON REQUIREMENTS:
+    - Respond with only valid JSON. No explanatory text or formatting.
+    - All strings in JSON must properly escape special characters (\\n for newlines, \\" for quotes, \\\\ for backslashes).
     - Dates must be correct and computed based on {CURRENT_DATE}.
     - JSON must be valid and exactly match field types.
+    - NEVER use actual line breaks inside JSON string values - always use \\n escape sequences.
     `
     ,
     

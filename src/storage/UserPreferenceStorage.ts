@@ -11,6 +11,8 @@ import { IPreference } from '../definition/lib/IUserPreferences';
 import { Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 
+
+
 export class UserPreferenceStorage implements IUserPreferenceStorage {
     private userId: string;
 
@@ -25,11 +27,16 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
     public async storeUserPreference(preference: IPreference): Promise<void> {
         const currentPreference = await this.getUserPreference();
 
+        // Store categories as selected by user (no forced defaults)
+        const userSelectedCategories = preference.reportCategories 
+            ? preference.reportCategories.map(c => c.toLowerCase())
+            : currentPreference.reportCategories;
+
         const updatedPreference: IPreference = {
             userId: this.userId,
             language: preference.language || currentPreference.language,
             emailProvider: preference.emailProvider || currentPreference.emailProvider,
-            reportCategories: preference.reportCategories || currentPreference.reportCategories,
+            reportCategories: userSelectedCategories,
         };
 
         const association = new RocketChatAssociationRecord(

@@ -517,17 +517,17 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
+            // Show user query first
+            const queryDisplayMessage = `${t(Translations.LLM_USER_QUERY_DISPLAY, this.language, { query })}\n\n🤖 ${t(Translations.LLM_AI_THINKING, this.language)}`;
+            messageBuilder.setText(queryDisplayMessage);
+            await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+
             // Enhance query with email addresses for mentioned users
             const usernameService = new UsernameService(this.read);
             const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
 
-            // Show processing message with enhanced query (or original if no enhancement)
-            const displayQuery = enhancedQuery !== query ? enhancedQuery : query;
-            messageBuilder.setText(t(Translations.LLM_PROCESSING_QUERY, this.language, { query: displayQuery }));
-            await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
-
             // Process enhanced query with LLM
-            const llmService = new LLMService(this.http);
+            const llmService = new LLMService(this.http, this.app.getLogger());
             const { toolCalls, error } = await llmService.processNaturalLanguageQuery(enhancedQuery);
 
             // Create new message for results
@@ -582,13 +582,13 @@ export class Handler implements IHandler {
                             // Create services
                             const { MessageService } = await import('../services/MessageService');
                             const messageService = new MessageService();
-                            const llmService = new LLMService(this.http);
+                            const llmService = new LLMService(this.http, this.app.getLogger());
 
                             // Retrieve messages from the current room
                             const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
 
                             if (messages.length === 0) {
-                                resultMessageBuilder.setText('No messages found to summarize based on your criteria.');
+                                resultMessageBuilder.setText(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
                                 return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
                             }
 
@@ -600,7 +600,7 @@ export class Handler implements IHandler {
                             const summary = await llmService.generateSummary(formattedMessages, channelName);
 
                             if (!summary || summary === "Failed to generate summary due to an error.") {
-                                resultMessageBuilder.setText('Unable to generate a summary of the messages. Please try again.');
+                                resultMessageBuilder.setText(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
                                 return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
                             }
 
@@ -660,8 +660,15 @@ export class Handler implements IHandler {
                     const block = this.modify.getCreator().getBlockBuilder();
                     
                     const messageText = toolCall.function.name === 'summarize-and-send-email' 
-                        ? 'Summary Generated Successfully'
-                        : t(Translations.EMAIL_READY_TO_SEND, this.language);
+                        ? t(Translations.LLM_SUMMARY_EMAIL_READY_USER, this.language, { 
+                            name: this.sender.name || this.sender.username,
+                            channelName: this.room.displayName || 'Channel',
+                            subject: emailData.subject 
+                          })
+                        : t(Translations.LLM_EMAIL_READY_USER, this.language, { 
+                            name: this.sender.name || this.sender.username, 
+                            subject: emailData.subject 
+                          });
                     
                     block.addSectionBlock({
                         text: block.newMarkdownTextObject(messageText),
@@ -669,10 +676,6 @@ export class Handler implements IHandler {
 
                     block.addActionsBlock({
                         elements: [
-                            block.newButtonElement({
-                                actionId: ActionIds.SEND_EMAIL_DIRECT_ACTION,
-                                text: block.newPlainTextObject(t(Translations.EMAIL_SEND_BUTTON, this.language)),
-                            }),
                             block.newButtonElement({
                                 actionId: ActionIds.SEND_EMAIL_EDIT_ACTION,
                                 text: block.newPlainTextObject(t(Translations.EMAIL_EDIT_AND_SEND_BUTTON, this.language)),

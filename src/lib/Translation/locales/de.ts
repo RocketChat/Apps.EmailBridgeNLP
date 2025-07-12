@@ -79,7 +79,7 @@ export const de = {
     Report_Command: "verwenden Sie `/email report` - Tägliche E-Mail-Statistiken abrufen",
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
-    Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
+    Login_Action_Text: "Bei __provider__ anmelden",
     SUCCESS_CONFIGURATION_UPDATED: "Ihre Einstellungen wurden erfolgreich aktualisiert.",
     
     // User Preference Modal
@@ -109,6 +109,7 @@ export const de = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__** abgemeldet",
     Provider_Change_Warning: "⚠️ Warnung: Das Ändern Ihres E-Mail-Anbieters wird Sie automatisch von Ihrem aktuellen Konto abmelden.",
+    Provider_Changed_Login_Message: "Sie können sich bei Ihrem __provider__ Konto anmelden",
     
     // Granular Error Messages
     Error_Fill_Required_Fields: "Fehler beim Verarbeiten der Anfrage. Bitte füllen Sie alle erforderlichen Felder aus ❌",
@@ -216,6 +217,9 @@ export const de = {
     New_Categories_Placeholder: "Add new categories, comma-separated...",
     // Tool Calling Messages
     LLM_Processing_Query: "Verarbeitung: \"__query__\"...",
+    LLM_User_Query_Display: "**Ihre Anfrage ist:** __query__",
+    LLM_AI_Thinking: "KI-Agent denkt nach...",
+    LLM_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit dem Titel **__subject__** ist versandbereit.",
     LLM_Tool_Detected: "**Tool Erkannt** für Anfrage: \"__query__\"\n\n**Tool:** __tool__",
     LLM_No_Tool_Detected: "Kein geeignetes Tool für Anfrage gefunden: \"__query__\"",
     LLM_Error_Processing: "**Fehler bei der Verarbeitung der Anfrage:** \"__query__\"\n\n**Fehler:** __error__",
@@ -245,7 +249,7 @@ export const de = {
     Send_Email_Send_Button: "E-Mail senden",
     Send_Email_Cancel_Button: "Abbrechen",
     Send_Email_Modal_Opened: "E-Mail Kompositions-Modal erfolgreich geöffnet",
-    Send_Email_Success: "E-Mail erfolgreich gesendet",
+    Send_Email_Success: "E-Mail erfolgreich gesendet ✅",
     Send_Email_Failed: "Fehler beim Senden der E-Mail: __error__",
     Send_Email_Error_No_From_Email: "Absender-E-Mail-Adresse kann nicht bestimmt werden",
     Send_Email_Validation_To_Required: "Empfänger-E-Mail-Adresse ist erforderlich",
@@ -265,4 +269,13 @@ export const de = {
     SEND_ACTION_TEXT: "Senden",
     EDIT_SEND_ACTION_TEXT: "Bearbeiten & Senden",
 
+    // LLM Error Messages
+    LLM_No_Response: "Keine Antwort vom KI-Dienst erhalten. Bitte versuchen Sie es erneut.",
+    LLM_No_Choices: "KI-Dienst gab eine leere Antwort zurück. Bitte formulieren Sie Ihre Anfrage neu.",
+    LLM_Request_Failed: "Kommunikation mit KI-Dienst fehlgeschlagen",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "Keine Nachrichten gefunden, die basierend auf Ihren Kriterien zusammengefasst werden können.",
+    Summary_Generation_Failed: "Eine Zusammenfassung der Nachrichten konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    LLM_Summary_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist versandbereit.",
 }; 

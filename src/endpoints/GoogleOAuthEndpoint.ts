@@ -12,7 +12,7 @@ import {
 } from '@rocket.chat/apps-engine/definition/api';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { GoogleOAuthService } from '../services/auth/GoogleOAuthService';
-import { oauthErrorHtml, oauthSuccessHtml } from '../templates/OAuthHtmlTemplates';
+import { oauthErrorHtml, oauthSuccessHtml } from '../lib/templates/OAuthHtmlTemplates';
 import { getGoogleOAuthSettings } from '../config/SettingsManager';
 import { OauthEndpointPaths, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
 import { Translations } from '../constants/Translations';
