@@ -300,7 +300,7 @@ export class Handler implements IHandler {
             block.addActionsBlock({
                 elements: [
                     block.newButtonElement({
-                        actionId: ActionIds.EMAIL_LOGOUT_ACTION,
+                        actionId: ActionIds.EMAIL_LOGOUT_CONFIRM_ACTION,
                         text: block.newPlainTextObject(t(Translations.CONFIRM_LOGOUT, this.language)),
                         style: ButtonStyle.DANGER,
                     }),

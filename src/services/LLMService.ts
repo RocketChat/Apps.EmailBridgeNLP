@@ -147,7 +147,6 @@ export class LLMService {
     private parseContentForTools(content: string): { tools: IToolCall[], error?: string } {
         const trimmed = content.trim();
         
-        // Remove any markdown formatting or extra text that might interfere
         let cleanContent = trimmed;
         if (cleanContent.startsWith('```json')) {
             cleanContent = cleanContent.replace(/```json\s*/, '').replace(/```\s*$/, '');
@@ -158,14 +157,11 @@ export class LLMService {
         
         cleanContent = cleanContent.trim();
         
-        // Handle unescaped newlines in JSON content - common LLM issue
         let contentToParseAttempts = [cleanContent];
         
-        // Create a version with properly escaped newlines as fallback
         if (cleanContent.includes('"content"') && cleanContent.match(/:\s*"[^"]*\n/)) {
             let fixedContent = cleanContent;
             
-            // Find content field and fix unescaped newlines
             const contentRegex = /("content"\s*:\s*")([^"]*(?:"[^"]*)*?)(")/g;
             fixedContent = fixedContent.replace(contentRegex, (match, start, content, end) => {
                 // Escape actual newlines and carriage returns in the content
@@ -180,47 +176,44 @@ export class LLMService {
             contentToParseAttempts.unshift(fixedContent); // Try fixed version first
         }
         
-        // Try parsing with different content variations
         for (const contentToParse of contentToParseAttempts) {
-            try {
+        try {
                 const parsed = JSON.parse(contentToParse);
 
-                // Handle error responses
-                if(parsed.error) {
-                    return { tools: [], error: parsed.error };
+            if(parsed.error) {
+                return { tools: [], error: parsed.error };
+            }
+
+            // Handle function_call format
+            if (parsed.function_call?.name) {
+                const toolName = parsed.function_call.name;
+                
+                // Validate tool name
+                if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
+                    return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
                 }
 
-                // Handle function_call format
-                if (parsed.function_call?.name) {
-                    const toolName = parsed.function_call.name;
-                    
-                    // Validate tool name
-                    if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
-                        return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
-                    }
+                const toolCall: IToolCall = {
+                    id: 'call_' + Date.now(),
+                    type: 'function',
+                    function: {
+                        name: toolName,
+                        arguments: JSON.stringify(parsed.function_call.arguments || {}),
+                    },
+                };
+                
+                return { tools: [toolCall] };
+            }
 
-                    const toolCall: IToolCall = {
-                        id: 'call_' + Date.now(),
-                        type: 'function',
-                        function: {
-                            name: toolName,
-                            arguments: JSON.stringify(parsed.function_call.arguments || {}),
-                        },
-                    };
-                    
-                    return { tools: [toolCall] };
-                }
+            // If no function_call found but it's valid JSON
+            return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
 
-                // If no function_call found but it's valid JSON
-                return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
-
-            } catch (e) {
+        } catch (e) {
                 // Continue to next parsing attempt
                 continue;
             }
         }
         
-        // If all parsing attempts failed
         return { tools: [], error: "Failed to parse LLM response. Please try rephrasing your request." };
     }
 } 

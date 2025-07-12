@@ -122,7 +122,7 @@ export const LlmConfig = {
 
 // Message Retrieval Configuration
 export const MessageConfig = {
-    MAX_MESSAGES_RETRIEVAL: 100, // Maximum number of messages that can be retrieved for summarization
-} as const;
+    MAX_MESSAGES_RETRIEVAL: 100, 
+} as const; 
 
  

@@ -27,6 +27,7 @@ import { UserPreferenceModal } from '../modal/UserPreferenceModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { EmailProviders } from '../enums/EmailProviders';
+import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -71,11 +72,12 @@ export class ExecuteBlockActionHandler {
             case ActionIds.USER_PREFERENCE_ACTION:
                 await handler.Config();
                 break;
-            case ActionIds.EMAIL_LOGIN_ACTION:
-                await handler.Login();
-                break;
             case ActionIds.EMAIL_LOGOUT_ACTION: {
                 await handler.Logout();
+                break;
+            }
+            case ActionIds.EMAIL_LOGOUT_CONFIRM_ACTION: {
+                await this.handleLogoutConfirm(user, room, language);
                 break;
             }
             case UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID:
@@ -267,6 +269,62 @@ export class ExecuteBlockActionHandler {
         } catch (error) {
             console.error('Error retrieving stored email data:', error);
             return null;
+        }
+    }
+
+    private async handleLogoutConfirm(user: any, room: any, language: any): Promise<void> {
+        try {
+            // Get user's preferred email provider
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, language, { provider: providerName });
+                await this.showMessage(user, room, message, language);
+                return;
+            }
+
+            // Check if user is authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailProvider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                const message = t(Translations.NOT_AUTHENTICATED, language, { provider: getProviderDisplayName(emailProvider) });
+                await this.showMessage(user, room, message, language);
+                return;
+            }
+
+            // Perform actual logout
+            await EmailServiceFactory.logoutUser(
+                emailProvider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Show success message
+            const successMessage = t(Translations.LOGOUT_SUCCESS, language, { provider: getProviderDisplayName(emailProvider) });
+            await this.showMessage(user, room, successMessage, language);
+
+        } catch (error) {
+            console.error('Error during logout:', error);
+            const errorMessage = t(Translations.LOGOUT_ERROR, language, { error: error.message });
+            await this.showMessage(user, room, errorMessage, language);
         }
     }
 

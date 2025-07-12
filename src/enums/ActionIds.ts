@@ -2,6 +2,7 @@ export enum ActionIds {
     // Email Authentication Actions
     EMAIL_LOGIN_ACTION = 'login',
     EMAIL_LOGOUT_ACTION = 'logout',
+    EMAIL_LOGOUT_CONFIRM_ACTION = 'logout_confirm',
     
     // User Preference Actions
     USER_PREFERENCE_ACTION = 'prefs',

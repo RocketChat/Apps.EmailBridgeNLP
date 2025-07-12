@@ -154,8 +154,8 @@ export async function UserPreferenceModal({
         blocks.push({
             type: 'section',
             text: {
-                type: TextObjectType.PLAIN_TEXT,
-                text: t(Translations.PROVIDER_CHANGE_WARNING, language),
+                type: TextObjectType.MRKDWN,
+                text: `⚠️ *${t(Translations.PROVIDER_CHANGE_WARNING, language).replace('⚠️ ', '')}*`,
             },
         } as SectionBlock);
     }
