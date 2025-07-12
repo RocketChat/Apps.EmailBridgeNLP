@@ -284,4 +284,5 @@ export const es = {
     No_Messages_To_Summarize: "No se encontraron mensajes para resumir según sus criterios.",
     Summary_Generation_Failed: "No se pudo generar un resumen de los mensajes. Por favor, inténtelo de nuevo.",
     LLM_Summary_Email_Ready_User: "Hola __name__, tu correo con resumen del canal: **__channelName__** titulado \"**__subject__**\" está listo para enviar.",
+    LLM_Parsing_Error: "No pude entender tu solicitud. Por favor, intenta reformular con direcciones de correo o contenido más simples.",
 }; 

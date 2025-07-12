@@ -56,14 +56,24 @@ export const LlmPrompts = {
     5. If only one email is given, still use array.
     6. "days" must be an integer number (no quotes).
     7. Populate subject and content fields if possible, according to the user's query.
-    8. CRITICAL JSON FORMATTING: The email "content" field must use escaped newlines (\\n) for line breaks. Never use actual line breaks in JSON strings. Example: "content": "Dear Name,\\n\\nThank you for..."
+    8. CRITICAL JSON FORMATTING: 
+       - All email "content" fields must use escaped newlines (\\n) for line breaks. Never use actual line breaks in JSON strings.
+       - Escape all quotes within content using \\"
+       - Example: "content": "Dear Name,\\n\\nThank you for the \\"amazing\\" work..."
+       - Never include unescaped special characters: \n, \r, \t, ", \
     9. For "people" field in summarize-and-send-email:
        - If usernames have @ prefix (e.g., "@alice", "bob") → include them: ["@alice"]
        - If usernames have NO @ prefix (e.g., "alice", "bob") → use empty array: []
-    10. IMPORTANT: When you see @username [email@example.com] in the query, extract the email address from the square brackets and use it in the "to" or "cc" fields. For example:
-        - "@john.doe [john@company.com]" → extract "john@company.com" for the email recipient
-        - "@alice [alice@example.com] and @bob [bob@example.com]" → extract ["alice@example.com", "bob@example.com"]
-        - "@username [ ]" → ignore this user (no email found), do not include in email recipients
+    10. EMAIL ADDRESS EXTRACTION: When you see @username [email@example.com] in the query, extract ONLY the email from brackets:
+        - "@john.doe [john@company.com]" → use "john@company.com" in "to" field
+        - "@alice [alice@example.com] and @bob [bob@example.com]" → use ["alice@example.com", "bob@example.com"]
+        - "@username [ ]" or "@username" → skip this user (no valid email)
+        - "send to john@gmail.com and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
+    11. MIXED RECIPIENTS: When query has both usernames with emails and direct emails:
+        - Extract emails from @username [email] format
+        - Include direct email addresses as-is
+        - Combine all valid emails into the "to" array
+        - "send to @john.gk [john@gmail.com] and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
     
     ---
     
@@ -94,6 +104,18 @@ export const LlmPrompts = {
         }
     }
     }
+
+    User: /email summarize thread and send to @john [john@company.com] and manager@company.com
+    Assistant:
+    {
+    "function_call": {
+        "name": "summarize-and-send-email",
+        "arguments": {
+            "to": ["john@company.com", "manager@company.com"],
+            "cc": []
+        }
+    }
+    }
     
     User: /email send an congratulatory email to @priyan.harsh [priyan@gmail.com] and bob@outlook.com regarding their resume shortlisting.
     Assistant:
@@ -102,8 +124,8 @@ export const LlmPrompts = {
         "name": "send-email",
         "arguments": {
             "to": ["priyan@gmail.com", "bob@outlook.com"],
-            "subject": "Congratulations on your resume shortlisting",
-            "content": "Dear <name>,\\n\\nWe are thrilled to inform you that your resumes have been shortlisted for further consideration. This is a significant step forward in our hiring process, and we are excited to move forward with your applications.\\n\\nPlease expect further communication from our team in the coming days. Thank you for your interest in joining our team.\\n\\nBest regards,\\n[Your Name]"
+            "subject": "Congratulations on Resume Shortlisting",
+            "content": "Dear Team,\\n\\nWe are thrilled to inform you that your resumes have been shortlisted for further consideration. This is a significant step forward in our hiring process.\\n\\nPlease expect further communication from our team in the coming days.\\n\\nBest regards,\\nHR Team"
         }       
     }
     }

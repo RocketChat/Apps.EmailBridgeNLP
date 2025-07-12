@@ -308,5 +308,6 @@ export const Translations = {
     NO_MESSAGES_TO_SUMMARIZE: 'No_Messages_To_Summarize',
     SUMMARY_GENERATION_FAILED: 'Summary_Generation_Failed',
     LLM_SUMMARY_EMAIL_READY_USER: 'LLM_Summary_Email_Ready_User',
+    LLM_PARSING_ERROR: 'LLM_Parsing_Error',
 
 } as const; 

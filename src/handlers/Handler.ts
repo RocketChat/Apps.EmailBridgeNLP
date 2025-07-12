@@ -546,7 +546,31 @@ export class Handler implements IHandler {
             if (toolCalls && toolCalls.length > 0) {
                 const toolCall = toolCalls[0];
                 const toolDisplayName = this.getToolDisplayName(toolCall.function.name);
-                const args = JSON.parse(toolCall.function.arguments);
+                
+                // Parse tool arguments with better error handling
+                let args: any;
+                try {
+                    args = JSON.parse(toolCall.function.arguments);
+                } catch (parseError) {
+                    let fixedArguments = toolCall.function.arguments;
+                    
+                    fixedArguments = fixedArguments.replace(/("content"\s*:\s*")([^"]*)\n([^"]*?)(")/g, (match, start, content1, content2, end) => {
+                        const fixedContent = (content1 + content2).replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+                        return start + fixedContent + end;
+                    });
+                    
+                    fixedArguments = fixedArguments.replace(/("content"\s*:\s*")([^"]*"[^"]*?)(")/g, (match, start, content, end) => {
+                        const fixedContent = content.replace(/"/g, '\\"');
+                        return start + fixedContent + end;
+                    });
+                    
+                    try {
+                        args = JSON.parse(fixedArguments);
+                    } catch (secondParseError) {
+                        resultMessageBuilder.setText(t(Translations.LLM_PARSING_ERROR, this.language));
+                        return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
+                    }
+                }
                 
                 // Handle send-email and summarize-and-send-email tools with buttons instead of immediate modal
                 if (toolCall.function.name === 'send-email' || toolCall.function.name === 'summarize-and-send-email') {

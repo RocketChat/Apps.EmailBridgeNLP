@@ -278,4 +278,5 @@ export const de = {
     No_Messages_To_Summarize: "Keine Nachrichten gefunden, die basierend auf Ihren Kriterien zusammengefasst werden können.",
     Summary_Generation_Failed: "Eine Zusammenfassung der Nachrichten konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
     LLM_Summary_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist versandbereit.",
+    LLM_Parsing_Error: "Ich konnte Ihre Anfrage nicht verstehen. Bitte versuchen Sie es mit einfacheren E-Mail-Adressen oder Inhalten umzuformulieren.",
 }; 

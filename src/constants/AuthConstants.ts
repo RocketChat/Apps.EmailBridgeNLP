@@ -120,4 +120,9 @@ export const LlmConfig = {
     TIMEOUT: 30000, // 30 seconds
 } as const;
 
+// Message Retrieval Configuration
+export const MessageConfig = {
+    MAX_MESSAGES_RETRIEVAL: 100, // Maximum number of messages that can be retrieved for summarization
+} as const;
+
  

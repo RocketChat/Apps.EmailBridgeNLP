@@ -278,4 +278,5 @@ export const pt = {
     No_Messages_To_Summarize: "Nenhuma mensagem encontrada para resumir com base em seus critérios.",
     Summary_Generation_Failed: "Não foi possível gerar um resumo das mensagens. Tente novamente.",
     LLM_Summary_Email_Ready_User: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar.",
+    LLM_Parsing_Error: "Não consegui entender sua solicitação. Tente reformular com endereços de e-mail ou conteúdo mais simples.",
 }; 

@@ -272,4 +272,5 @@ export const pl = {
     No_Messages_To_Summarize: "Nie znaleziono wiadomości do podsumowania według Twoich kryteriów.",
     Summary_Generation_Failed: "Nie udało się wygenerować podsumowania wiadomości. Spróbuj ponownie.",
     LLM_Summary_Email_Ready_User: "Cześć __name__, Twój e-mail z podsumowaniem z kanału: **__channelName__** zatytułowany \"**__subject__**\" jest gotowy do wysłania.",
+    LLM_Parsing_Error: "Nie mogłem zrozumieć Twojego żądania. Spróbuj przeformułować je z prostszymi adresami e-mail lub treścią.",
 }; 

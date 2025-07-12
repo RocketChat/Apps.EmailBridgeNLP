@@ -2,6 +2,7 @@ import { IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { IMessage, ISummarizeParams } from '../definition/lib/IEmailUtils';
+import { MessageConfig } from '../constants/AuthConstants';
 
 export class MessageService {
     public async getMessages(
@@ -12,17 +13,31 @@ export class MessageService {
         threadId?: string,
     ): Promise<IMessage[]> {
         try {
-            // Re-implementing with a more robust logic inspired by Apps.Chat.Summarize
-            // Get all recent messages from the room first
-            const recentMessages = await read.getRoomReader().getMessages(room.id, {
-                limit: 100, // Fetch a good number of recent messages to filter from
-                sort: { createdAt: "desc" },
-            });
+            let targetMessages: any[] = [];
 
-            // If a threadId is provided, filter for that thread. Otherwise, use all messages.
-            const targetMessages = threadId
-                ? recentMessages.filter((msg) => msg.threadId === threadId || msg.id === threadId)
-                : recentMessages;
+            if (threadId) {
+                // For threads, get maximum messages to ensure we find the thread
+                const allMessages = await read.getRoomReader().getMessages(room.id, {
+                    limit: MessageConfig.MAX_MESSAGES_RETRIEVAL,
+                    sort: { createdAt: "desc" },
+                });
+
+                targetMessages = allMessages.filter((msg) => {
+                    return msg.id === threadId || msg.threadId === threadId;
+                });
+            } else {
+                // For channel summaries, use the configured limit
+                const recentMessages = await read.getRoomReader().getMessages(room.id, {
+                    limit: Math.min(MessageConfig.MAX_MESSAGES_RETRIEVAL, 200), 
+                    sort: { createdAt: "desc" },
+                });
+                targetMessages = recentMessages;
+            }
+
+            // If still no messages found, return empty array early
+            if (targetMessages.length === 0) {
+                return [];
+            }
 
             // Reverse to get chronological order (oldest to newest)
             const chronologicalMessages = [...targetMessages].reverse();
@@ -44,7 +59,7 @@ export class MessageService {
                 });
             }
 
-            // Filter by participants/people if provided
+            // Filter by participants/people if provided (reverted to simpler logic)
             if (params.people && params.people.length > 0) {
                 const cleanPeople = params.people.map(person => person.replace(/^@/, ''));
                 filteredMessages = filteredMessages.filter((message) => {
@@ -52,11 +67,16 @@ export class MessageService {
                 });
             }
 
-            // If no specific date/user filters are applied, respect the default limit
-            if (!params.start_date && !params.end_date && !params.people) {
-                const defaultLimit = params.days ? filteredMessages.length : 25;
-                filteredMessages = filteredMessages.slice(-defaultLimit);
+            // Apply default limit for channel summaries without specific filters
+            if (!params.start_date && !params.end_date && !params.people && !threadId && !params.days) {
+                filteredMessages = filteredMessages.slice(-25);
             }
+
+            filteredMessages = filteredMessages.filter((message) => {
+                if (!message.text || message.text.trim().length < 3) return false;
+                if (message.sender?.username === 'rocket.cat') return false;
+                return true;
+            });
 
             // Convert to IMessage format
             return filteredMessages.map(message => ({

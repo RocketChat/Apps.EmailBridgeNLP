@@ -282,4 +282,5 @@ export const en = {
     No_Messages_To_Summarize: "No messages found to summarize based on your criteria.",
     Summary_Generation_Failed: "Unable to generate a summary of the messages. Please try again.",
     LLM_Summary_Email_Ready_User: "Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send.",
+    LLM_Parsing_Error: "I couldn't understand your request. Please try rephrasing with simpler email addresses or content.",
 }; 
