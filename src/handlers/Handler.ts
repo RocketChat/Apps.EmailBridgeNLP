@@ -33,6 +33,8 @@ import { IToolCall } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
 import { UsernameService } from '../services/UsernameService';
+import { MessageFormatter } from '../lib/MessageFormatter';
+import { NLQueryHandler } from './NLQuery';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -218,9 +220,19 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            messageBuilder.setText(
-                t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: error.message })
-            );
+            this.app.getLogger().error('Login processing error:', error);
+            
+            // Provide user-friendly error message based on error type
+            let userMessage: string;
+            if (error.message?.includes('network') || error.message?.includes('connection')) {
+                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
+            } else if (error.message?.includes('configuration') || error.message?.includes('settings')) {
+                userMessage = t(Translations.ERROR_MISSING_CONFIGURATION, this.language);
+            } else {
+                userMessage = t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
+            }
+            
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -312,7 +324,17 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            messageBuilder.setText(t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: error.message }));
+            this.app.getLogger().error('Logout preparation error:', error);
+            
+            // Provide user-friendly error message
+            let userMessage: string;
+            if (error.message?.includes('network') || error.message?.includes('connection')) {
+                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
+            } else {
+                userMessage = t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
+            }
+            
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -354,6 +376,9 @@ export class Handler implements IHandler {
                 .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
 
         } catch (error) {
+            this.app.getLogger().error('Config error:', error);
+            
+            // Only show user-friendly error notifications for actionable errors
             const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
             const messageBuilder = this.modify
                 .getCreator()
@@ -362,7 +387,17 @@ export class Handler implements IHandler {
                 .setRoom(this.room)
                 .setGroupable(false);
 
-            messageBuilder.setText(t(Translations.CONFIG_ERROR, this.language, { error: error.message }));
+            // Categorize error and provide user-friendly message
+            let userMessage: string;
+            if (error.message?.includes('trigger')) {
+                userMessage = t(Translations.ERROR_TRIGGER_ID_MISSING, this.language);
+            } else if (error.message?.includes('modal')) {
+                userMessage = t(Translations.ERROR_MODAL_CREATION_FAILED, this.language);
+            } else {
+                userMessage = t(Translations.CONFIG_ERROR, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
+            }
+
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -455,9 +490,18 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error('Report generation error:', error);
-            messageBuilder.setText(
-                t(Translations.REPORT_ERROR, this.language, { error: error.message })
-            );
+            
+            // Provide user-friendly error message based on error type
+            let userMessage: string;
+            if (error.message?.includes('network') || error.message?.includes('connection')) {
+                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
+            } else if (error.message?.includes('auth') || error.message?.includes('token')) {
+                userMessage = t(Translations.REPORT_TOKEN_EXPIRED, this.language, { provider: 'your email provider' });
+            } else {
+                userMessage = t(Translations.REPORT_ERROR, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
+            }
+            
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -494,6 +538,9 @@ export class Handler implements IHandler {
                 .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
 
         } catch (error) {
+            this.app.getLogger().error('Modal creation error:', error);
+            
+            // Only show user notification for actionable errors
             const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
             const messageBuilder = this.modify
                 .getCreator()
@@ -502,289 +549,36 @@ export class Handler implements IHandler {
                 .setRoom(this.room)
                 .setGroupable(false);
 
-            messageBuilder.setText(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
+            // Provide specific error message based on error type
+            let userMessage: string;
+            if (error.message?.includes('trigger')) {
+                userMessage = t(Translations.ERROR_TRIGGER_ID_MISSING, this.language);
+            } else {
+                userMessage = t(Translations.ERROR_MODAL_CREATION_FAILED, this.language);
+            }
+
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
 
     public async ProcessNaturalLanguageQuery(query: string): Promise<void> {
-        const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
-        const messageBuilder = this.modify
-            .getCreator()
-            .startMessage()
-            .setSender(appUser)
-            .setRoom(this.room)
-            .setGroupable(false);
-
-        try {
-            // Show user query first
-            const queryDisplayMessage = `${t(Translations.LLM_USER_QUERY_DISPLAY, this.language, { query })}\n\n🤖 ${t(Translations.LLM_AI_THINKING, this.language)}`;
-            messageBuilder.setText(queryDisplayMessage);
-            await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
-
-            // Enhance query with email addresses for mentioned users
-            const usernameService = new UsernameService(this.read);
-            const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
-
-            // Process enhanced query with LLM
-            const llmService = new LLMService(this.http, this.app.getLogger());
-            const { toolCalls, error } = await llmService.processNaturalLanguageQuery(enhancedQuery);
-
-            // Create new message for results
-            const resultMessageBuilder = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser)
-                .setRoom(this.room)
-                .setGroupable(false);
-
-            if (error) {
-                resultMessageBuilder.setText(error);
-                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-            }
-
-            if (toolCalls && toolCalls.length > 0) {
-                const toolCall = toolCalls[0];
-                const toolDisplayName = this.getToolDisplayName(toolCall.function.name);
-                
-                // Parse tool arguments with better error handling
-                let args: any;
-                try {
-                    args = JSON.parse(toolCall.function.arguments);
-                } catch (parseError) {
-                    let fixedArguments = toolCall.function.arguments;
-                    
-                    fixedArguments = fixedArguments.replace(/("content"\s*:\s*")([^"]*)\n([^"]*?)(")/g, (match, start, content1, content2, end) => {
-                        const fixedContent = (content1 + content2).replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-                        return start + fixedContent + end;
-                    });
-                    
-                    fixedArguments = fixedArguments.replace(/("content"\s*:\s*")([^"]*"[^"]*?)(")/g, (match, start, content, end) => {
-                        const fixedContent = content.replace(/"/g, '\\"');
-                        return start + fixedContent + end;
-                    });
-                    
-                    try {
-                        args = JSON.parse(fixedArguments);
-                    } catch (secondParseError) {
-                        resultMessageBuilder.setText(t(Translations.LLM_PARSING_ERROR, this.language));
-                        return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-                    }
-                }
-                
-                // Handle send-email and summarize-and-send-email tools with buttons instead of immediate modal
-                if (toolCall.function.name === 'send-email' || toolCall.function.name === 'summarize-and-send-email') {
-                    let emailData: ISendEmailData;
-                    
-                    if (toolCall.function.name === 'send-email') {
-                        // Store email data for later use in button handlers
-                        emailData = {
-                            to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                            cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
-                            subject: args.subject || '',
-                            content: args.content || '',
-                        };
-                    } else {
-                        // Handle summarize-and-send-email tool
-                        try {
-                            // Create summarize parameters
-                            const summarizeParams: ISummarizeParams = {
-                                start_date: args.start_date,
-                                end_date: args.end_date,
-                                people: args.people,
-                                format: args.format,
-                            };
-
-                            // Calculate days if date range is provided
-                            if (args.start_date && args.end_date) {
-                                const startDate = new Date(args.start_date);
-                                const endDate = new Date(args.end_date);
-                                const timeDiff = endDate.getTime() - startDate.getTime();
-                                summarizeParams.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                            }
-
-                            // Create services
-                            const { MessageService } = await import('../services/MessageService');
-                            const messageService = new MessageService();
-                            const llmService = new LLMService(this.http, this.app.getLogger());
-
-                            // Retrieve messages from the current room
-                            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
-
-                            if (messages.length === 0) {
-                                resultMessageBuilder.setText(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
-                                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-                            }
-
-                            // Format messages for summarization
-                            const formattedMessages = messageService.formatMessagesForSummary(messages);
-
-                            // Generate summary using LLM
-                            const channelName = this.room.displayName || 'Channel';
-                            const summary = await llmService.generateSummary(formattedMessages, channelName);
-
-                            if (!summary || summary === "Failed to generate summary due to an error.") {
-                                resultMessageBuilder.setText(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
-                                return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-                            }
-
-                            // Prepare email content
-                            const subject = args.subject || `Summary of ${channelName} conversation`;
-                            
-                            let emailContent = `CONVERSATION SUMMARY: ${channelName}\n\n`;
-                            emailContent += `${summary}\n\n`;
-                            emailContent += `--------------------------------------------------\n\n`;
-                            emailContent += `SUMMARY DETAILS:\n`;
-                            emailContent += `- Messages included: ${messages.length}\n`;
-                            emailContent += `- Channel: ${channelName}\n`;
-                            
-                            if (args.people && args.people.length > 0) {
-                                emailContent += `- Participants: ${args.people.join(', ')}\n`;
-                            }
-                            
-                            if (summarizeParams.days) {
-                                emailContent += `- Time period: Last ${summarizeParams.days} day(s)\n`;
-                            } else if (args.start_date && args.end_date) {
-                                emailContent += `- Time period: ${args.start_date} to ${args.end_date}\n`;
-                            }
-                            
-                            emailContent += `\nThis summary was generated automatically by EmailBridge NLP.`;
-
-                            emailData = {
-                                to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                                cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
-                                subject,
-                                content: emailContent,
-                            };
-
-                        } catch (error) {
-                            resultMessageBuilder.setText(`Failed to generate summary: ${error.message}`);
-                            return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-                        }
-                    }
-
-                    // Store email data in room interaction storage for button handlers
-                    const roomInteractionStorage = new RoomInteractionStorage(
-                        this.persis,
-                        this.read.getPersistenceReader(),
-                        this.sender.id,
-                    );
-                    await roomInteractionStorage.storeInteractionRoomId(this.room.id);
-                    // Store email data with room interaction
-                    await this.persis.updateByAssociation(
-                        new RocketChatAssociationRecord(
-                            RocketChatAssociationModel.ROOM,
-                            this.room.id,
-                        ),
-                        { emailData },
-                        true,
-                    );
-
-                    // Show simplified email ready message with buttons
-                    const block = this.modify.getCreator().getBlockBuilder();
-                    
-                    const messageText = toolCall.function.name === 'summarize-and-send-email' 
-                        ? t(Translations.LLM_SUMMARY_EMAIL_READY_USER, this.language, { 
-                            name: this.sender.name || this.sender.username,
-                            channelName: this.room.displayName || 'Channel',
-                            subject: emailData.subject 
-                          })
-                        : t(Translations.LLM_EMAIL_READY_USER, this.language, { 
-                            name: this.sender.name || this.sender.username, 
-                            subject: emailData.subject 
-                          });
-                    
-                    block.addSectionBlock({
-                        text: block.newMarkdownTextObject(messageText),
-                    });
-
-                    block.addActionsBlock({
-                        elements: [
-                            block.newButtonElement({
-                                actionId: ActionIds.SEND_EMAIL_EDIT_ACTION,
-                                text: block.newPlainTextObject(t(Translations.EMAIL_EDIT_AND_SEND_BUTTON, this.language)),
-                                style: ButtonStyle.PRIMARY,
-                            }),
-                        ],
-                    });
-
-                    resultMessageBuilder.setBlocks(block.getBlocks());
-                    return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-                }
-
-                // Use the ToolExecutorService for all other tools
-                const toolExecutorService = new ToolExecutorService(
+        const nlQueryHandler = new NLQueryHandler(
                     this.app,
                     this.read,
                     this.modify,
                     this.http,
-                    this.persis
-                );
-                
-                const result = await toolExecutorService.executeTool(
-                    toolCall,
+            this.persis,
                     this.sender,
                     this.room,
+            this.language,
                     this.triggerId
                 );
                 
-                // Create formatted message showing the tool execution result
-                const block = this.modify.getCreator().getBlockBuilder();
-                
-                if (result.success) {
-                block.addSectionBlock({
-                    text: block.newMarkdownTextObject(
-                        t(Translations.LLM_TOOL_DETECTED, this.language, { 
-                            query,
-                            tool: toolDisplayName 
-                        })
-                    ),
-                });
-
-                    if (result.modal_opened) {
-                        block.addSectionBlock({
-                            text: block.newMarkdownTextObject(
-                                `✅ ${result.message}`
-                            ),
-                        });
-                    } else {
-                block.addSectionBlock({
-                    text: block.newMarkdownTextObject(
-                        `**${t(Translations.TOOL_NAME_LABEL, this.language)}:** ${toolDisplayName}\n` +
-                                `**${t(Translations.TOOL_ARGS_LABEL, this.language)}:** \`${JSON.stringify(args, null, 2)}\`\n` +
-                                `**Result:** ${result.message}`
-                            ),
-                        });
-                    }
-                } else {
-                    block.addSectionBlock({
-                        text: block.newMarkdownTextObject(
-                            `❌ **Tool Execution Failed**\n` +
-                            `**Tool:** ${toolDisplayName}\n` +
-                            `**Error:** ${result.error || result.message}`
-                    ),
-                });
-                }
-
-                resultMessageBuilder.setBlocks(block.getBlocks());
-            } else {
-                resultMessageBuilder.setText(
-                    t(Translations.LLM_NO_TOOL_DETECTED, this.language, { query })
-                );
-            }
-
-            return this.read.getNotifier().notifyUser(this.sender, resultMessageBuilder.getMessage());
-
-        } catch (error) {
-            messageBuilder.setText(
-                t(Translations.LLM_ERROR_PROCESSING, this.language, { 
-                    query, 
-                    error: error.message 
-                })
-            );
-            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
-        }
+        await nlQueryHandler.processNaturalLanguageQuery(query);
     }
+
+
 
     private getToolDisplayName(toolName: string): string {
         switch (toolName) {

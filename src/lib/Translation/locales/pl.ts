@@ -273,4 +273,20 @@ export const pl = {
     Summary_Generation_Failed: "Nie udało się wygenerować podsumowania wiadomości. Spróbuj ponownie.",
     LLM_Summary_Email_Ready_User: "Cześć __name__, Twój e-mail z podsumowaniem z kanału: **__channelName__** zatytułowany \"**__subject__**\" jest gotowy do wysłania.",
     LLM_Parsing_Error: "Nie mogłem zrozumieć Twojego żądania. Spróbuj przeformułować je z prostszymi adresami e-mail lub treścią.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**Odpowiedź AI:** Cześć __name__, Twój e-mail zatytułowany **__subject__** jest gotowy do wysłania do __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**Odpowiedź AI:** Cześć __name__, Twój e-mail z podsumowaniem z kanału: **__channelName__** zatytułowany \"**__subject__**\" jest gotowy do wysłania do __recipients__",
+
+    // New format constants for specific display format
+    LLM_AI_Response_Label: "**Odpowiedź AI:**\n",
+    LLM_Email_To_Label: "**Do:**",
+    LLM_Email_CC_Label: "**Kopia:**",
+    LLM_Email_Subject_Label: "**Temat:**",
+    LLM_Email_Ready_Formatted: "Cześć __name__, Twój e-mail jest gotowy do wysłania",
+    LLM_Summary_Email_Ready_Formatted: "Cześć __name__, Twój e-mail z podsumowaniem z kanału: **__channelName__** jest gotowy do wysłania",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Dane e-mail nie są już dostępne. Spróbuj ponownie przesłać żądanie.",
+    Error_Please_Try_Again: "Spróbuj ponownie.",
 }; 

@@ -109,4 +109,50 @@ export class UsernameService {
     public static removeDuplicateEmails(emails: string[]): string[] {
         return [...new Set(emails.map(email => email.toLowerCase()))];
     }
+
+    public async formatRecipientsForDisplay(emailData: any, enhancedQuery: string): Promise<string> {
+        const usernamePairs = UsernameService.extractUsernameEmailPairs(enhancedQuery);
+        const allEmails = [...(emailData.to || []), ...(emailData.cc || [])];
+        
+        const formattedRecipients: string[] = [];
+        const emailsWithUsernames = new Set(usernamePairs.map(pair => pair.email));
+        
+        // Format username-email pairs as "RealName (email)" using actual RocketChat user data
+        for (const pair of usernamePairs) {
+            try {
+                // Get the full user object directly from RocketChat
+                const user = await this.read.getUserReader().getByUsername(pair.username);
+                let displayName = pair.username; // fallback to username
+                
+                if (user) {
+                    // Use real name if available, otherwise use username
+                    displayName = user.name || user.username;
+                }
+                
+                formattedRecipients.push(`${displayName} (${pair.email})`);
+            } catch (error) {
+                // If user lookup fails, fallback to username
+                formattedRecipients.push(`${pair.username} (${pair.email})`);
+            }
+        }
+        
+        // Add direct emails that don't have associated usernames
+        for (const email of allEmails) {
+            if (!emailsWithUsernames.has(email)) {
+                formattedRecipients.push(email);
+            }
+        }
+        
+        // Format the final string
+        if (formattedRecipients.length === 0) {
+            return '';
+        } else if (formattedRecipients.length === 1) {
+            return formattedRecipients[0];
+        } else if (formattedRecipients.length === 2) {
+            return `${formattedRecipients[0]} and ${formattedRecipients[1]}`;
+        } else {
+            const lastRecipient = formattedRecipients.pop();
+            return `${formattedRecipients.join(', ')} and ${lastRecipient}`;
+        }
+    }
 }

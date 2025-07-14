@@ -214,8 +214,8 @@ export const Translations = {
     OAUTH_ENDPOINT_SSL_PROTOCOL_ERROR: 'SSL/TLS Protocol Error. For localhost development, ensure Azure app registration includes HTTP (not HTTPS) redirect URI. Check your redirect URI configuration in Azure Portal.',
 
     // Common Error Messages (moved from AuthConstants.ts)
-    COMMON_UNKNOWN_ERROR: 'Unknown error',
-    COMMON_FAILED_EXCHANGE_CODE: 'Failed to exchange code for tokens',
+    COMMON_UNKNOWN_ERROR: 'Common_Unknown_Error',
+    COMMON_FAILED_EXCHANGE_CODE: 'Common_Failed_Exchange_Code',
     COMMON_FAILED_GET_USER_INFO: 'Failed to get user info',
     COMMON_FAILED_REFRESH_TOKEN: 'Failed to refresh token',
     COMMON_USER_INFO_INCOMPLETE: 'User info incomplete or missing email',
@@ -309,5 +309,21 @@ export const Translations = {
     SUMMARY_GENERATION_FAILED: 'Summary_Generation_Failed',
     LLM_SUMMARY_EMAIL_READY_USER: 'LLM_Summary_Email_Ready_User',
     LLM_PARSING_ERROR: 'LLM_Parsing_Error',
+
+    // Email Ready Messages with Recipients
+    LLM_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Email_Ready_User_With_Recipients',
+    LLM_SUMMARY_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Summary_Email_Ready_User_With_Recipients',
+
+    // New format constants for specific display format
+    LLM_AI_RESPONSE_LABEL: 'LLM_AI_Response_Label',
+    LLM_EMAIL_TO_LABEL: 'LLM_Email_To_Label', 
+    LLM_EMAIL_CC_LABEL: 'LLM_Email_CC_Label',
+    LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',
+    LLM_EMAIL_READY_FORMATTED: 'LLM_Email_Ready_Formatted',
+    LLM_SUMMARY_EMAIL_READY_FORMATTED: 'LLM_Summary_Email_Ready_Formatted',
+
+    // Error message details for MessageFormatter
+    ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',
+    ERROR_PLEASE_TRY_AGAIN: 'Error_Please_Try_Again',
 
 } as const; 

@@ -9,10 +9,12 @@ import { EmailServiceFactory } from './auth/EmailServiceFactory';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { EmailProviders } from '../enums/EmailProviders';
-import { GoogleOauthUrls, MicrosoftOauthUrls } from '../constants/AuthConstants';
+import { GoogleOauthUrls, MicrosoftOauthUrls, HeaderBuilders, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
 import { IToolExecutionResult } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
+import { t, Language } from '../lib/Translation/translation';
+import { Translations } from '../constants/Translations';
 
 export class ToolExecutorService {
     constructor(
@@ -67,25 +69,32 @@ export class ToolExecutorService {
     public async sendEmail(emailData: ISendEmailData, user: IUser): Promise<{ success: boolean; message: string }> {
 
         try {
+            // Get user's preferred language
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
             // Validate required fields
             if (!emailData.to || emailData.to.length === 0) {
                 return {
                     success: false,
-                    message: 'Recipient email address is required.',
+                    message: t(Translations.SEND_EMAIL_VALIDATION_TO_REQUIRED, language),
                 };
             }
 
             if (!emailData.subject) {
                 return {
                     success: false,
-                    message: 'Email subject is required.',
+                    message: t(Translations.SEND_EMAIL_VALIDATION_SUBJECT_REQUIRED, language),
                 };
             }
 
             if (!emailData.content) {
                 return {
                     success: false,
-                    message: 'Email content is required.',
+                    message: t(Translations.SEND_EMAIL_VALIDATION_CONTENT_REQUIRED, language),
                 };
             }
 
@@ -102,7 +111,7 @@ export class ToolExecutorService {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 return {
                     success: false,
-                    message: `The selected email provider (${emailProvider}) is not supported.`,
+                    message: t(Translations.PROVIDER_NOT_IMPLEMENTED, language, { provider: emailProvider }),
                 };
             }
 
@@ -119,7 +128,7 @@ export class ToolExecutorService {
             if (!isAuthenticated) {
                 return {
                     success: false,
-                    message: `You are not authenticated with ${emailProvider}. Please log in.`,
+                    message: t(Translations.NOT_AUTHENTICATED, language, { provider: emailProvider }),
                 };
             }
 
@@ -136,7 +145,7 @@ export class ToolExecutorService {
             if (!accessToken) {
                 return {
                     success: false,
-                    message: `Authentication failed for ${emailProvider}. Please log in again.`,
+                    message: t(Translations.ERROR_TOKEN_EXPIRED, language),
                 };
             }
 
@@ -154,7 +163,7 @@ export class ToolExecutorService {
             if (!fromEmail) {
                 return {
                     success: false,
-                    message: 'Could not determine your email address.',
+                    message: t(Translations.SEND_EMAIL_ERROR_NO_FROM_EMAIL, language),
                 };
             }
 
@@ -165,25 +174,26 @@ export class ToolExecutorService {
                 if (success) {
                     return {
                         success: true,
-                        message: 'Email sent successfully.',
+                        message: t(Translations.SEND_EMAIL_SUCCESS, language),
                     };
                 } else {
                     return {
                         success: false,
-                        message: 'Failed to send email due to an unknown error.',
+                        message: t(Translations.SEND_EMAIL_FAILED, language, { error: t(Translations.COMMON_UNKNOWN_ERROR, language) }),
                     };
                 }
             } catch (sendError) {
                 return {
                     success: false,
-                    message: `Failed to send email: ${sendError.message}`,
+                    message: t(Translations.SEND_EMAIL_FAILED, language, { error: sendError.message }),
                 };
             }
 
         } catch (error) {
+            // Fallback to English if language detection fails
             return {
                 success: false,
-                message: `Failed to send email: ${error.message}`,
+                message: t(Translations.SEND_EMAIL_FAILED, Language.en, { error: error.message }),
             };
         }
     }
@@ -237,10 +247,7 @@ export class ToolExecutorService {
 
             // Send the email using Gmail API
             const response = await this.http.post(GoogleOauthUrls.SEND_EMAIL, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                },
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
                 data: {
                     raw: encodedEmail
                 }
@@ -300,10 +307,7 @@ export class ToolExecutorService {
 
             // Send the email using Outlook API
             const response = await this.http.post(MicrosoftOauthUrls.SEND_EMAIL, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                },
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
                 data: emailPayload
             });
 

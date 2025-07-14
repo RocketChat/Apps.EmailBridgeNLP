@@ -279,4 +279,20 @@ export const pt = {
     Summary_Generation_Failed: "Não foi possível gerar um resumo das mensagens. Tente novamente.",
     LLM_Summary_Email_Ready_User: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar.",
     LLM_Parsing_Error: "Não consegui entender sua solicitação. Tente reformular com endereços de e-mail ou conteúdo mais simples.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**Resposta da IA:** Olá __name__, seu e-mail intitulado **__subject__** está pronto para enviar para __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**Resposta da IA:** Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar para __recipients__",
+
+    // New format constants for specific display format
+    LLM_AI_Response_Label: "**Resposta da IA:**\n",
+    LLM_Email_To_Label: "**Para:**",
+    LLM_Email_CC_Label: "**Cópia:**",
+    LLM_Email_Subject_Label: "**Assunto:**",
+    LLM_Email_Ready_Formatted: "Olá __name__, seu e-mail está pronto para enviar",
+    LLM_Summary_Email_Ready_Formatted: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** está pronto para enviar",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Os dados do e-mail não estão mais disponíveis. Por favor, tente sua solicitação novamente.",
+    Error_Please_Try_Again: "Por favor, tente novamente.",
 }; 

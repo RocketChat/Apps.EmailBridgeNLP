@@ -17,11 +17,12 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { ActionIds } from '../enums/ActionIds';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { getUserPreferredLanguage } from '../helper/userPreference';
-import { t } from '../lib/Translation/translation';
+import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { SendEmailModal } from '../modal/SendEmailModal';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { MessageFormatter } from '../lib/MessageFormatter';
 
 export class ExecuteActionButtonHandler {
     private context: UIKitActionButtonInteractionContext;
@@ -72,7 +73,13 @@ export class ExecuteActionButtonHandler {
             // Retrieve stored email data
             const emailData = await this.getStoredEmailData(room.id);
             if (!emailData) {
-                throw new Error('Email data not found');
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
             }
 
             // Send email directly using ToolExecutorService
@@ -95,11 +102,11 @@ export class ExecuteActionButtonHandler {
             );
 
         } catch (error) {
-            // Show error message
+            // Show generic error message for any unexpected errors
             await this.showMessage(
                 user,
                 room,
-                `${t(Translations.SEND_EMAIL_FAILED, language, { error: 'Unknown error' })}`,
+                MessageFormatter.formatRetryErrorMessage(language),
                 language
             );
         }
@@ -117,11 +124,23 @@ export class ExecuteActionButtonHandler {
             const emailData = await this.getStoredEmailData(room.id);
             
             if (!emailData) {
-                throw new Error('Email data not found');
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
             }
 
             if (!triggerId) {
-                throw new Error('Trigger ID not available');
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_TRIGGER_ID_MISSING, language),
+                    language
+                );
+                return;
             }
 
             // Store room ID for later use in ExecuteViewSubmitHandler
@@ -142,7 +161,13 @@ export class ExecuteActionButtonHandler {
             });
 
             if (!modal) {
-                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, language));
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_MODAL_CREATION_FAILED, language),
+                    language
+                );
+                return;
             }
 
             await this.modify
@@ -150,11 +175,11 @@ export class ExecuteActionButtonHandler {
                 .openSurfaceView(modal, { triggerId }, user);
 
         } catch (error) {
-            // Show error message
+            // Show generic error message for any unexpected errors
             await this.showMessage(
                 user,
                 room,
-                `${t(Translations.ERROR_MODAL_CREATION_FAILED, language)}`,
+                MessageFormatter.formatRetryErrorMessage(language),
                 language
             );
         }

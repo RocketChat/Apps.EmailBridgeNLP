@@ -28,6 +28,7 @@ import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { EmailProviders } from '../enums/EmailProviders';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { MessageFormatter } from '../lib/MessageFormatter';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -159,7 +160,13 @@ export class ExecuteBlockActionHandler {
             // Retrieve stored email data
             const emailData = await this.getStoredEmailData(room.id);
             if (!emailData) {
-                throw new Error('Email data not found');
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
             }
 
             // Send email directly using ToolExecutorService
@@ -177,18 +184,16 @@ export class ExecuteBlockActionHandler {
             await this.showMessage(
                 user,
                 room,
-                result.success
-                    ? t(Translations.SEND_EMAIL_SUCCESS_WITH_EMOJI, language)
-                    : t(Translations.SEND_EMAIL_FAILED_WITH_EMOJI, language, { error: 'Unknown error' }),
+                MessageFormatter.formatSendEmailResultMessage(result.success, result.message, language),
                 language
             );
 
         } catch (error) {
-            console.error('Error in handleDirectSendEmail:', error);
+            this.app.getLogger().error('Error in handleDirectSendEmail:', error);
             await this.showMessage(
                 user,
                 room,
-                t(Translations.SEND_EMAIL_FAILED_WITH_EMOJI, language, { error: 'Unknown error' }),
+                MessageFormatter.formatRetryErrorMessage(language),
                 language
             );
         }
@@ -205,11 +210,23 @@ export class ExecuteBlockActionHandler {
             // Retrieve stored email data
             const emailData = await this.getStoredEmailData(room.id);
             if (!emailData) {
-                throw new Error('Email data not found');
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
             }
 
             if (!triggerId) {
-                throw new Error('Trigger ID not available');
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_TRIGGER_ID_MISSING, language),
+                    language
+                );
+                return;
             }
 
             // Store room ID for later use in ExecuteViewSubmitHandler
@@ -230,7 +247,13 @@ export class ExecuteBlockActionHandler {
             });
 
             if (!modal) {
-                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, language));
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_MODAL_CREATION_FAILED, language),
+                    language
+                );
+                return;
             }
 
             await this.modify
@@ -238,12 +261,12 @@ export class ExecuteBlockActionHandler {
                 .openSurfaceView(modal, { triggerId }, user);
 
         } catch (error) {
-            console.error('Error in handleEditAndSendEmail:', error);
+            this.app.getLogger().error('Error in handleEditAndSendEmail:', error);
             // Show error message
             await this.showMessage(
                 user,
                 room,
-                t(Translations.ERROR_MODAL_CREATION_FAILED, language),
+                MessageFormatter.formatRetryErrorMessage(language),
                 language
             );
         }
@@ -267,7 +290,7 @@ export class ExecuteBlockActionHandler {
 
             return null;
         } catch (error) {
-            console.error('Error retrieving stored email data:', error);
+            this.app.getLogger().error('Error retrieving stored email data:', error);
             return null;
         }
     }
@@ -322,7 +345,7 @@ export class ExecuteBlockActionHandler {
             await this.showMessage(user, room, successMessage, language);
 
         } catch (error) {
-            console.error('Error during logout:', error);
+            this.app.getLogger().error('Error during logout:', error);
             const errorMessage = t(Translations.LOGOUT_ERROR, language, { error: error.message });
             await this.showMessage(user, room, errorMessage, language);
         }
@@ -343,7 +366,7 @@ export class ExecuteBlockActionHandler {
 
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         } catch (error) {
-            console.error('Error showing message:', error);
+            this.app.getLogger().error('Error showing message:', error);
         }
     }
 }

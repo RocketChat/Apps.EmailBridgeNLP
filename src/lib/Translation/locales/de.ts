@@ -279,4 +279,20 @@ export const de = {
     Summary_Generation_Failed: "Eine Zusammenfassung der Nachrichten konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
     LLM_Summary_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist versandbereit.",
     LLM_Parsing_Error: "Ich konnte Ihre Anfrage nicht verstehen. Bitte versuchen Sie es mit einfacheren E-Mail-Adressen oder Inhalten umzuformulieren.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**KI-Antwort:** Hallo __name__, Ihre E-Mail mit dem Titel **__subject__** ist bereit zum Senden an __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**KI-Antwort:** Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist bereit zum Senden an __recipients__",
+
+    // New format constants for specific display format
+    LLM_AI_Response_Label: "**KI-Antwort:**\n",
+    LLM_Email_To_Label: "**An:**",
+    LLM_Email_CC_Label: "**Kopie:**",
+    LLM_Email_Subject_Label: "**Betreff:**",
+    LLM_Email_Ready_Formatted: "Hallo __name__, Ihre E-Mail ist bereit zum Senden",
+    LLM_Summary_Email_Ready_Formatted: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** ist bereit zum Senden",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "E-Mail-Daten sind nicht mehr verfügbar. Bitte versuchen Sie Ihre Anfrage erneut.",
+    Error_Please_Try_Again: "Bitte versuchen Sie es erneut.",
 }; 

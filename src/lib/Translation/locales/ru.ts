@@ -279,4 +279,16 @@ export const ru = {
     Summary_Generation_Failed: "Невозможно создать сводку сообщений. Попробуйте еще раз.",
     LLM_Summary_Email_Ready_User: "Привет __name__, ваше письмо с резюме из канала: **__channelName__** с темой \"**__subject__**\" готово к отправке.",
     LLM_Parsing_Error: "Я не смог понять ваш запрос. Попробуйте переформулировать с более простыми адресами электронной почты или содержимым.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**Ответ ИИ:** Привет __name__, ваше письмо с темой **__subject__** готово к отправке для __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**Ответ ИИ:** Привет __name__, ваше письмо с резюме из канала: **__channelName__** с темой \"**__subject__**\" готово к отправке для __recipients__",
+
+    // New format constants for specific display format
+    LLM_AI_Response_Label: "**Ответ ИИ:**\n",
+    LLM_Email_To_Label: "**Кому:**",
+    LLM_Email_CC_Label: "**Копия:**",
+    LLM_Email_Subject_Label: "**Тема:**",
+    LLM_Email_Ready_Formatted: "Привет __name__, ваше письмо готово к отправке",
+    LLM_Summary_Email_Ready_Formatted: "Привет __name__, ваше письмо с резюме из канала: **__channelName__** готово к отправке",
 }; 

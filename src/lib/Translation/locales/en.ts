@@ -269,6 +269,10 @@ export const en = {
     LOGOUT_ERROR: "An error occurred during logout: __error__",
     EMAIL_SENT_CONFIRMATION: "Email sent.",
 
+    // Common Error Messages
+    Common_Unknown_Error: "Unknown error",
+    Common_Failed_Exchange_Code: "Failed to exchange code for tokens",
+
     // Send/Edit Action Buttons
     SEND_ACTION_TEXT: "Send",
     EDIT_SEND_ACTION_TEXT: "Edit & Send",
@@ -283,4 +287,20 @@ export const en = {
     Summary_Generation_Failed: "Unable to generate a summary of the messages. Please try again.",
     LLM_Summary_Email_Ready_User: "Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send.",
     LLM_Parsing_Error: "I couldn't understand your request. Please try rephrasing with simpler email addresses or content.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**AI response:** Hey __name__, your email titled **__subject__** is ready to send to __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**AI response:** Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send to __recipients__",
+
+    // New format constants for specific display format
+    LLM_AI_Response_Label: "**AI Response:**\n",
+    LLM_Email_To_Label: "**To:**",
+    LLM_Email_CC_Label: "**Cc:**",
+    LLM_Email_Subject_Label: "**Subject:**",
+    LLM_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
+    LLM_Summary_Email_Ready_Formatted: "Hey __name__, your email with summary from channel: **__channelName__** is ready to send",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Email data is no longer available. Please try your request again.",
+    Error_Please_Try_Again: "Please try again.",
 }; 
