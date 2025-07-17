@@ -25,7 +25,7 @@ export class MessageFormatter {
                 name: senderName
               });
         
-        let formattedMessage = `${t(Translations.LLM_AI_RESPONSE_LABEL, language)} ${responseText}\n`;
+        let formattedMessage = `${t(Translations.LLM_AI_RESPONSE_LABEL, language)} ${responseText}\n\n`;
         formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${recipients}\n`;
         
         // Add CC line only if there are CC recipients

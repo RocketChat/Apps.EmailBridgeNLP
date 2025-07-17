@@ -134,7 +134,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -160,9 +160,9 @@ export class Handler implements IHandler {
                         this.app.getLogger()
                     );
                     messageBuilder.setText(
-                        t(Translations.ALREADY_LOGGED_IN, this.language, { 
-                            provider: getProviderDisplayName(emailProvider), 
-                            email: userInfo.email 
+                        t(Translations.ALREADY_LOGGED_IN, this.language, {
+                            provider: getProviderDisplayName(emailProvider),
+                            email: userInfo.email
                         })
                     );
                     return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -181,7 +181,7 @@ export class Handler implements IHandler {
                     } catch (logoutError) {
                         this.app.getLogger().error(t(Translations.LOG_LOGOUT_ERR, this.language), logoutError);
                     }
-                    
+
                     // Fall through to show login button
                 }
             }
@@ -221,8 +221,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error('Login processing error:', error);
-            
-            // Provide user-friendly error message based on error type
+
             let userMessage: string;
             if (error.message?.includes('network') || error.message?.includes('connection')) {
                 userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
@@ -231,7 +230,7 @@ export class Handler implements IHandler {
             } else {
                 userMessage = t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
             }
-            
+
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
@@ -261,7 +260,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -302,9 +301,9 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    t(Translations.LOGOUT_CONFIRMATION, this.language, { 
-                        provider: getProviderDisplayName(emailProvider), 
-                        email: userInfo.email 
+                    t(Translations.LOGOUT_CONFIRMATION, this.language, {
+                        provider: getProviderDisplayName(emailProvider),
+                        email: userInfo.email
                     })
                 ),
             });
@@ -325,7 +324,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error('Logout preparation error:', error);
-            
+
             // Provide user-friendly error message
             let userMessage: string;
             if (error.message?.includes('network') || error.message?.includes('connection')) {
@@ -333,7 +332,7 @@ export class Handler implements IHandler {
             } else {
                 userMessage = t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
             }
-            
+
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
@@ -347,7 +346,7 @@ export class Handler implements IHandler {
                 this.read.getPersistenceReader(),
                 this.sender.id,
             );
-            
+
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
 
             const userPreference = new UserPreferenceStorage(
@@ -377,7 +376,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error('Config error:', error);
-            
+
             // Only show user-friendly error notifications for actionable errors
             const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
             const messageBuilder = this.modify
@@ -427,7 +426,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -477,20 +476,20 @@ export class Handler implements IHandler {
 
             // Create a comprehensive report
             const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
-                                 t(Translations.REPORT_STATISTICS, this.language, {
-                                     receivedToday: statistics.receivedToday.toString(),
-                                     receivedUnreadToday: statistics.receivedUnreadToday.toString(),
-                                     sentToday: statistics.sentToday.toString()
-                                 }) + '\n\n' +
-                                 categoryReport +
-                                 '---';
+                t(Translations.REPORT_STATISTICS, this.language, {
+                    receivedToday: statistics.receivedToday.toString(),
+                    receivedUnreadToday: statistics.receivedUnreadToday.toString(),
+                    sentToday: statistics.sentToday.toString()
+                }) + '\n\n' +
+                categoryReport +
+                '---';
             messageBuilder.setText(reportMessage);
-            
+
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
             this.app.getLogger().error('Report generation error:', error);
-            
+
             // Provide user-friendly error message based on error type
             let userMessage: string;
             if (error.message?.includes('network') || error.message?.includes('connection')) {
@@ -500,7 +499,7 @@ export class Handler implements IHandler {
             } else {
                 userMessage = t(Translations.REPORT_ERROR, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
             }
-            
+
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
@@ -514,7 +513,7 @@ export class Handler implements IHandler {
                 this.read.getPersistenceReader(),
                 this.sender.id,
             );
-            
+
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
 
             const modal = await SendEmailModal({
@@ -539,7 +538,7 @@ export class Handler implements IHandler {
 
         } catch (error) {
             this.app.getLogger().error('Modal creation error:', error);
-            
+
             // Only show user notification for actionable errors
             const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
             const messageBuilder = this.modify
@@ -564,17 +563,17 @@ export class Handler implements IHandler {
 
     public async ProcessNaturalLanguageQuery(query: string): Promise<void> {
         const nlQueryHandler = new NLQueryHandler(
-                    this.app,
-                    this.read,
-                    this.modify,
-                    this.http,
+            this.app,
+            this.read,
+            this.modify,
+            this.http,
             this.persis,
-                    this.sender,
-                    this.room,
+            this.sender,
+            this.room,
             this.language,
-                    this.triggerId
-                );
-                
+            this.triggerId
+        );
+
         await nlQueryHandler.processNaturalLanguageQuery(query);
     }
 
