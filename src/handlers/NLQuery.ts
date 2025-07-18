@@ -26,6 +26,8 @@ import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
 
 export class NLQueryHandler {
+    private originalQuery: string = '';
+
     constructor(
         private readonly app: EmailBridgeNlpApp,
         private readonly read: IRead,
@@ -38,8 +40,39 @@ export class NLQueryHandler {
         private readonly triggerId?: string
     ) {}
 
+    private extractUsernamesFromCurrentQuery(): string[] {
+        const usernameService = new UsernameService(this.read);
+        return usernameService.extractUsernamesFromQuery(this.originalQuery);
+    }
+
+    private async mapEmailsToUsernames(args: any, usernameService: UsernameService): Promise<{ toUsernames: string[], ccUsernames: string[] }> {
+        // Get enhanced query with email mappings
+        const enhancedQuery = await usernameService.enhanceQueryWithEmails(this.originalQuery);
+        const usernamePairs = UsernameService.extractUsernameEmailPairs(enhancedQuery);
+        
+        const toEmails = Array.isArray(args.to) ? args.to : [args.to].filter(Boolean);
+        const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : [];
+        
+        // Map emails back to usernames
+        const toUsernames: string[] = [];
+        const ccUsernames: string[] = [];
+        
+        for (const pair of usernamePairs) {
+            if (toEmails.includes(pair.email)) {
+                toUsernames.push(pair.username);
+            } else if (ccEmails.includes(pair.email)) {
+                ccUsernames.push(pair.username);
+            }
+        }
+        
+        return { toUsernames, ccUsernames };
+    }
+
     public async processNaturalLanguageQuery(query: string): Promise<void> {
         const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
+        
+        // Store the original query for username extraction
+        this.originalQuery = query;
 
         try {
             // Send initial query message with AI thinking indicator
@@ -184,16 +217,24 @@ export class NLQueryHandler {
             let emailData: ISendEmailData;
             
             if (toolCall.function.name === LlmTools.SEND_EMAIL) {
+                // Map emails back to usernames for To and CC separately
+                const usernameService = new UsernameService(this.read);
+                const { toUsernames, ccUsernames } = await this.mapEmailsToUsernames(args, usernameService);
+                
                 emailData = {
                     to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
                     cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
                     subject: args.subject || '',
                     content: args.content || '',
+                    toUsernames: toUsernames, // Store To usernames for avatar display
+                    ccUsernames: ccUsernames, // Store CC usernames for avatar display
                 };
             } else {
                 // Handle summarize-and-send-email tool
                 emailData = await this.prepareSummarizeEmailData(args);
             }
+
+
 
             // Store email data for button handlers
             await this.storeEmailDataForButtons(emailData);
@@ -264,6 +305,8 @@ export class NLQueryHandler {
                 cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
                 subject: emailResult.subject,
                 content: emailResult.content,
+                toUsernames: this.extractUsernamesFromCurrentQuery(), // For summarize, all usernames go to To field
+                ccUsernames: [], // No CC usernames for summarize
             };
         } catch (error) {
             this.app.getLogger().error('Error preparing summarize email data:', error);
@@ -285,19 +328,18 @@ export class NLQueryHandler {
             this.sender.id,
         );
 
+        // Use ROOM association to match retrieval logic
         const association = new RocketChatAssociationRecord(
-            RocketChatAssociationModel.MISC,
-            `email-data-${this.sender.id}`
+            RocketChatAssociationModel.ROOM,
+            this.room.id
         );
 
-        await this.persis.updateByAssociation(association, emailData, true);
+        // Store email data with proper structure for retrieval
+        await this.persis.updateByAssociation(association, { emailData }, true);
         await roomInteractionStorage.storeInteractionRoomId(this.room.id);
     }
 
     private async sendEmailReadyMessage(emailData: ISendEmailData, toolCall: IToolCall, appUser: IUser): Promise<void> {
-        const usernameService = new UsernameService(this.read);
-        const enhancedQuery = await usernameService.enhanceQueryWithEmails(''); // We need the enhanced query for formatting
-        
         const messageBuilder = this.modify
             .getCreator()
             .startMessage()
@@ -307,19 +349,16 @@ export class NLQueryHandler {
 
         const block = this.modify.getCreator().getBlockBuilder();
         
-        // Format recipients for display
-        const recipients = await usernameService.formatRecipientsForDisplay(emailData, enhancedQuery);
-        
         // Use MessageFormatter for consistent formatting
         const channelName = toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL
             ? this.room.displayName || 'Channel' 
             : undefined;
         
-        const formattedMessage = MessageFormatter.formatEmailReadyMessage(
+        const formattedMessage = await MessageFormatter.formatEmailReadyMessage(
             this.sender.name || this.sender.username,
             emailData,
-            recipients,
             this.language,
+            this.read,
             channelName
         );
         

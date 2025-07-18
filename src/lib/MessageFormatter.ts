@@ -1,6 +1,8 @@
-import { t, Language } from './Translation/translation';
+import { Language, t } from './Translation/translation';
 import { Translations } from '../constants/Translations';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { AvatarUtils } from '../constants/AuthConstants';
 
 export class MessageFormatter {
     
@@ -8,13 +10,13 @@ export class MessageFormatter {
         return `${t(Translations.LLM_USER_QUERY_DISPLAY, language, { query })}\n\n🤖 ${t(Translations.LLM_AI_THINKING, language)}`;
     }
 
-    public static formatEmailReadyMessage(
+    public static async formatEmailReadyMessage(
         senderName: string, 
         emailData: ISendEmailData, 
-        recipients: string, 
         language: Language,
+        read?: IRead,
         channelName?: string
-    ): string {
+    ): Promise<string> {
         // Determine if this is a summary email or regular email
         const responseText = channelName 
             ? t(Translations.LLM_SUMMARY_EMAIL_READY_FORMATTED, language, { 
@@ -26,16 +28,46 @@ export class MessageFormatter {
               });
         
         let formattedMessage = `${t(Translations.LLM_AI_RESPONSE_LABEL, language)} ${responseText}\n\n`;
-        formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${recipients}\n`;
         
-        // Add CC line only if there are CC recipients
-        if (emailData.cc && emailData.cc.length > 0) {
+        // Format To recipients with actual avatars and names
+        if (emailData.toUsernames && emailData.toUsernames.length > 0 && read) {
+            const toDisplay = await this.formatUsernamesWithAvatars(emailData.toUsernames, read);
+            formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${toDisplay}\n`;
+        } else if (emailData.to && emailData.to.length > 0) {
+            // Fallback to emails if no usernames or read access
+            formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${emailData.to.join(', ')}\n`;
+        }
+        
+        // Format CC recipients with actual avatars and names (only if there are CC recipients)
+        if (emailData.ccUsernames && emailData.ccUsernames.length > 0 && read) {
+            const ccDisplay = await this.formatUsernamesWithAvatars(emailData.ccUsernames, read);
+            formattedMessage += `${t(Translations.LLM_EMAIL_CC_LABEL, language)} ${ccDisplay}\n`;
+        } else if (emailData.cc && emailData.cc.length > 0) {
+            // Fallback to emails if no usernames or read access
             formattedMessage += `${t(Translations.LLM_EMAIL_CC_LABEL, language)} ${emailData.cc.join(', ')}\n`;
         }
         
         formattedMessage += `${t(Translations.LLM_EMAIL_SUBJECT_LABEL, language)} ${emailData.subject}`;
         
         return formattedMessage;
+    }
+
+    private static async formatUsernamesWithAvatars(usernames: string[], read: IRead): Promise<string> {
+        const formattedUsers: string[] = [];
+        
+        for (const username of usernames) {
+            try {
+                const user = await read.getUserReader().getByUsername(username);
+                const displayName = user?.name || username;
+                // Just show the clean name in bold
+                formattedUsers.push(`**${displayName}**`);
+            } catch (error) {
+                // If user lookup fails, use username in bold
+                formattedUsers.push(`**${username}**`);
+            }
+        }
+        
+        return formattedUsers.join(' ');
     }
 
     public static formatErrorMessage(error: string, language: Language, context?: string): string {

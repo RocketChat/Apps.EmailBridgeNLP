@@ -125,4 +125,15 @@ export const MessageConfig = {
     MAX_MESSAGES_RETRIEVAL: 100, 
 } as const; 
 
- 
+// Avatar Configuration
+export const AvatarConfig = {
+    DEFAULT_SIZE: 32,
+    DEFAULT_FORMAT: 'png',
+    ENDPOINT_PATH: '/avatar',
+} as const;
+
+// Avatar URL Builder
+export const AvatarUtils = {
+    buildAvatarUrl: (username: string, format: string = AvatarConfig.DEFAULT_FORMAT, size: number = AvatarConfig.DEFAULT_SIZE) => 
+        `${AvatarConfig.ENDPOINT_PATH}/${username}?format=${format}&size=${size}`,
+} as const;

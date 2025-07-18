@@ -3,6 +3,8 @@ export interface ISendEmailData {
     cc?: string[];
     subject: string;
     content: string;
+    toUsernames?: string[]; // Store To usernames for avatar/name display
+    ccUsernames?: string[]; // Store CC usernames for avatar/name display
 }
 
 export interface IMessage {
