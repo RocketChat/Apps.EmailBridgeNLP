@@ -291,4 +291,9 @@ export const ru = {
     LLM_Email_Subject_Label: "**Тема:**",
     LLM_Email_Ready_Formatted: "Привет __name__, ваше письмо готово к отправке",
     LLM_Summary_Email_Ready_Formatted: "Привет __name__, ваше письмо с резюме из канала: **__channelName__** готово к отправке",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Данные электронной почты больше недоступны. Пожалуйста, попробуйте снова.",
+    Error_Please_Try_Again: "Пожалуйста, попробуйте снова.",
+    Error_Processing_Summary_Request: "Возникла проблема при обработке вашего запроса на резюме. Пожалуйста, попробуйте снова.",
 }; 

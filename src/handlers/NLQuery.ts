@@ -235,7 +235,7 @@ export class NLQueryHandler {
             const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams);
 
             if (messages.length === 0) {
-                throw new Error('No messages found to summarize');
+                throw new Error(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
             }
 
             // Format messages for summarization
@@ -246,7 +246,7 @@ export class NLQueryHandler {
             const summaryContent = await llmService.generateSummary(formattedMessages, channelName);
 
             if (!summaryContent || summaryContent === "Failed to generate summary due to an error.") {
-                throw new Error('Failed to generate summary');
+                throw new Error(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
             }
 
             // Prepare email content
@@ -279,7 +279,14 @@ export class NLQueryHandler {
             };
         } catch (error) {
             this.app.getLogger().error('Error preparing summarize email data:', error);
-            throw error;
+            // Re-throw user-friendly error messages, but convert system errors to generic ones
+            if (error.message === t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language) || 
+                error.message === t(Translations.SUMMARY_GENERATION_FAILED, this.language)) {
+                throw error;
+            }
+            
+            // For any other system errors, throw a generic user-friendly message
+            throw new Error(t(Translations.ERROR_PROCESSING_SUMMARY_REQUEST, this.language));
         }
     }
 

@@ -155,6 +155,7 @@ export class ExecuteActionButtonHandler {
             const modal = await SendEmailModal({
                 app: this.app,
                 modify: this.modify,
+                read: this.read,
                 language: language,
                 emailData,
                 context: 'edit',

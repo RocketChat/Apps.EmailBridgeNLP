@@ -307,6 +307,7 @@ export const Translations = {
     // Summarization Messages
     NO_MESSAGES_TO_SUMMARIZE: 'No_Messages_To_Summarize',
     SUMMARY_GENERATION_FAILED: 'Summary_Generation_Failed',
+    ERROR_PROCESSING_SUMMARY_REQUEST: 'Error_Processing_Summary_Request',
     LLM_SUMMARY_EMAIL_READY_USER: 'LLM_Summary_Email_Ready_User',
     LLM_PARSING_ERROR: 'LLM_Parsing_Error',
 
@@ -325,5 +326,4 @@ export const Translations = {
     // Error message details for MessageFormatter
     ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',
     ERROR_PLEASE_TRY_AGAIN: 'Error_Please_Try_Again',
-
 } as const; 

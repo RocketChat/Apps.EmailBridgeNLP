@@ -301,4 +301,5 @@ export const es = {
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "Los datos del correo ya no están disponibles. Por favor, intenta tu solicitud nuevamente.",
     Error_Please_Try_Again: "Por favor, inténtalo de nuevo.",
+    Error_Processing_Summary_Request: "Hubo un problema al procesar tu solicitud de resumen. Por favor, inténtalo de nuevo.",
 }; 

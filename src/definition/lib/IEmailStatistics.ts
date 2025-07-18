@@ -1,3 +1,5 @@
+import { ICategoryStats } from '../formats/IEmailFormats';
+
 export interface IEmailStatistics {
     totalEmails: number;
     unreadEmails: number;
@@ -5,7 +7,7 @@ export interface IEmailStatistics {
     receivedToday: number;
     receivedUnreadToday: number;
     sentToday: number;
-    categoryStats?: { [category: string]: { total: number; unread: number } };
+    categoryStats?: ICategoryStats;
     timeRange: string;
     emailAddress: string;
     provider: string;

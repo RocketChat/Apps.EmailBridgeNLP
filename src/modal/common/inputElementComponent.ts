@@ -1,6 +1,6 @@
 import { InputBlock, InputElementDispatchAction } from '@rocket.chat/ui-kit';
 import { EmailBridgeNlpApp } from '../../../EmailBridgeNlpApp';
-import { ElementInteractionParam } from '../../lib/ElementBuilder';
+import { ElementInteractionParam } from '../../definition/lib/IElementBuilder';
 import { Modals } from '../../enums/modals/common/Modal';
 
 export function inputElementComponent(

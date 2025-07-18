@@ -295,4 +295,5 @@ export const de = {
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "E-Mail-Daten sind nicht mehr verfügbar. Bitte versuchen Sie Ihre Anfrage erneut.",
     Error_Please_Try_Again: "Bitte versuchen Sie es erneut.",
+    Error_Processing_Summary_Request: "Es gab ein Problem bei der Verarbeitung Ihrer Zusammenfassungsanfrage. Bitte versuchen Sie es erneut.",
 }; 

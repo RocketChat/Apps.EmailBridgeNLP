@@ -35,6 +35,7 @@ import { LlmTools } from '../enums/LlmTools';
 import { UsernameService } from '../services/UsernameService';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { NLQueryHandler } from './NLQuery';
+import { EmailFormats } from '../lib/formats/EmailFormats';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -463,26 +464,8 @@ export class Handler implements IHandler {
                 this.language
             );
 
-            let categoryReport = '';
-            if (statistics.categoryStats) {
-                for (const category in statistics.categoryStats) {
-                    if (statistics.categoryStats.hasOwnProperty(category)) {
-                        const stats = statistics.categoryStats[category];
-                        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
-                        categoryReport += `**${categoryName}**: ${stats.total} emails (${stats.unread} unread)\n`;
-                    }
-                }
-            }
-
-            // Create a comprehensive report
-            const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
-                t(Translations.REPORT_STATISTICS, this.language, {
-                    receivedToday: statistics.receivedToday.toString(),
-                    receivedUnreadToday: statistics.receivedUnreadToday.toString(),
-                    sentToday: statistics.sentToday.toString()
-                }) + '\n\n' +
-                categoryReport +
-                '---';
+            // Use centralized report formatting
+            const reportMessage = EmailFormats.formatEmailReport(statistics, this.language);
             messageBuilder.setText(reportMessage);
 
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -519,6 +502,7 @@ export class Handler implements IHandler {
             const modal = await SendEmailModal({
                 app: this.app,
                 modify: this.modify,
+                read: this.read,
                 language: this.language,
                 emailData,
                 context: 'llm',
