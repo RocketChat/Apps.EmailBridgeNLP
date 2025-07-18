@@ -23,6 +23,7 @@ import { MessageFormatter } from '../lib/MessageFormatter';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
+import { EmailFormats } from '../lib/formats/EmailFormats';
 
 export class NLQueryHandler {
     constructor(
@@ -249,33 +250,20 @@ export class NLQueryHandler {
                 throw new Error(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
             }
 
-            // Prepare email content
-            const subject = args.subject || `Summary of ${channelName} conversation`;
-            
-            let emailContent = `CONVERSATION SUMMARY: ${channelName}\n\n`;
-            emailContent += `${summaryContent}\n\n`;
-            emailContent += `--------------------------------------------------\n\n`;
-            emailContent += `SUMMARY DETAILS:\n`;
-            emailContent += `- Messages included: ${messages.length}\n`;
-            emailContent += `- Channel: ${channelName}\n`;
-            
-            if (args.people && args.people.length > 0) {
-                emailContent += `- Participants: ${args.people.join(', ')}\n`;
-            }
-            
-            if (summarizeParams.days) {
-                emailContent += `- Time period: Last ${summarizeParams.days} day(s)\n`;
-            } else if (args.start_date && args.end_date) {
-                emailContent += `- Time period: ${args.start_date} to ${args.end_date}\n`;
-            }
-            
-            emailContent += `\nThis summary was generated automatically by EmailBridge NLP.`;
+            // Format email using EmailFormats utility
+            const emailResult = EmailFormats.formatSummaryEmail(
+                channelName,
+                summaryContent,
+                messages.length,
+                args,
+                summarizeParams
+            );
 
             return {
                 to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
                 cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
-                subject: subject,
-                content: emailContent,
+                subject: emailResult.subject,
+                content: emailResult.content,
             };
         } catch (error) {
             this.app.getLogger().error('Error preparing summarize email data:', error);
