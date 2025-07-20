@@ -9,7 +9,6 @@ import { handleErrorAndGetMessage } from '../helper/errorHandler';
 import { t, Language } from '../lib/Translation/translation';
 
 export class LLMService {
-    private readonly llmEndpoint: string;
     private readonly llmSettings: ILLMSettings;
 
     constructor(
@@ -18,7 +17,6 @@ export class LLMService {
         private readonly app: any,
         private readonly language: Language
     ) {
-        this.llmEndpoint = LlmConfig.ENDPOINT;
         this.llmSettings = llmSettings;
     }
 
@@ -64,64 +62,8 @@ export class LLMService {
             case 'groq':
                 return await this.processWithGroq(systemPromptWithDates, query);
             case 'self-hosted':
-                return await this.processWithSelfHosted(systemPromptWithDates, query);
-            case 'default':
             default:
-                return await this.processWithDefault(systemPromptWithDates, query);
-        }
-    }
-
-    private async processWithDefault(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
-        const payload = {
-            model: LlmConfig.MODEL_PATH,
-            messages: [
-                {
-                    role: 'system',
-                    content: systemPrompt,
-                },
-                {
-                    role: 'user',
-                    content: query,
-                },
-            ],
-            stream: false,
-        };
-
-        const request: IHttpRequest = {
-            headers: {
-                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
-            },
-            data: payload,
-        };
-
-        try {
-            const response = await this.http.post(this.llmEndpoint, request);
-
-            if (!response?.data) {
-                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
-            }
-
-            const llmResponse = response.data as ILLMResponse;
-
-            if (!llmResponse.choices?.length) {
-                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
-            }
-
-            const choice = llmResponse.choices[0];
-            let toolCalls = choice.message.tool_calls || [];
-            let error: string | undefined;
-
-            // Simple parsing - only try to parse JSON from content if no tool_calls
-            if (toolCalls.length === 0 && choice.message.content) {
-                const parsed = this.parseContentForTools(choice.message.content);
-                toolCalls = parsed.tools;
-                error = parsed.error;
-            }
-
-            return { toolCalls, rawResponse: llmResponse, error };
-        } catch (error) {
-            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'LLM Default Provider', error);
-            throw new Error(errorMessage);
+                return await this.processWithSelfHosted(systemPromptWithDates, query);
         }
     }
 
@@ -395,11 +337,8 @@ export class LLMService {
                     response = await this.generateSummaryWithGroq(prompt);
                     break;
                 case 'self-hosted':
-                    response = await this.generateSummaryWithSelfHosted(prompt);
-                    break;
-                case 'default':
                 default:
-                    response = await this.generateSummaryWithDefault(prompt);
+                    response = await this.generateSummaryWithSelfHosted(prompt);
                     break;
             }
 
@@ -407,42 +346,6 @@ export class LLMService {
         } catch (error) {
             return t(Translations.SUMMARY_GENERATION_FAILED, this.language);
         }
-    }
-
-    private async generateSummaryWithDefault(prompt: string): Promise<string> {
-        const payload = {
-            model: LlmConfig.MODEL_PATH,
-            messages: [
-                {
-                    role: 'system',
-                    content: prompt,
-                },
-            ],
-            stream: false,
-        };
-
-        const request: IHttpRequest = {
-            headers: {
-                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
-            },
-            data: payload,
-        };
-
-            const response = await this.http.post(this.llmEndpoint, request);
-
-            if (!response?.data) {
-            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
-        }
-
-        const llmResponse = response.data as ILLMResponse;
-
-        if (!llmResponse.choices?.length) {
-            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
-        }
-
-        const choice = llmResponse.choices[0];
-        const content = choice.message.content || '';
-        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
     }
 
     private async generateSummaryWithOpenAI(prompt: string): Promise<string> {

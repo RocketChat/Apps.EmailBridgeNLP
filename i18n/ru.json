@@ -106,7 +106,6 @@
 	"Config_Error": "❌ Ошибка конфигурации: __error__",
 	"LLM_Provider_Label": "Провайдер LLM",
 	"LLM_Provider_Description": "Выберите провайдера языковой модели ИИ для обработки команд электронной почты",
-	"LLM_Provider_Default_Label": "По умолчанию (Самостоятельно размещенный)",
 	"LLM_Provider_SelfHosted_Label": "Самостоятельно размещенный",
 	"LLM_Provider_OpenAI_Label": "OpenAI",
 	"LLM_Provider_Gemini_Label": "Google Gemini",

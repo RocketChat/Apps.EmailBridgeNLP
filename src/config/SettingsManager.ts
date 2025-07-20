@@ -51,7 +51,7 @@ import { ILLMSettings } from '../definition/lib/ILLMSettings';
 
 export async function getLLMSettings(settingsReader: ISettingRead): Promise<ILLMSettings> {
     return {
-        provider: await settingsReader.getValueById(SettingsIds.LLMProvider) as string || 'default',
+        provider: await settingsReader.getValueById(SettingsIds.LLMProvider) as string || 'self-hosted',
         selfHostedUrl: await settingsReader.getValueById(SettingsIds.SelfHostedLLMUrl) as string,
         openaiApiKey: await settingsReader.getValueById(SettingsIds.OpenAIApiKey) as string,
         geminiApiKey: await settingsReader.getValueById(SettingsIds.GeminiApiKey) as string,

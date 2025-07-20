@@ -127,8 +127,6 @@ export const LlmModels = {
 
 // LLM Configuration
 export const LlmConfig = {
-    ENDPOINT: 'http://llama3-8b.local:12345/v1/chat/completions',
-    MODEL_PATH: './dist/Llama-3-8B-Instruct-q4f16_1-MLC/',
     MAX_TOKENS: 2000,
     TEMPERATURE: 0.7,
     TIMEOUT: 30000, // 30 seconds

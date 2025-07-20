@@ -106,7 +106,6 @@
 	"Config_Error": "❌ Erro de configuração: __error__",
 	"LLM_Provider_Label": "Provedor de LLM",
 	"LLM_Provider_Description": "Selecione o provedor de modelo de linguagem IA para processar comandos de e-mail",
-	"LLM_Provider_Default_Label": "Padrão (Auto-hospedado)",
 	"LLM_Provider_SelfHosted_Label": "Auto-hospedado",
 	"LLM_Provider_OpenAI_Label": "OpenAI",
 	"LLM_Provider_Gemini_Label": "Google Gemini",

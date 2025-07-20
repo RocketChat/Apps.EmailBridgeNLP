@@ -101,17 +101,13 @@ export const settings: Array<ISetting> = [
     {
         id: SettingsIds.LLMProvider,
         type: SettingType.SELECT,
-        packageValue: 'default',
+        packageValue: 'self-hosted',
         required: true,
         public: false,
         section: 'LLM Configuration',
         i18nLabel: 'LLM_Provider_Label',
         i18nDescription: 'LLM_Provider_Description',
         values: [
-            {
-                key: 'default',
-                i18nLabel: 'LLM_Provider_Default_Label',
-            },
             {
                 key: 'self-hosted',
                 i18nLabel: 'LLM_Provider_SelfHosted_Label',
