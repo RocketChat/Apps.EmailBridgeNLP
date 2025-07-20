@@ -28,6 +28,7 @@ import { Translations } from '../constants/Translations';
 import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 import { LLMService } from '../services/LLMService';
 import { ToolExecutorService } from '../services/ToolExecutorService';
+import { handleError, handleErrorAndGetMessage } from '../helper/errorHandler';
 import { SendEmailModal } from '../modal/SendEmailModal';
 import { IToolCall } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
@@ -61,6 +62,8 @@ export class Handler implements IHandler {
         this.threadId = params.threadId;
         this.language = params.language;
     }
+
+
 
     public async Help(): Promise<void> {
         await sendHelperNotification(
@@ -221,16 +224,12 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            this.app.getLogger().error('Login processing error:', error);
-
-            let userMessage: string;
-            if (error.message?.includes('network') || error.message?.includes('connection')) {
-                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
-            } else if (error.message?.includes('configuration') || error.message?.includes('settings')) {
-                userMessage = t(Translations.ERROR_MISSING_CONFIGURATION, this.language);
-            } else {
-                userMessage = t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
-            }
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Login processing',
+                error
+            );
 
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -324,15 +323,12 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            this.app.getLogger().error('Logout preparation error:', error);
-
-            // Provide user-friendly error message
-            let userMessage: string;
-            if (error.message?.includes('network') || error.message?.includes('connection')) {
-                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
-            } else {
-                userMessage = t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
-            }
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Logout preparation',
+                error
+            );
 
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -376,29 +372,16 @@ export class Handler implements IHandler {
                 .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
 
         } catch (error) {
-            this.app.getLogger().error('Config error:', error);
-
-            // Only show user-friendly error notifications for actionable errors
-            const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
-            const messageBuilder = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser)
-                .setRoom(this.room)
-                .setGroupable(false);
-
-            // Categorize error and provide user-friendly message
-            let userMessage: string;
-            if (error.message?.includes('trigger')) {
-                userMessage = t(Translations.ERROR_TRIGGER_ID_MISSING, this.language);
-            } else if (error.message?.includes('modal')) {
-                userMessage = t(Translations.ERROR_MODAL_CREATION_FAILED, this.language);
-            } else {
-                userMessage = t(Translations.CONFIG_ERROR, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
-            }
-
-            messageBuilder.setText(userMessage);
-            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            return handleError(
+                this.app,
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                this.language,
+                'Config',
+                error
+            );
         }
     }
 
@@ -471,17 +454,12 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            this.app.getLogger().error('Report generation error:', error);
-
-            // Provide user-friendly error message based on error type
-            let userMessage: string;
-            if (error.message?.includes('network') || error.message?.includes('connection')) {
-                userMessage = t(Translations.ERROR_NETWORK_FAILURE, this.language);
-            } else if (error.message?.includes('auth') || error.message?.includes('token')) {
-                userMessage = t(Translations.REPORT_TOKEN_EXPIRED, this.language, { provider: 'your email provider' });
-            } else {
-                userMessage = t(Translations.REPORT_ERROR, this.language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, this.language) });
-            }
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Report generation',
+                error
+            );
 
             messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -521,27 +499,16 @@ export class Handler implements IHandler {
                 .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
 
         } catch (error) {
-            this.app.getLogger().error('Modal creation error:', error);
-
-            // Only show user notification for actionable errors
-            const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
-            const messageBuilder = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser)
-                .setRoom(this.room)
-                .setGroupable(false);
-
-            // Provide specific error message based on error type
-            let userMessage: string;
-            if (error.message?.includes('trigger')) {
-                userMessage = t(Translations.ERROR_TRIGGER_ID_MISSING, this.language);
-            } else {
-                userMessage = t(Translations.ERROR_MODAL_CREATION_FAILED, this.language);
-            }
-
-            messageBuilder.setText(userMessage);
-            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            return handleError(
+                this.app,
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                this.language,
+                'Modal creation',
+                error
+            );
         }
     }
 

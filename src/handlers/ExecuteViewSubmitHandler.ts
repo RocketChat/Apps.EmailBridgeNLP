@@ -27,6 +27,7 @@ import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { handleError } from '../helper/errorHandler';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -321,7 +322,6 @@ export class ExecuteViewSubmitHandler {
             }
 
         } catch (error) {
-            this.app.getLogger().error('Error in handleSendEmailSubmit:', error);
             const userLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
                 this.persistence,
@@ -329,9 +329,16 @@ export class ExecuteViewSubmitHandler {
             );
 
             if (room) {
-                await sendNotification(this.read, this.modify, user, room, {
-                    message: t(Translations.ERROR_FAIL_INTERNAL, userLanguage)
-                });
+                await handleError(
+                    this.app,
+                    this.read,
+                    this.modify,
+                    user,
+                    room,
+                    userLanguage,
+                    'Send email submission',
+                    error
+                );
             }
             return this.context.getInteractionResponder().errorResponse();
         }

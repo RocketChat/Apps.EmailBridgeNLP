@@ -24,6 +24,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
+import { handleError } from '../helper/errorHandler';
 
 export class NLQueryHandler {
     private originalQuery: string = '';

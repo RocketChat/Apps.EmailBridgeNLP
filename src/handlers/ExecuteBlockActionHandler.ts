@@ -29,6 +29,7 @@ import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { EmailProviders } from '../enums/EmailProviders';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { MessageFormatter } from '../lib/MessageFormatter';
+import { handleError } from '../helper/errorHandler';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -189,12 +190,15 @@ export class ExecuteBlockActionHandler {
             );
 
         } catch (error) {
-            this.app.getLogger().error('Error in handleDirectSendEmail:', error);
-            await this.showMessage(
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
                 user,
                 room,
-                MessageFormatter.formatRetryErrorMessage(language),
-                language
+                language,
+                'Direct send email',
+                error
             );
         }
     }
@@ -262,13 +266,15 @@ export class ExecuteBlockActionHandler {
                 .openSurfaceView(modal, { triggerId }, user);
 
         } catch (error) {
-            this.app.getLogger().error('Error in handleEditAndSendEmail:', error);
-            // Show error message
-            await this.showMessage(
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
                 user,
                 room,
-                MessageFormatter.formatRetryErrorMessage(language),
-                language
+                language,
+                'Edit and send email',
+                error
             );
         }
     }
@@ -346,9 +352,16 @@ export class ExecuteBlockActionHandler {
             await this.showMessage(user, room, successMessage, language);
 
         } catch (error) {
-            this.app.getLogger().error('Error during logout:', error);
-            const errorMessage = t(Translations.LOGOUT_ERROR, language, { error: error.message });
-            await this.showMessage(user, room, errorMessage, language);
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
+                user,
+                room,
+                language,
+                'User logout',
+                error
+            );
         }
     }
 
