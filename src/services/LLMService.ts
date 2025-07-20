@@ -63,6 +63,8 @@ export class LLMService {
                 return await this.processWithGemini(systemPromptWithDates, query);
             case 'groq':
                 return await this.processWithGroq(systemPromptWithDates, query);
+            case 'self-hosted':
+                return await this.processWithSelfHosted(systemPromptWithDates, query);
             case 'default':
             default:
                 return await this.processWithDefault(systemPromptWithDates, query);
@@ -315,6 +317,65 @@ export class LLMService {
         }
     }
 
+    private async processWithSelfHosted(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
+        if (!this.llmSettings.selfHostedUrl) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: 'llama3', // Default model name for self-hosted
+            messages: [
+                {
+                    role: 'system',
+                    content: systemPrompt,
+                },
+                {
+                    role: 'user',
+                    content: query,
+                },
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
+        try {
+            const response = await this.http.post(this.llmSettings.selfHostedUrl, request);
+
+            if (!response?.data) {
+                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+            }
+
+            const llmResponse = response.data as ILLMResponse;
+
+            if (!llmResponse.choices?.length) {
+                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+            }
+
+            const choice = llmResponse.choices[0];
+            let toolCalls = choice.message.tool_calls || [];
+            let error: string | undefined;
+
+            // Parse content for tool calls if no direct tool_calls
+            if (toolCalls.length === 0 && choice.message.content) {
+                const parsed = this.parseContentForTools(choice.message.content);
+                toolCalls = parsed.tools;
+                error = parsed.error;
+            }
+
+            return { toolCalls, rawResponse: llmResponse, error };
+        } catch (error) {
+            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Self-hosted Provider', error);
+            throw new Error(errorMessage);
+        }
+    }
+
     public async generateSummary(messages: string, channelName: string): Promise<string> {
         const prompt = LlmPrompts.SUMMARIZE_PROMPT
             .replace('__channelName__', channelName)
@@ -332,6 +393,9 @@ export class LLMService {
                     break;
                 case 'groq':
                     response = await this.generateSummaryWithGroq(prompt);
+                    break;
+                case 'self-hosted':
+                    response = await this.generateSummaryWithSelfHosted(prompt);
                     break;
                 case 'default':
                 default:
@@ -494,6 +558,47 @@ export class LLMService {
         };
 
         const response = await this.http.post(LlmApiUrls.GROQ, request);
+
+        if (!response?.data) {
+            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+        }
+
+        const llmResponse = response.data as ILLMResponse;
+
+        if (!llmResponse.choices?.length) {
+            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+        }
+
+        const choice = llmResponse.choices[0];
+        const content = choice.message.content || '';
+        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
+    }
+
+    private async generateSummaryWithSelfHosted(prompt: string): Promise<string> {
+        if (!this.llmSettings.selfHostedUrl) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: 'llama3', // Default model name for self-hosted
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt,
+                },
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
+        const response = await this.http.post(this.llmSettings.selfHostedUrl, request);
 
         if (!response?.data) {
             throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));

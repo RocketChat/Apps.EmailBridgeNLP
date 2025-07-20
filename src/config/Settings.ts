@@ -10,6 +10,7 @@ export enum SettingsIds {
     OutlookRedirectUri = 'outlook_redirect_uri',
     // LLM Configuration
     LLMProvider = 'llm_provider',
+    SelfHostedLLMUrl = 'self_hosted_llm_url',
     OpenAIApiKey = 'openai_api_key',
     GeminiApiKey = 'gemini_api_key',
     GroqApiKey = 'groq_api_key',
@@ -112,6 +113,10 @@ export const settings: Array<ISetting> = [
                 i18nLabel: 'LLM_Provider_Default_Label',
             },
             {
+                key: 'self-hosted',
+                i18nLabel: 'LLM_Provider_SelfHosted_Label',
+            },
+            {
                 key: 'openai',
                 i18nLabel: 'LLM_Provider_OpenAI_Label',
             },
@@ -124,6 +129,16 @@ export const settings: Array<ISetting> = [
                 i18nLabel: 'LLM_Provider_Groq_Label',
             },
         ],
+    },
+    {
+        id: SettingsIds.SelfHostedLLMUrl,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: false,
+        public: false,
+        section: 'LLM Configuration',
+        i18nLabel: 'SelfHosted_LLM_URL_Label',
+        i18nDescription: 'SelfHosted_LLM_URL_Description',
     },
     {
         id: SettingsIds.OpenAIApiKey,

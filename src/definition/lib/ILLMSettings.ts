@@ -1,5 +1,6 @@
 export interface ILLMSettings {
     provider: string;
+    selfHostedUrl?: string;
     openaiApiKey?: string;
     geminiApiKey?: string;
     groqApiKey?: string;
