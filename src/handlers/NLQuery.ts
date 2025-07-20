@@ -225,13 +225,16 @@ export class NLQueryHandler {
                 const usernameService = new UsernameService(this.read);
                 const { toUsernames, ccUsernames } = await this.mapEmailsToUsernames(args, usernameService);
                 
+                const toEmails = Array.isArray(args.to) ? args.to as string[] : [args.to].filter(Boolean) as string[];
+                const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc as string[] : [args.cc].filter(Boolean) as string[]) : undefined;
+                
                 emailData = {
-                    to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                    cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                    to: [...new Set(toEmails)],
+                    cc: ccEmails ? [...new Set(ccEmails)] : undefined,
                     subject: args.subject || '',
                     content: args.content || '',
-                    toUsernames: toUsernames, // Store To usernames for avatar display
-                    ccUsernames: ccUsernames, // Store CC usernames for avatar display
+                    toUsernames: [...new Set(toUsernames)], // Remove duplicate usernames
+                    ccUsernames: [...new Set(ccUsernames)], // Remove duplicate usernames
                 };
             } else {
                 // Handle summarize-and-send-email tool
@@ -305,12 +308,16 @@ export class NLQueryHandler {
                 summarizeParams
             );
 
+            const toEmails = Array.isArray(args.to) ? args.to as string[] : [args.to].filter(Boolean) as string[];
+            const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc as string[] : [args.cc].filter(Boolean) as string[]) : undefined;
+            const toUsernames = this.extractUsernamesFromCurrentQuery();
+
             return {
-                to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                to: [...new Set(toEmails)],
+                cc: ccEmails ? [...new Set(ccEmails)] : undefined,
                 subject: emailResult.subject,
                 content: emailResult.content,
-                toUsernames: this.extractUsernamesFromCurrentQuery(), // For summarize, all usernames go to To field
+                toUsernames: [...new Set(toUsernames)], // Remove duplicate usernames
                 ccUsernames: [], // No CC usernames for summarize
             };
         } catch (error) {

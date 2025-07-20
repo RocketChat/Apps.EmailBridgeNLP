@@ -73,9 +73,13 @@ export class MessageFormatter {
     private static async formatMixedRecipients(emails: string[], usernames: string[], read?: IRead): Promise<string> {
         const recipients: string[] = [];
         
-        if (read && usernames.length > 0) {
+        // Remove duplicates from input arrays
+        const uniqueEmails = [...new Set(emails)];
+        const uniqueUsernames = [...new Set(usernames)];
+        
+        if (read && uniqueUsernames.length > 0) {
             // Add usernames as display names
-            for (const username of usernames) {
+            for (const username of uniqueUsernames) {
                 try {
                     const user = await read.getUserReader().getByUsername(username);
                     const displayName = user?.name || username;
@@ -85,13 +89,17 @@ export class MessageFormatter {
                 }
             }
             
-            const remainingEmails = emails.slice(usernames.length);
+            // Add remaining direct emails that don't have corresponding usernames
+            const remainingEmails = uniqueEmails.slice(uniqueUsernames.length);
             recipients.push(...remainingEmails);
         } else {
-            recipients.push(...emails);
+            // If no usernames or read access, just return all emails
+            recipients.push(...uniqueEmails);
         }
         
-        return recipients.join(', ');
+        // Remove any remaining duplicates from final result
+        const uniqueRecipients = [...new Set(recipients)];
+        return uniqueRecipients.join(', ');
     }
 
     public static formatErrorMessage(error: string, language: Language, context?: string): string {
