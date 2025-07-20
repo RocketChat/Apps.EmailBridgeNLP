@@ -216,7 +216,7 @@ export const es = {
     // Tool Calling Messages
     LLM_Processing_Query: "Procesando: \"__query__\"...",
     LLM_User_Query_Display: "**Tu consulta es:** __query__",
-    LLM_AI_Thinking: "pensando...",
+    LLM_AI_Thinking: "_pensando_...",
     LLM_Email_Ready_User: "Hola __name__, tu correo titulado **__subject__** está listo para enviar.",
     LLM_Tool_Detected: "**Herramienta Detectada** para consulta: \"__query__\"\n\n**Herramienta:** __tool__",
     LLM_No_Tool_Detected: "No se encontró herramienta adecuada para consulta: \"__query__\"",

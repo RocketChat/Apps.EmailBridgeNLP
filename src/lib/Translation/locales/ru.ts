@@ -212,7 +212,7 @@ export const ru = {
     // Tool Calling Messages
     LLM_Processing_Query: "Обработка: \"__query__\"...",
     LLM_User_Query_Display: "**Ваш запрос:** __query__",
-    LLM_AI_Thinking: "думает...",
+    LLM_AI_Thinking: "_думает_...",
     LLM_Email_Ready_User: "Привет __name__, ваше письмо с темой **__subject__** готово к отправке.",
     LLM_Tool_Detected: "**Инструмент Обнаружен** для запроса: \"__query__\"\n\n**Инструмент:** __tool__",
     LLM_No_Tool_Detected: "Подходящий инструмент для запроса не найден: \"__query__\"",

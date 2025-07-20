@@ -59,15 +59,13 @@ export class MessageFormatter {
             try {
                 const user = await read.getUserReader().getByUsername(username);
                 const displayName = user?.name || username;
-                // Just show the clean name in bold
-                formattedUsers.push(`**${displayName}**`);
+                formattedUsers.push(displayName);
             } catch (error) {
-                // If user lookup fails, use username in bold
-                formattedUsers.push(`**${username}**`);
+                formattedUsers.push(username);
             }
         }
         
-        return formattedUsers.join(' ');
+        return formattedUsers.join(', ');
     }
 
     public static formatErrorMessage(error: string, language: Language, context?: string): string {
@@ -127,4 +125,4 @@ export class MessageFormatter {
                 error: message || t(Translations.COMMON_UNKNOWN_ERROR, language) 
               });
     }
-} 
+}
