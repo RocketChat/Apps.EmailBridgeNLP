@@ -45,4 +45,15 @@ export async function getOutlookOAuthSettings(settingsReader: ISettingRead): Pro
         outlook_client_secret: await settingsReader.getValueById(SettingsIds.OutlookClientSecret) as string,
         outlook_redirect_uri: await settingsReader.getValueById(SettingsIds.OutlookRedirectUri) as string,
     };
+}
+
+import { ILLMSettings } from '../definition/lib/ILLMSettings';
+
+export async function getLLMSettings(settingsReader: ISettingRead): Promise<ILLMSettings> {
+    return {
+        provider: await settingsReader.getValueById(SettingsIds.LLMProvider) as string || 'default',
+        openaiApiKey: await settingsReader.getValueById(SettingsIds.OpenAIApiKey) as string,
+        geminiApiKey: await settingsReader.getValueById(SettingsIds.GeminiApiKey) as string,
+        groqApiKey: await settingsReader.getValueById(SettingsIds.GroqApiKey) as string,
+    };
 } 

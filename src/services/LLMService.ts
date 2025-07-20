@@ -1,15 +1,25 @@
 import { IHttp, IHttpRequest } from '@rocket.chat/apps-engine/definition/accessors';
-import { LlmConfig } from '../constants/AuthConstants';
+import { LlmConfig, LlmApiUrls, LlmModels, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
 import { Translations } from '../constants/Translations';
 import { LlmPrompts } from '../constants/prompts';
 import { IToolCall, ILLMResponse } from '../definition/lib/ToolInterfaces';
 import { LlmTools } from '../enums/LlmTools';
+import { ILLMSettings } from '../definition/lib/ILLMSettings';
+import { handleErrorAndGetMessage } from '../helper/errorHandler';
+import { t, Language } from '../lib/Translation/translation';
 
 export class LLMService {
     private readonly llmEndpoint: string;
+    private readonly llmSettings: ILLMSettings;
 
-    constructor(private readonly http: IHttp, private readonly logger?: any) {
+    constructor(
+        private readonly http: IHttp, 
+        llmSettings: ILLMSettings,
+        private readonly app: any,
+        private readonly language: Language
+    ) {
         this.llmEndpoint = LlmConfig.ENDPOINT;
+        this.llmSettings = llmSettings;
     }
 
     private generateDateReplacements(): Record<string, string> {
@@ -45,12 +55,27 @@ export class LLMService {
             systemPromptWithDates = systemPromptWithDates.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), date);
         }
         
+        // Route to appropriate provider based on settings
+        switch (this.llmSettings.provider) {
+            case 'openai':
+                return await this.processWithOpenAI(systemPromptWithDates, query);
+            case 'gemini':
+                return await this.processWithGemini(systemPromptWithDates, query);
+            case 'groq':
+                return await this.processWithGroq(systemPromptWithDates, query);
+            case 'default':
+            default:
+                return await this.processWithDefault(systemPromptWithDates, query);
+        }
+    }
+
+    private async processWithDefault(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
         const payload = {
             model: LlmConfig.MODEL_PATH,
             messages: [
                 {
                     role: 'system',
-                    content: systemPromptWithDates,
+                    content: systemPrompt,
                 },
                 {
                     role: 'user',
@@ -62,7 +87,7 @@ export class LLMService {
 
         const request: IHttpRequest = {
             headers: {
-                'Content-Type': 'application/json',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
             },
             data: payload,
         };
@@ -71,13 +96,13 @@ export class LLMService {
             const response = await this.http.post(this.llmEndpoint, request);
 
             if (!response?.data) {
-                throw new Error(Translations.LLM_NO_RESPONSE);
+                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
             }
 
             const llmResponse = response.data as ILLMResponse;
 
             if (!llmResponse.choices?.length) {
-                throw new Error(Translations.LLM_NO_CHOICES);
+                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
             }
 
             const choice = llmResponse.choices[0];
@@ -93,7 +118,200 @@ export class LLMService {
 
             return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
-            throw new Error(`${Translations.LLM_REQUEST_FAILED}: ${error.message}`);
+            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'LLM Default Provider', error);
+            throw new Error(errorMessage);
+        }
+    }
+
+    private async processWithOpenAI(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
+        if (!this.llmSettings.openaiApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: LlmModels.OPENAI,
+            messages: [
+                {
+                    role: 'system',
+                    content: systemPrompt,
+                },
+                {
+                    role: 'user',
+                    content: query,
+                },
+            ],
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${this.llmSettings.openaiApiKey}`,
+            },
+            data: payload,
+        };
+
+        try {
+            const response = await this.http.post(LlmApiUrls.OPENAI, request);
+
+            if (!response?.data) {
+                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+            }
+
+            const llmResponse = response.data as ILLMResponse;
+
+            if (!llmResponse.choices?.length) {
+                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+            }
+
+            const choice = llmResponse.choices[0];
+            let toolCalls = choice.message.tool_calls || [];
+            let error: string | undefined;
+
+            // Parse content for tool calls if no direct tool_calls
+            if (toolCalls.length === 0 && choice.message.content) {
+                const parsed = this.parseContentForTools(choice.message.content);
+                toolCalls = parsed.tools;
+                error = parsed.error;
+            }
+
+            return { toolCalls, rawResponse: llmResponse, error };
+        } catch (error) {
+            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'OpenAI Provider', error);
+            throw new Error(errorMessage);
+        }
+    }
+
+    private async processWithGemini(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
+        if (!this.llmSettings.geminiApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            contents: [
+                {
+                    parts: [
+                        {
+                            text: `${systemPrompt}\n\nUser Query: ${query}`,
+                        }
+                    ]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 3000,
+            },
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
+        try {
+            const response = await this.http.post(
+                `${LlmApiUrls.GEMINI}?key=${this.llmSettings.geminiApiKey}`,
+                request
+            );
+
+            if (!response?.data) {
+                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+            }
+
+            const geminiResponse = response.data;
+
+            if (!geminiResponse.candidates?.length) {
+                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+            }
+
+            const content = geminiResponse.candidates[0].content.parts[0].text;
+
+            // Convert Gemini response to LLM format
+            const llmResponse: ILLMResponse = {
+                id: 'gemini-' + Date.now(),
+                model: LlmModels.GEMINI,
+                created: Date.now(),
+                choices: [
+                    {
+                        message: {
+                            content: content,
+                        },
+                        finish_reason: 'stop'
+                    }
+                ],
+                usage: {
+                    prompt_tokens: 0,
+                    completion_tokens: 0,
+                    total_tokens: 0,
+                }
+            };
+
+            const parsed = this.parseContentForTools(content);
+            return { toolCalls: parsed.tools, rawResponse: llmResponse, error: parsed.error };
+        } catch (error) {
+            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Gemini Provider', error);
+            throw new Error(errorMessage);
+        }
+    }
+
+    private async processWithGroq(systemPrompt: string, query: string): Promise<{ toolCalls: IToolCall[], rawResponse: ILLMResponse, error?: string }> {
+        if (!this.llmSettings.groqApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: LlmModels.GROQ,
+            messages: [
+                {
+                    role: 'system',
+                    content: systemPrompt,
+                },
+                {
+                    role: 'user',
+                    content: query,
+                },
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${this.llmSettings.groqApiKey}`,
+            },
+            data: payload,
+        };
+
+        try {
+            const response = await this.http.post(LlmApiUrls.GROQ, request);
+
+            if (!response?.data) {
+                throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+            }
+
+            const llmResponse = response.data as ILLMResponse;
+
+            if (!llmResponse.choices?.length) {
+                throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+            }
+
+            const choice = llmResponse.choices[0];
+            let toolCalls = choice.message.tool_calls || [];
+            let error: string | undefined;
+
+            // Parse content for tool calls if no direct tool_calls
+            if (toolCalls.length === 0 && choice.message.content) {
+                const parsed = this.parseContentForTools(choice.message.content);
+                toolCalls = parsed.tools;
+                error = parsed.error;
+            }
+
+            return { toolCalls, rawResponse: llmResponse, error };
+        } catch (error) {
+            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Groq Provider', error);
+            throw new Error(errorMessage);
         }
     }
 
@@ -102,6 +320,32 @@ export class LLMService {
             .replace('__channelName__', channelName)
             .replace('__messages__', messages);
 
+        try {
+            let response;
+            
+            switch (this.llmSettings.provider) {
+                case 'openai':
+                    response = await this.generateSummaryWithOpenAI(prompt);
+                    break;
+                case 'gemini':
+                    response = await this.generateSummaryWithGemini(prompt);
+                    break;
+                case 'groq':
+                    response = await this.generateSummaryWithGroq(prompt);
+                    break;
+                case 'default':
+                default:
+                    response = await this.generateSummaryWithDefault(prompt);
+                    break;
+            }
+
+            return response;
+        } catch (error) {
+            return t(Translations.SUMMARY_GENERATION_FAILED, this.language);
+        }
+    }
+
+    private async generateSummaryWithDefault(prompt: string): Promise<string> {
         const payload = {
             model: LlmConfig.MODEL_PATH,
             messages: [
@@ -115,33 +359,155 @@ export class LLMService {
 
         const request: IHttpRequest = {
             headers: {
-                'Content-Type': 'application/json',
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
             },
             data: payload,
         };
 
-
-
-        try {
             const response = await this.http.post(this.llmEndpoint, request);
 
             if (!response?.data) {
-                throw new Error('Failed to get response from LLM API');
+            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+        }
+
+        const llmResponse = response.data as ILLMResponse;
+
+        if (!llmResponse.choices?.length) {
+            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+        }
+
+        const choice = llmResponse.choices[0];
+        const content = choice.message.content || '';
+        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
+    }
+
+    private async generateSummaryWithOpenAI(prompt: string): Promise<string> {
+        if (!this.llmSettings.openaiApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: LlmModels.OPENAI,
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt,
+                },
+            ],
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${this.llmSettings.openaiApiKey}`,
+            },
+            data: payload,
+        };
+
+        const response = await this.http.post(LlmApiUrls.OPENAI, request);
+
+        if (!response?.data) {
+            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
             }
 
             const llmResponse = response.data as ILLMResponse;
 
             if (!llmResponse.choices?.length) {
-                throw new Error('No choices in LLM response');
+            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
             }
 
             const choice = llmResponse.choices[0];
             const content = choice.message.content || '';
-            return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || "Failed to generate summary.";
-            
-        } catch (error) {
-            return "Failed to generate summary due to an error.";
+        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
+    }
+
+    private async generateSummaryWithGemini(prompt: string): Promise<string> {
+        if (!this.llmSettings.geminiApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
         }
+
+        const payload = {
+            contents: [
+                {
+                    parts: [
+                        {
+                            text: prompt,
+                        }
+                    ]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 2000,
+            },
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
+        const response = await this.http.post(
+            `${LlmApiUrls.GEMINI}?key=${this.llmSettings.geminiApiKey}`,
+            request
+        );
+
+        if (!response?.data) {
+            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+        }
+
+        const geminiResponse = response.data;
+
+        if (!geminiResponse.candidates?.length) {
+            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+        }
+
+        const content = geminiResponse.candidates[0].content.parts[0].text;
+        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
+    }
+
+    private async generateSummaryWithGroq(prompt: string): Promise<string> {
+        if (!this.llmSettings.groqApiKey) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
+        }
+
+        const payload = {
+            model: LlmModels.GROQ,
+            messages: [
+                {
+                    role: 'system',
+                    content: prompt,
+                },
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${this.llmSettings.groqApiKey}`,
+            },
+            data: payload,
+        };
+
+        const response = await this.http.post(LlmApiUrls.GROQ, request);
+
+        if (!response?.data) {
+            throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
+        }
+
+        const llmResponse = response.data as ILLMResponse;
+
+        if (!llmResponse.choices?.length) {
+            throw new Error(t(Translations.LLM_NO_CHOICES, this.language));
+        }
+
+        const choice = llmResponse.choices[0];
+        const content = choice.message.content || '';
+        return content.replace(/^Summary:|\bSummary\b:/i, "").trim() || t(Translations.SUMMARY_GENERATION_FAILED, this.language);
     }
 
     private parseContentForTools(content: string): { tools: IToolCall[], error?: string } {
@@ -190,7 +556,7 @@ export class LLMService {
                 
                 // Validate tool name
                 if (!Object.values(LlmTools).includes(toolName as LlmTools)) {
-                    return { tools: [], error: `Unknown tool: ${toolName}. Please use a valid tool name.` };
+                        return { tools: [], error: t(Translations.LLM_PARSING_ERROR, this.language) };
                 }
 
                 const toolCall: IToolCall = {
@@ -206,7 +572,7 @@ export class LLMService {
             }
 
             // If no function_call found but it's valid JSON
-            return { tools: [], error: "No suitable tool found for query. Please specify what you'd like to do with email." };
+                return { tools: [], error: t(Translations.LLM_NO_TOOL_DETECTED, this.language) };
 
         } catch (e) {
                 // Continue to next parsing attempt
@@ -214,6 +580,6 @@ export class LLMService {
             }
         }
         
-        return { tools: [], error: "Failed to parse LLM response. Please try rephrasing your request." };
+        return { tools: [], error: t(Translations.LLM_PARSING_FAILED, this.language) };
     }
 } 

@@ -8,6 +8,11 @@ export enum SettingsIds {
     OutlookClientId = 'outlook_client_id',
     OutlookClientSecret = 'outlook_client_secret',
     OutlookRedirectUri = 'outlook_redirect_uri',
+    // LLM Configuration
+    LLMProvider = 'llm_provider',
+    OpenAIApiKey = 'openai_api_key',
+    GeminiApiKey = 'gemini_api_key',
+    GroqApiKey = 'groq_api_key',
 }
 
 export const settings: Array<ISetting> = [
@@ -19,6 +24,7 @@ export const settings: Array<ISetting> = [
         public: false,
         i18nLabel: 'Email_Provider_Label',
         i18nDescription: 'Email_Provider_Description',
+        section: 'General',
         values: [
             {
                 key: 'gmail',
@@ -36,6 +42,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'Google_OAuth_Client_ID_Label',
         i18nDescription: 'Google_OAuth_Client_ID_Description',
     },
@@ -45,6 +52,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'Google_OAuth_Client_Secret_Label',
         i18nDescription: 'Google_OAuth_Client_Secret_Description',
     },
@@ -54,6 +62,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'OAuth_Redirect_URI_Label',
         i18nDescription: 'OAuth_Redirect_URI_Description',
     },
@@ -63,6 +72,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'Outlook_OAuth_Client_ID_Label',
         i18nDescription: 'Outlook_OAuth_Client_ID_Description',
     },
@@ -72,6 +82,7 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'Outlook_OAuth_Client_Secret_Label',
         i18nDescription: 'Outlook_OAuth_Client_Secret_Description',
     },
@@ -81,7 +92,67 @@ export const settings: Array<ISetting> = [
         packageValue: '',
         required: true,
         public: false,
+        section: 'General',
         i18nLabel: 'Outlook_OAuth_Redirect_URI_Label',
         i18nDescription: 'Outlook_OAuth_Redirect_URI_Description',
+    },
+    // LLM Configuration Section
+    {
+        id: SettingsIds.LLMProvider,
+        type: SettingType.SELECT,
+        packageValue: 'default',
+        required: true,
+        public: false,
+        section: 'LLM Configuration',
+        i18nLabel: 'LLM_Provider_Label',
+        i18nDescription: 'LLM_Provider_Description',
+        values: [
+            {
+                key: 'default',
+                i18nLabel: 'LLM_Provider_Default_Label',
+            },
+            {
+                key: 'openai',
+                i18nLabel: 'LLM_Provider_OpenAI_Label',
+            },
+            {
+                key: 'gemini',
+                i18nLabel: 'LLM_Provider_Gemini_Label',
+            },
+            {
+                key: 'groq',
+                i18nLabel: 'LLM_Provider_Groq_Label',
+            },
+        ],
+    },
+    {
+        id: SettingsIds.OpenAIApiKey,
+        type: SettingType.PASSWORD,
+        packageValue: '',
+        required: false,
+        public: false,
+        section: 'LLM Configuration',
+        i18nLabel: 'OpenAI_API_Key_Label',
+        i18nDescription: 'OpenAI_API_Key_Description',
+    },
+    {
+        id: SettingsIds.GeminiApiKey,
+        type: SettingType.PASSWORD,
+        packageValue: '',
+        required: false,
+        public: false,
+        section: 'LLM Configuration',
+        i18nLabel: 'Gemini_API_Key_Label',
+        i18nDescription: 'Gemini_API_Key_Description',
+    },
+    {
+        id: SettingsIds.GroqApiKey,
+        type: SettingType.PASSWORD,
+        packageValue: '',
+        required: false,
+        public: false,
+        section: 'LLM Configuration',
+        i18nLabel: 'Groq_API_Key_Label',
+        i18nDescription: 'Groq_API_Key_Description',
     },
 ]; 

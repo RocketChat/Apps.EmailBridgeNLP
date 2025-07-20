@@ -303,4 +303,18 @@ export const en = {
     Error_Email_Data_Unavailable: "Email data is no longer available. Please try your request again.",
     Error_Please_Try_Again: "Please try again.",
     Error_Processing_Summary_Request: "There was an issue processing your summary request. Please try again.",
+
+    // LLM Configuration Settings
+    LLM_Provider_Label: "LLM Provider",
+    LLM_Provider_Description: "Select the AI language model provider to use for processing email commands",
+    LLM_Provider_Default_Label: "Default (Self-hosted)",
+    LLM_Provider_OpenAI_Label: "OpenAI",
+    LLM_Provider_Gemini_Label: "Google Gemini",
+    LLM_Provider_Groq_Label: "Groq",
+    OpenAI_API_Key_Label: "OpenAI API Key",
+    OpenAI_API_Key_Description: "Your OpenAI API key for accessing GPT models (required only when using OpenAI provider)",
+    Gemini_API_Key_Label: "Google Gemini API Key",
+    Gemini_API_Key_Description: "Your Google AI Studio API key for accessing Gemini models (required only when using Gemini provider)",
+    Groq_API_Key_Label: "Groq API Key",
+    Groq_API_Key_Description: "Your Groq API key for accessing Llama models (required only when using Groq provider)",
 }; 

@@ -325,4 +325,18 @@ export const Translations = {
     // Error message details for MessageFormatter
     ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',
     ERROR_PLEASE_TRY_AGAIN: 'Error_Please_Try_Again',
+
+    // LLM Configuration Settings
+    LLM_PROVIDER_LABEL: 'LLM_Provider_Label',
+    LLM_PROVIDER_DESCRIPTION: 'LLM_Provider_Description',
+    LLM_PROVIDER_DEFAULT_LABEL: 'LLM_Provider_Default_Label',
+    LLM_PROVIDER_OPENAI_LABEL: 'LLM_Provider_OpenAI_Label',
+    LLM_PROVIDER_GEMINI_LABEL: 'LLM_Provider_Gemini_Label',
+    LLM_PROVIDER_GROQ_LABEL: 'LLM_Provider_Groq_Label',
+    OPENAI_API_KEY_LABEL: 'OpenAI_API_Key_Label',
+    OPENAI_API_KEY_DESCRIPTION: 'OpenAI_API_Key_Description',
+    GEMINI_API_KEY_LABEL: 'Gemini_API_Key_Label',
+    GEMINI_API_KEY_DESCRIPTION: 'Gemini_API_Key_Description',
+    GROQ_API_KEY_LABEL: 'Groq_API_Key_Label',
+    GROQ_API_KEY_DESCRIPTION: 'Groq_API_Key_Description',
 } as const; 

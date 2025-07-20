@@ -29,22 +29,24 @@ export class MessageFormatter {
         
         let formattedMessage = `${responseText}\n\n`;
         
-        // Format To recipients with actual avatars and names
-        if (emailData.toUsernames && emailData.toUsernames.length > 0 && read) {
-            const toDisplay = await this.formatUsernamesWithAvatars(emailData.toUsernames, read);
-            formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${toDisplay}\n`;
-        } else if (emailData.to && emailData.to.length > 0) {
-            // Fallback to emails if no usernames or read access
-            formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${emailData.to.join(', ')}\n`;
+        // Format To recipients with combination of usernames and direct emails
+        if (emailData.to && emailData.to.length > 0) {
+            const recipientDisplay = await this.formatMixedRecipients(
+                emailData.to, 
+                emailData.toUsernames || [], 
+                read
+            );
+            formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${recipientDisplay}\n`;
         }
         
-        // Format CC recipients with actual avatars and names (only if there are CC recipients)
-        if (emailData.ccUsernames && emailData.ccUsernames.length > 0 && read) {
-            const ccDisplay = await this.formatUsernamesWithAvatars(emailData.ccUsernames, read);
+        // Format CC recipients with combination of usernames and direct emails (only if there are CC recipients)
+        if (emailData.cc && emailData.cc.length > 0) {
+            const ccDisplay = await this.formatMixedRecipients(
+                emailData.cc, 
+                emailData.ccUsernames || [], 
+                read
+            );
             formattedMessage += `${t(Translations.LLM_EMAIL_CC_LABEL, language)} ${ccDisplay}\n`;
-        } else if (emailData.cc && emailData.cc.length > 0) {
-            // Fallback to emails if no usernames or read access
-            formattedMessage += `${t(Translations.LLM_EMAIL_CC_LABEL, language)} ${emailData.cc.join(', ')}\n`;
         }
         
         formattedMessage += `${t(Translations.LLM_EMAIL_SUBJECT_LABEL, language)} ${emailData.subject}`;
@@ -66,6 +68,30 @@ export class MessageFormatter {
         }
         
         return formattedUsers.join(', ');
+    }
+
+    private static async formatMixedRecipients(emails: string[], usernames: string[], read?: IRead): Promise<string> {
+        const recipients: string[] = [];
+        
+        if (read && usernames.length > 0) {
+            // Add usernames as display names
+            for (const username of usernames) {
+                try {
+                    const user = await read.getUserReader().getByUsername(username);
+                    const displayName = user?.name || username;
+                    recipients.push(displayName);
+                } catch (error) {
+                    recipients.push(username);
+                }
+            }
+            
+            const remainingEmails = emails.slice(usernames.length);
+            recipients.push(...remainingEmails);
+        } else {
+            recipients.push(...emails);
+        }
+        
+        return recipients.join(', ');
     }
 
     public static formatErrorMessage(error: string, language: Language, context?: string): string {

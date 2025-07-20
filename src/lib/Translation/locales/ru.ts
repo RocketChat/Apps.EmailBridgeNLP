@@ -295,4 +295,18 @@ export const ru = {
     Error_Email_Data_Unavailable: "Данные электронной почты больше недоступны. Пожалуйста, попробуйте снова.",
     Error_Please_Try_Again: "Пожалуйста, попробуйте снова.",
     Error_Processing_Summary_Request: "Возникла проблема при обработке вашего запроса на резюме. Пожалуйста, попробуйте снова.",
+
+    // LLM Configuration Settings
+    LLM_Provider_Label: "Провайдер LLM",
+    LLM_Provider_Description: "Выберите провайдера языковой модели ИИ для обработки команд электронной почты",
+    LLM_Provider_Default_Label: "По умолчанию (Самостоятельно размещенный)",
+    LLM_Provider_OpenAI_Label: "OpenAI",
+    LLM_Provider_Gemini_Label: "Google Gemini",
+    LLM_Provider_Groq_Label: "Groq",
+    OpenAI_API_Key_Label: "API-ключ OpenAI",
+    OpenAI_API_Key_Description: "Ваш API-ключ OpenAI для доступа к моделям GPT (требуется только при использовании провайдера OpenAI)",
+    Gemini_API_Key_Label: "API-ключ Google Gemini",
+    Gemini_API_Key_Description: "Ваш API-ключ Google AI Studio для доступа к моделям Gemini (требуется только при использовании провайдера Gemini)",
+    Groq_API_Key_Label: "API-ключ Groq",
+    Groq_API_Key_Description: "Ваш API-ключ Groq для доступа к моделям Llama (требуется только при использовании провайдера Groq)",
 }; 

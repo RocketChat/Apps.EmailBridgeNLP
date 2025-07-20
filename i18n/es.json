@@ -103,5 +103,17 @@
 	"Outlook_Get_Email_Failed": "No se pudo obtener el correo",
 	"Config_No_Trigger": "❌ No se puede abrir el modal de configuración. Inténtelo de nuevo.",
 	"Config_Modal_Error": "❌ Error al abrir el modal de configuración. Inténtelo de nuevo.",
-	"Config_Error": "❌ Error de configuración: __error__"
+	"Config_Error": "❌ Error de configuración: __error__",
+	"LLM_Provider_Label": "Proveedor de LLM",
+	"LLM_Provider_Description": "Selecciona el proveedor de modelo de lenguaje IA para procesar comandos de correo electrónico",
+	"LLM_Provider_Default_Label": "Predeterminado (Auto-hospedado)",
+	"LLM_Provider_OpenAI_Label": "OpenAI",
+	"LLM_Provider_Gemini_Label": "Google Gemini",
+	"LLM_Provider_Groq_Label": "Groq",
+	"OpenAI_API_Key_Label": "Clave API de OpenAI",
+	"OpenAI_API_Key_Description": "Tu clave API de OpenAI para acceder a modelos GPT (requerido solo al usar el proveedor OpenAI)",
+	"Gemini_API_Key_Label": "Clave API de Google Gemini",
+	"Gemini_API_Key_Description": "Tu clave API de Google AI Studio para acceder a modelos Gemini (requerido solo al usar el proveedor Gemini)",
+	"Groq_API_Key_Label": "Clave API de Groq",
+	"Groq_API_Key_Description": "Tu clave API de Groq para acceder a modelos Llama (requerido solo al usar el proveedor Groq)"
 } 

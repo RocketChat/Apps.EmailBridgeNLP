@@ -25,6 +25,7 @@ import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
 import { handleError } from '../helper/errorHandler';
+import { getLLMSettings } from '../config/SettingsManager';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -38,7 +39,8 @@ export class NLQueryHandler {
         private readonly sender: IUser,
         private readonly room: IRoom,
         private readonly language: Language,
-        private readonly triggerId?: string
+        private readonly triggerId?: string,
+        private readonly threadId?: string
     ) {}
 
     private extractUsernamesFromCurrentQuery(): string[] {
@@ -125,8 +127,9 @@ export class NLQueryHandler {
             const usernameService = new UsernameService(this.read);
             const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
 
-            // Process enhanced query with LLM
-            const llmService = new LLMService(this.http, this.app.getLogger());
+            // Get LLM settings and create service
+            const llmSettings = await getLLMSettings(this.read.getEnvironmentReader().getSettings());
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
             const result = await llmService.processNaturalLanguageQuery(enhancedQuery);
             
             return {
@@ -272,10 +275,11 @@ export class NLQueryHandler {
             // Create services for summarization
             const { MessageService } = await import('../services/MessageService');
             const messageService = new MessageService();
-            const llmService = new LLMService(this.http, this.app.getLogger());
+            const llmSettings = await getLLMSettings(this.read.getEnvironmentReader().getSettings());
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
 
-            // Retrieve messages from the current room
-            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams);
+            // Retrieve messages from the current room or thread
+            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
 
             if (messages.length === 0) {
                 throw new Error(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));

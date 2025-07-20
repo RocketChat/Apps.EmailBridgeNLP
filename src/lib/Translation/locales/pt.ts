@@ -295,4 +295,18 @@ export const pt = {
     Error_Email_Data_Unavailable: "Os dados do e-mail não estão mais disponíveis. Por favor, tente sua solicitação novamente.",
     Error_Please_Try_Again: "Por favor, tente novamente.",
     Error_Processing_Summary_Request: "Houve um problema ao processar sua solicitação de resumo. Por favor, tente novamente.",
+
+    // LLM Configuration Settings
+    LLM_Provider_Label: "Provedor de LLM",
+    LLM_Provider_Description: "Selecione o provedor de modelo de linguagem IA para processar comandos de e-mail",
+    LLM_Provider_Default_Label: "Padrão (Auto-hospedado)",
+    LLM_Provider_OpenAI_Label: "OpenAI",
+    LLM_Provider_Gemini_Label: "Google Gemini",
+    LLM_Provider_Groq_Label: "Groq",
+    OpenAI_API_Key_Label: "Chave API do OpenAI",
+    OpenAI_API_Key_Description: "Sua chave API do OpenAI para acessar modelos GPT (necessário apenas ao usar o provedor OpenAI)",
+    Gemini_API_Key_Label: "Chave API do Google Gemini",
+    Gemini_API_Key_Description: "Sua chave API do Google AI Studio para acessar modelos Gemini (necessário apenas ao usar o provedor Gemini)",
+    Groq_API_Key_Label: "Chave API do Groq",
+    Groq_API_Key_Description: "Sua chave API do Groq para acessar modelos Llama (necessário apenas ao usar o provedor Groq)",
 }; 

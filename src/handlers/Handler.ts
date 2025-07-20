@@ -522,7 +522,8 @@ export class Handler implements IHandler {
             this.sender,
             this.room,
             this.language,
-            this.triggerId
+            this.triggerId,
+            this.threadId
         );
 
         await nlQueryHandler.processNaturalLanguageQuery(query);

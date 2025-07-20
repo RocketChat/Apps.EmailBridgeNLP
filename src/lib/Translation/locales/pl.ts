@@ -289,4 +289,18 @@ export const pl = {
     Error_Email_Data_Unavailable: "Dane e-mail nie są już dostępne. Spróbuj ponownie przesłać żądanie.",
     Error_Please_Try_Again: "Spróbuj ponownie.",
     Error_Processing_Summary_Request: "Wystąpił problem z przetwarzaniem Twojego żądania podsumowania. Spróbuj ponownie.",
+
+    // LLM Configuration Settings
+    LLM_Provider_Label: "Dostawca LLM",
+    LLM_Provider_Description: "Wybierz dostawcę modelu językowego AI do przetwarzania poleceń e-mail",
+    LLM_Provider_Default_Label: "Domyślny (Własny hosting)",
+    LLM_Provider_OpenAI_Label: "OpenAI",
+    LLM_Provider_Gemini_Label: "Google Gemini",
+    LLM_Provider_Groq_Label: "Groq",
+    OpenAI_API_Key_Label: "Klucz API OpenAI",
+    OpenAI_API_Key_Description: "Twój klucz API OpenAI do dostępu do modeli GPT (wymagany tylko przy używaniu dostawcy OpenAI)",
+    Gemini_API_Key_Label: "Klucz API Google Gemini",
+    Gemini_API_Key_Description: "Twój klucz API Google AI Studio do dostępu do modeli Gemini (wymagany tylko przy używaniu dostawcy Gemini)",
+    Groq_API_Key_Label: "Klucz API Groq",
+    Groq_API_Key_Description: "Twój klucz API Groq do dostępu do modeli Llama (wymagany tylko przy używaniu dostawcy Groq)",
 }; 
