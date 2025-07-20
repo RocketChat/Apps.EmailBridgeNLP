@@ -212,7 +212,7 @@ export const pl = {
     // Tool Calling Messages
     LLM_Processing_Query: "Przetwarzanie: \"__query__\"...",
     LLM_User_Query_Display: "**Twoje zapytanie to:** __query__",
-    LLM_AI_Thinking: "Agent AI myśli...",
+    LLM_AI_Thinking: "myślenie...",
     LLM_Email_Ready_User: "Cześć __name__, Twój e-mail zatytułowany **__subject__** jest gotowy do wysłania.",
     LLM_Tool_Detected: "**Narzędzie Wykryte** dla zapytania: \"__query__\"\n\n**Narzędzie:** __tool__",
     LLM_No_Tool_Detected: "Nie znaleziono odpowiedniego narzędzia dla zapytania: \"__query__\"",
@@ -279,7 +279,6 @@ export const pl = {
     LLM_Summary_Email_Ready_User_With_Recipients: "**Odpowiedź AI:** Cześć __name__, Twój e-mail z podsumowaniem z kanału: **__channelName__** zatytułowany \"**__subject__**\" jest gotowy do wysłania do __recipients__",
 
     // New format constants for specific display format
-    LLM_AI_Response_Label: "**Odpowiedź AI:**\n",
     LLM_Email_To_Label: "**Do:**",
     LLM_Email_CC_Label: "**Kopia:**",
     LLM_Email_Subject_Label: "**Temat:**",

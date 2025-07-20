@@ -316,7 +316,6 @@ export const Translations = {
     LLM_SUMMARY_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Summary_Email_Ready_User_With_Recipients',
 
     // New format constants for specific display format
-    LLM_AI_RESPONSE_LABEL: 'LLM_AI_Response_Label',
     LLM_EMAIL_TO_LABEL: 'LLM_Email_To_Label', 
     LLM_EMAIL_CC_LABEL: 'LLM_Email_CC_Label',
     LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',

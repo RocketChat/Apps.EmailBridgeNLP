@@ -21,41 +21,87 @@ async function createAvatarElementsFromUsernames(
     read: IRead
 ): Promise<any[]> {
     const avatarElements: any[] = [];
+    const totalCount = usernames.length;
     
-    // Show only first 3 usernames
-    const displayUsernames = usernames.slice(0, 3);
-    
-    for (const username of displayUsernames) {
-        try {
-            // Get user info from Rocket.Chat
-            const user = await read.getUserReader().getByUsername(username);
-            if (user) {
-                // Use Rocket.Chat's avatar API endpoint
-                const avatarUrl = AvatarUtils.buildAvatarUrl(username);
-                const displayName = user.name || user.username;
-                
-                // Create image element for context blocks
-                const avatarElement = {
-                    type: 'image',
-                    imageUrl: avatarUrl,
-                    altText: displayName
-                };
-                
-                avatarElements.push(avatarElement);
-                avatarElements.push(`**${displayName}**`);
-            } else {
-                // If user not found, just show username
+    if (totalCount <= 3) {
+        // ≤3 recipients: Show <avatar> <name> for all
+        for (const username of usernames) {
+            try {
+                const user = await read.getUserReader().getByUsername(username);
+                if (user) {
+                    const avatarUrl = AvatarUtils.buildAvatarUrl(username);
+                    const displayName = user.name || user.username;
+                    
+                    const avatarElement = {
+                        type: 'image',
+                        imageUrl: avatarUrl,
+                        altText: displayName
+                    };
+                    
+                    avatarElements.push(avatarElement);
+                    avatarElements.push(`**${displayName}**`);
+                } else {
+                    avatarElements.push(`**${username}**`);
+                }
+            } catch (error) {
                 avatarElements.push(`**${username}**`);
             }
-        } catch (error) {
-            // If user lookup fails, show username
-            avatarElements.push(`**${username}**`);
         }
-    }
-    
-    // Add "+ x more" text if there are more than 3 usernames
-    if (usernames.length > 3) {
-        const remainingCount = usernames.length - 3;
+    } else if (totalCount <= 10) {
+        // >3 and ≤10 recipients: Show only <avatar> (no names)
+        for (const username of usernames) {
+            try {
+                const user = await read.getUserReader().getByUsername(username);
+                if (user) {
+                    const avatarUrl = AvatarUtils.buildAvatarUrl(username);
+                    const displayName = user.name || user.username;
+                    
+                    const avatarElement = {
+                        type: 'image',
+                        imageUrl: avatarUrl,
+                        altText: displayName
+                    };
+                    
+                    avatarElements.push(avatarElement);
+                } else {
+                    // For users not found, we can't show avatar, so skip
+                    continue;
+                }
+            } catch (error) {
+                // Skip if user lookup fails
+                continue;
+            }
+        }
+    } else {
+        // >10 recipients: Show first 10 <avatar> + "x more" text
+        const displayUsernames = usernames.slice(0, 10);
+        
+        for (const username of displayUsernames) {
+            try {
+                const user = await read.getUserReader().getByUsername(username);
+                if (user) {
+                    const avatarUrl = AvatarUtils.buildAvatarUrl(username);
+                    const displayName = user.name || user.username;
+                    
+                    const avatarElement = {
+                        type: 'image',
+                        imageUrl: avatarUrl,
+                        altText: displayName
+                    };
+                    
+                    avatarElements.push(avatarElement);
+                } else {
+                    // Skip if user not found
+                    continue;
+                }
+            } catch (error) {
+                // Skip if user lookup fails
+                continue;
+            }
+        }
+        
+        // Add "+ x more" text
+        const remainingCount = totalCount - 10;
         avatarElements.push(`*+ ${remainingCount} more*`);
     }
     

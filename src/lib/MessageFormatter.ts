@@ -7,7 +7,7 @@ import { AvatarUtils } from '../constants/AuthConstants';
 export class MessageFormatter {
     
     public static formatQueryMessage(query: string, language: Language): string {
-        return `${t(Translations.LLM_USER_QUERY_DISPLAY, language, { query })}\n\n🤖 ${t(Translations.LLM_AI_THINKING, language)}`;
+        return `${t(Translations.LLM_USER_QUERY_DISPLAY, language, { query })}\n\n${t(Translations.LLM_AI_THINKING, language)}`;
     }
 
     public static async formatEmailReadyMessage(
@@ -27,7 +27,7 @@ export class MessageFormatter {
                 name: senderName
               });
         
-        let formattedMessage = `${t(Translations.LLM_AI_RESPONSE_LABEL, language)} ${responseText}\n\n`;
+        let formattedMessage = `${responseText}\n\n`;
         
         // Format To recipients with actual avatars and names
         if (emailData.toUsernames && emailData.toUsernames.length > 0 && read) {

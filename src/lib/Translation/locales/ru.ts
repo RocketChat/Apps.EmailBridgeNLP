@@ -212,7 +212,7 @@ export const ru = {
     // Tool Calling Messages
     LLM_Processing_Query: "Обработка: \"__query__\"...",
     LLM_User_Query_Display: "**Ваш запрос:** __query__",
-    LLM_AI_Thinking: "ИИ-агент думает...",
+    LLM_AI_Thinking: "думает...",
     LLM_Email_Ready_User: "Привет __name__, ваше письмо с темой **__subject__** готово к отправке.",
     LLM_Tool_Detected: "**Инструмент Обнаружен** для запроса: \"__query__\"\n\n**Инструмент:** __tool__",
     LLM_No_Tool_Detected: "Подходящий инструмент для запроса не найден: \"__query__\"",
@@ -285,7 +285,6 @@ export const ru = {
     LLM_Summary_Email_Ready_User_With_Recipients: "**Ответ ИИ:** Привет __name__, ваше письмо с резюме из канала: **__channelName__** с темой \"**__subject__**\" готово к отправке для __recipients__",
 
     // New format constants for specific display format
-    LLM_AI_Response_Label: "**Ответ ИИ:**\n",
     LLM_Email_To_Label: "**Кому:**",
     LLM_Email_CC_Label: "**Копия:**",
     LLM_Email_Subject_Label: "**Тема:**",
