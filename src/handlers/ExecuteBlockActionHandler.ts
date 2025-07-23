@@ -8,23 +8,32 @@ import {
     IUIKitResponse,
     UIKitBlockInteractionContext,
 } from '@rocket.chat/apps-engine/definition/uikit';
-
+import {
+    RocketChatAssociationModel,
+    RocketChatAssociationRecord,
+} from '@rocket.chat/apps-engine/definition/metadata';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
-import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t, Language } from '../lib/Translation/translation';
-import { EmailProviders } from '../enums/EmailProviders';
-import { UserPreferenceModal } from '../modal/UserPreferenceModal';
-import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
-import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
-import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 import { Translations } from '../constants/Translations';
+import { Handler } from './Handler';
+import { SendEmailModal } from '../modal/SendEmailModal';
+import { ToolExecutorService } from '../services/ToolExecutorService';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
+import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
+import { UserPreferenceModal } from '../modal/UserPreferenceModal';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+import { EmailProviders } from '../enums/EmailProviders';
+import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
+import { MessageFormatter } from '../lib/MessageFormatter';
+import { handleError } from '../helper/errorHandler';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
-    
+
     constructor(
         protected readonly app: EmailBridgeNlpApp,
         protected readonly read: IRead,
@@ -36,173 +45,54 @@ export class ExecuteBlockActionHandler {
         this.context = context;
     }
 
-
-
     public async handleActions(): Promise<IUIKitResponse> {
-        const { actionId, user, room, triggerId } = this.context.getInteractionData();
+        const { actionId, user, room, triggerId, message, value } = this.context.getInteractionData();
 
-        if (actionId === ActionIds.EMAIL_LOGOUT_ACTION) {
-            if (user && room) {
-                // Process logout asynchronously to avoid blocking the interaction response
-                Promise.resolve().then(async () => {
-                    try {
-                        await this.handleLogoutAction(user, room);
-                    } catch (error) {
-                        const language = await getUserPreferredLanguage(
-                            this.read.getPersistenceReader(),
-                            this.persistence,
-                            user.id,
-                        );
-                        this.app.getLogger().error(t(Translations.LOG_ASYNC_LOGOUT, language), error);
-                    }
-                });
-            }
-
-            // Return immediate success response to prevent UI timeout
+        if (!room) {
             return this.context.getInteractionResponder().successResponse();
         }
 
-        if (actionId === ActionIds.USER_PREFERENCE_ACTION) {
-            if (user && triggerId && room) {
-                // Store room ID for later use in ExecuteViewSubmitHandler
-                const roomInteractionStorage = new RoomInteractionStorage(
-                    this.persistence,
-                    this.read.getPersistenceReader(),
-                    user.id,
-                );
-                
-                await roomInteractionStorage.storeInteractionRoomId(room.id);
-                
-                // Process user preference action asynchronously
-                Promise.resolve().then(async () => {
-                    try {
-                        await this.handleUserPreferenceAction(user, triggerId);
-                    } catch (error) {
-                        const language = await getUserPreferredLanguage(
-                            this.read.getPersistenceReader(),
-                            this.persistence,
-                            user.id,
-                        );
-                        this.app.getLogger().error(t(Translations.LOG_ASYNC_PREF, language), error);
-                    }
-                });
+        const language = await getUserPreferredLanguage(
+            this.read.getPersistenceReader(),
+            this.persistence,
+            user.id,
+        );
+
+        const handler = new Handler({
+            app: this.app,
+            sender: user,
+            room: room,
+            read: this.read,
+            modify: this.modify,
+            http: this.http,
+            persis: this.persistence,
+            triggerId: triggerId,
+            language: language,
+        });
+
+        switch (actionId) {
+            case ActionIds.USER_PREFERENCE_ACTION:
+                await handler.Config();
+                break;
+            case ActionIds.EMAIL_LOGOUT_ACTION: {
+                await handler.Logout();
+                break;
             }
-
-            // Return immediate success response to prevent UI timeout
-            return this.context.getInteractionResponder().successResponse();
-        }
-
-        // Handle provider dropdown change to show warning
-        if (actionId === UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID) {
-            return await this.handleProviderChange(user);
+            case ActionIds.EMAIL_LOGOUT_CONFIRM_ACTION: {
+                await this.handleLogoutConfirm(user, room, language);
+                break;
+            }
+            case UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID:
+                return await this.handleProviderChange(user);
+            case ActionIds.SEND_EMAIL_DIRECT_ACTION:
+                await this.handleDirectSendEmail(user, room);
+                break;
+            case ActionIds.SEND_EMAIL_EDIT_ACTION:
+                await this.handleEditAndSendEmail(user, room, triggerId);
+                break;
         }
 
         return this.context.getInteractionResponder().successResponse();
-    }
-
-    private async handleUserPreferenceAction(user: any, triggerId: string): Promise<void> {
-        try {
-            // Get user's preferred language
-            const language = await getUserPreferredLanguage(
-                this.read.getPersistenceReader(),
-                this.persistence,
-                user.id,
-            );
-
-            const userPreference = new UserPreferenceStorage(
-                this.persistence,
-                this.read.getPersistenceReader(),
-                user.id,
-            );
-            const existingPreference = await userPreference.getUserPreference();
-
-            const modal = await UserPreferenceModal({
-                app: this.app,
-                modify: this.modify,
-                existingPreference: existingPreference,
-            });
-
-            if (modal instanceof Error) {
-                return;
-            }
-
-            await this.modify
-                .getUiController()
-                .openSurfaceView(modal, { triggerId }, user);
-
-        } catch (error) {
-            // For errors in this method, use English as fallback since we can't get user language easily here
-            this.app.getLogger().error(t(Translations.LOG_PREF_HANDLE, Language.en), error);
-        }
-    }
-
-    private async handleLogoutAction(user: any, room: any): Promise<void> {
-        const appUser = await this.read.getUserReader().getAppUser();
-        const messageBuilder = this.modify
-            .getCreator()
-            .startMessage()
-            .setSender(appUser!)
-            .setRoom(room)
-            .setGroupable(false);
-
-        try {
-            // Get user's preferred language
-            const language = await getUserPreferredLanguage(
-                this.read.getPersistenceReader(),
-                this.persistence,
-                user.id,
-            );
-
-            // Get user's preferred email provider from their personal settings
-            const userPreferenceStorage = new UserPreferenceStorage(
-                this.persistence,
-                this.read.getPersistenceReader(),
-                user.id,
-            );
-            const userPreference = await userPreferenceStorage.getUserPreference();
-            const emailProvider = userPreference.emailProvider;
-
-            // Check if provider is supported
-            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
-                const providerName = getProviderDisplayName(emailProvider);
-                const message = t(Translations.PROVIDER_NOT_SUPPORTED_LOGOUT, language, { provider: providerName });
-                
-                messageBuilder.setText(message);
-                await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            }
-
-            // Attempt to logout using the service factory
-            const success = await EmailServiceFactory.logoutUser(
-                emailProvider,
-                user.id,
-                this.http,
-                this.persistence,
-                this.read,
-                this.app.getLogger()
-            );
-
-            if (success) {
-                const providerName = getProviderDisplayName(emailProvider);
-                messageBuilder.setText(t(Translations.LOGOUT_SUCCESS, language, { provider: providerName }));
-                await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            } else {
-                messageBuilder.setText(t(Translations.LOGOUT_FAILED, language));
-                await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-                return;
-            }
-        } catch (error) {
-            // Get user's preferred language for error message
-            const language = await getUserPreferredLanguage(
-                this.read.getPersistenceReader(),
-                this.persistence,
-                user.id,
-            );
-            
-            messageBuilder.setText(t(Translations.LOGOUT_ERROR, language, { error: error.message }));
-            await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
-        }
     }
 
     private async handleProviderChange(user: any): Promise<IUIKitResponse> {
@@ -259,4 +149,238 @@ export class ExecuteBlockActionHandler {
             return this.context.getInteractionResponder().successResponse();
         }
     }
-} 
+
+    private async handleDirectSendEmail(user: any, room: any): Promise<void> {
+        const language = await getUserPreferredLanguage(
+            this.read.getPersistenceReader(),
+            this.persistence,
+            user.id,
+        );
+
+        try {
+            // Retrieve stored email data
+            const emailData = await this.getStoredEmailData(room.id);
+            if (!emailData) {
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
+            }
+
+            // Send email directly using ToolExecutorService
+            const toolExecutorService = new ToolExecutorService(
+                this.app,
+                this.read,
+                this.modify,
+                this.http,
+                this.persistence
+            );
+
+            const result = await toolExecutorService.sendEmail(emailData, user);
+
+            // Show result message
+            await this.showMessage(
+                user,
+                room,
+                MessageFormatter.formatSendEmailResultMessage(result.success, result.message, language),
+                language
+            );
+
+        } catch (error) {
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
+                user,
+                room,
+                language,
+                'Direct send email',
+                error
+            );
+        }
+    }
+
+    private async handleEditAndSendEmail(user: any, room: any, triggerId?: string): Promise<void> {
+        const language = await getUserPreferredLanguage(
+            this.read.getPersistenceReader(),
+            this.persistence,
+            user.id,
+        );
+
+        try {
+            // Retrieve stored email data
+            const emailData = await this.getStoredEmailData(room.id);
+            if (!emailData) {
+                await this.showMessage(
+                    user,
+                    room,
+                    MessageFormatter.formatDataNotAvailableMessage(language),
+                    language
+                );
+                return;
+            }
+
+            if (!triggerId) {
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_TRIGGER_ID_MISSING, language),
+                    language
+                );
+                return;
+            }
+
+            // Store room ID for later use in ExecuteViewSubmitHandler
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            await roomInteractionStorage.storeInteractionRoomId(room.id);
+
+            // Create and open modal
+            const modal = await SendEmailModal({
+                app: this.app,
+                modify: this.modify,
+                read: this.read,
+                language: language,
+                emailData,
+                context: 'edit',
+            });
+
+            if (!modal) {
+                await this.showMessage(
+                    user,
+                    room,
+                    t(Translations.ERROR_MODAL_CREATION_FAILED, language),
+                    language
+                );
+                return;
+            }
+
+            await this.modify
+                .getUiController()
+                .openSurfaceView(modal, { triggerId }, user);
+
+        } catch (error) {
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
+                user,
+                room,
+                language,
+                'Edit and send email',
+                error
+            );
+        }
+    }
+
+    private async getStoredEmailData(roomId: string): Promise<ISendEmailData | null> {
+        try {
+            const association = new RocketChatAssociationRecord(
+                RocketChatAssociationModel.ROOM,
+                roomId,
+            );
+
+            const data = await this.read.getPersistenceReader().readByAssociation(association);
+
+            // Handle both array and single object responses
+            if (Array.isArray(data) && data.length > 0) {
+                return (data[0] as any)?.emailData || null;
+            } else if (data && typeof data === 'object') {
+                return (data as any)?.emailData || null;
+            }
+
+            return null;
+        } catch (error) {
+            this.app.getLogger().error('Error retrieving stored email data:', error);
+            return null;
+        }
+    }
+
+    private async handleLogoutConfirm(user: any, room: any, language: any): Promise<void> {
+        try {
+            // Get user's preferred email provider
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, language, { provider: providerName });
+                await this.showMessage(user, room, message, language);
+                return;
+            }
+
+            // Check if user is authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailProvider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                const message = t(Translations.NOT_AUTHENTICATED, language, { provider: getProviderDisplayName(emailProvider) });
+                await this.showMessage(user, room, message, language);
+                return;
+            }
+
+            // Perform actual logout
+            await EmailServiceFactory.logoutUser(
+                emailProvider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            // Show success message
+            const successMessage = t(Translations.LOGOUT_SUCCESS, language, { provider: getProviderDisplayName(emailProvider) });
+            await this.showMessage(user, room, successMessage, language);
+
+        } catch (error) {
+            await handleError(
+                this.app,
+                this.read,
+                this.modify,
+                user,
+                room,
+                language,
+                'User logout',
+                error
+            );
+        }
+    }
+
+    private async showMessage(user: any, room: any, message: string, language: any): Promise<void> {
+        try {
+            const appUser = await this.read.getUserReader().getAppUser();
+            if (!appUser) return;
+
+            const messageBuilder = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser)
+                .setRoom(room)
+                .setGroupable(false)
+                .setText(message);
+
+            await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
+        } catch (error) {
+            this.app.getLogger().error('Error showing message:', error);
+        }
+    }
+}

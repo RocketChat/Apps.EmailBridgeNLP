@@ -9,13 +9,15 @@ export const GoogleOauthUrls = {
     TOKEN: 'https://oauth2.googleapis.com/token',
     USER_INFO: 'https://www.googleapis.com/oauth2/v2/userinfo',
     REVOKE: 'https://oauth2.googleapis.com/revoke',
+    SEND_EMAIL: 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
 } as const;
 
 // Microsoft OAuth URLs
 export const MicrosoftOauthUrls = {
     AUTHORIZATION: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
     TOKEN: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-    USER_INFO: ApiEndpoints.OUTLOOK_API_BASE_URL,
+    USER_INFO: 'https://graph.microsoft.com/v1.0/me',
+    SEND_EMAIL: 'https://graph.microsoft.com/v1.0/me/sendMail',
 } as const;
 
 // Google OAuth Scopes
@@ -107,4 +109,31 @@ export const HeaderBuilders = {
         [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
         [HttpHeaders.CONSISTENCY_LEVEL]: HeaderValues.CONSISTENCY_LEVEL_EVENTUAL,
     }),
+} as const;
+
+// LLM Configuration
+export const LlmConfig = {
+    ENDPOINT: 'http://llama3-8b.local:12345/v1/chat/completions',
+    MODEL_PATH: './dist/Llama-3-8B-Instruct-q4f16_1-MLC/',
+    MAX_TOKENS: 2000,
+    TEMPERATURE: 0.7,
+    TIMEOUT: 30000, // 30 seconds
+} as const;
+
+// Message Retrieval Configuration
+export const MessageConfig = {
+    MAX_MESSAGES_RETRIEVAL: 100, 
+} as const; 
+
+// Avatar Configuration
+export const AvatarConfig = {
+    DEFAULT_SIZE: 32,
+    DEFAULT_FORMAT: 'png',
+    ENDPOINT_PATH: '/avatar',
+} as const;
+
+// Avatar URL Builder
+export const AvatarUtils = {
+    buildAvatarUrl: (username: string, format: string = AvatarConfig.DEFAULT_FORMAT, size: number = AvatarConfig.DEFAULT_SIZE) => 
+        `${AvatarConfig.ENDPOINT_PATH}/${username}?format=${format}&size=${size}`,
 } as const;

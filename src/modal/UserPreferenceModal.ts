@@ -20,6 +20,9 @@ import { getLanguageDisplayTextFromCode } from '../helper/userPreference';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { EmailProviders } from '../enums/EmailProviders';
 import { Translations } from '../constants/Translations';
+import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+
+
 
 export async function UserPreferenceModal({
     app,
@@ -35,8 +38,10 @@ export async function UserPreferenceModal({
     const language = existingPreference.language as Language;
     const blocks: (InputBlock | DividerBlock | SectionBlock | ActionsBlock)[] = [];
 
-    // Report Categories Selection
-    const allCategories = [...new Set(existingPreference.reportCategories || [])];
+    // Report Categories Selection - show default categories in dropdown but don't force selection
+    const userCategories = existingPreference.reportCategories || [];
+    const defaultCategories = ['github', 'calendar', 'social'];
+    const allCategories = [...new Set([...defaultCategories, ...userCategories.map(c => c.toLowerCase())])];
     const categoryOptions = allCategories.map((category) => ({
         text: category.charAt(0).toUpperCase() + category.slice(1),
         value: category,
@@ -46,7 +51,7 @@ export async function UserPreferenceModal({
         {
             placeholder: t(Translations.REPORT_CATEGORIES_LABEL, language),
             options: categoryDropdownOptions,
-            initialValue: existingPreference.reportCategories || [],
+            initialValue: userCategories,
         },
         {
             blockId: UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_BLOCK_ID,
@@ -149,8 +154,8 @@ export async function UserPreferenceModal({
         blocks.push({
             type: 'section',
             text: {
-                type: TextObjectType.PLAIN_TEXT,
-                text: t(Translations.PROVIDER_CHANGE_WARNING, language),
+                type: TextObjectType.MRKDWN,
+                text: `⚠️ *${t(Translations.PROVIDER_CHANGE_WARNING, language).replace('⚠️ ', '')}*`,
             },
         } as SectionBlock);
     }

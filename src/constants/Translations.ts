@@ -107,6 +107,7 @@ export const Translations = {
     // Provider Change Messages
     PROVIDER_CHANGED_AUTO_LOGOUT: 'Provider_Changed_Auto_Logout',
     PROVIDER_CHANGE_WARNING: 'Provider_Change_Warning',
+    PROVIDER_CHANGED_LOGIN_MESSAGE: 'Provider_Changed_Login_Message',
 
     // Error Messages
     ERROR_FILL_REQUIRED_FIELDS: 'Error_Fill_Required_Fields',
@@ -213,8 +214,8 @@ export const Translations = {
     OAUTH_ENDPOINT_SSL_PROTOCOL_ERROR: 'SSL/TLS Protocol Error. For localhost development, ensure Azure app registration includes HTTP (not HTTPS) redirect URI. Check your redirect URI configuration in Azure Portal.',
 
     // Common Error Messages (moved from AuthConstants.ts)
-    COMMON_UNKNOWN_ERROR: 'Unknown error',
-    COMMON_FAILED_EXCHANGE_CODE: 'Failed to exchange code for tokens',
+    COMMON_UNKNOWN_ERROR: 'Common_Unknown_Error',
+    COMMON_FAILED_EXCHANGE_CODE: 'Common_Failed_Exchange_Code',
     COMMON_FAILED_GET_USER_INFO: 'Failed to get user info',
     COMMON_FAILED_REFRESH_TOKEN: 'Failed to refresh token',
     COMMON_USER_INFO_INCOMPLETE: 'User info incomplete or missing email',
@@ -244,4 +245,84 @@ export const Translations = {
     // User Preference Modal
     NEW_CATEGORY_LABEL: 'New_Category_Label',
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
+    // Tool Calling Messages
+    LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
+    LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',
+    LLM_AI_THINKING: 'LLM_AI_Thinking',
+    LLM_EMAIL_READY_USER: 'LLM_Email_Ready_User',
+    LLM_TOOL_DETECTED: 'LLM_Tool_Detected', 
+    LLM_NO_TOOL_DETECTED: 'LLM_No_Tool_Detected',
+    LLM_ERROR_PROCESSING: 'LLM_Error_Processing',
+    TOOL_CALL_RESULT: 'Tool_Call_Result',
+    TOOL_NAME_LABEL: 'Tool_Name_Label',
+    TOOL_ARGS_LABEL: 'Tool_Args_Label',
+    QUERY_PROCESSED_SUCCESS: 'Query_Processed_Success',
+    INVALID_TOOL_NAME: 'Invalid_Tool_Name',
+    LLM_PARSING_FAILED: 'LLM_Parsing_Failed',
+    
+    // Tool Names (for user display)
+    TOOL_SEND_EMAIL: 'Tool_Send_Email',
+    TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
+    TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
+    TOOL_REPORT: 'Tool_Report',
+
+    // Send Email Modal
+    SEND_EMAIL_MODAL_TITLE: 'Send_Email_Modal_Title',
+    SEND_EMAIL_TO_LABEL: 'Send_Email_To_Label',
+    SEND_EMAIL_TO_PLACEHOLDER: 'Send_Email_To_Placeholder',
+    SEND_EMAIL_CC_LABEL: 'Send_Email_CC_Label',
+    SEND_EMAIL_CC_PLACEHOLDER: 'Send_Email_CC_Placeholder',
+    SEND_EMAIL_SUBJECT_LABEL: 'Send_Email_Subject_Label',
+    SEND_EMAIL_SUBJECT_PLACEHOLDER: 'Send_Email_Subject_Placeholder',
+    SEND_EMAIL_CONTENT_LABEL: 'Send_Email_Content_Label',
+    SEND_EMAIL_CONTENT_PLACEHOLDER: 'Send_Email_Content_Placeholder',
+    SEND_EMAIL_SEND_BUTTON: 'Send_Email_Send_Button',
+    SEND_EMAIL_CANCEL_BUTTON: 'Send_Email_Cancel_Button',
+    SEND_EMAIL_MODAL_OPENED: 'Send_Email_Modal_Opened',
+    
+    // Send Email Button translations
+    EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',
+    EMAIL_SEND_BUTTON: 'Email_Send_Button',
+    EMAIL_EDIT_AND_SEND_BUTTON: 'Email_Edit_And_Send_Button',
+
+    // Send Email Status translations
+    SEND_EMAIL_SUCCESS: 'Send_Email_Success',
+    SEND_EMAIL_FAILED: 'Send_Email_Failed',
+    SEND_EMAIL_ERROR_NO_FROM_EMAIL: 'Send_Email_Error_No_From_Email',
+
+    // Send Email Validation translations
+    SEND_EMAIL_VALIDATION_TO_REQUIRED: 'Send_Email_Validation_To_Required',
+    SEND_EMAIL_VALIDATION_SUBJECT_REQUIRED: 'Send_Email_Validation_Subject_Required',
+    SEND_EMAIL_VALIDATION_CONTENT_REQUIRED: 'Send_Email_Validation_Content_Required',
+
+    // Send email with status
+    SEND_EMAIL_SUCCESS_WITH_EMOJI: 'Send_Email_Success_With_Emoji',
+    SEND_EMAIL_FAILED_WITH_EMOJI: 'Send_Email_Failed_With_Emoji',
+
+    // LLM Error Messages
+    LLM_NO_RESPONSE: 'LLM_No_Response',
+    LLM_NO_CHOICES: 'LLM_No_Choices', 
+    LLM_REQUEST_FAILED: 'LLM_Request_Failed',
+
+    // Summarization Messages
+    NO_MESSAGES_TO_SUMMARIZE: 'No_Messages_To_Summarize',
+    SUMMARY_GENERATION_FAILED: 'Summary_Generation_Failed',
+    ERROR_PROCESSING_SUMMARY_REQUEST: 'Error_Processing_Summary_Request',
+    LLM_SUMMARY_EMAIL_READY_USER: 'LLM_Summary_Email_Ready_User',
+    LLM_PARSING_ERROR: 'LLM_Parsing_Error',
+
+    // Email Ready Messages with Recipients
+    LLM_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Email_Ready_User_With_Recipients',
+    LLM_SUMMARY_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Summary_Email_Ready_User_With_Recipients',
+
+    // New format constants for specific display format
+    LLM_EMAIL_TO_LABEL: 'LLM_Email_To_Label', 
+    LLM_EMAIL_CC_LABEL: 'LLM_Email_CC_Label',
+    LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',
+    LLM_EMAIL_READY_FORMATTED: 'LLM_Email_Ready_Formatted',
+    LLM_SUMMARY_EMAIL_READY_FORMATTED: 'LLM_Summary_Email_Ready_Formatted',
+
+    // Error message details for MessageFormatter
+    ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',
+    ERROR_PLEASE_TRY_AGAIN: 'Error_Please_Try_Again',
 } as const; 

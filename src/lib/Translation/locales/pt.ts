@@ -74,7 +74,7 @@ export const pt = {
     Report_Command: "use `/email report` - Obter relatório diário de estatísticas de email",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
-    Login_Action_Text: "Fazer login na sua conta de email",
+    Login_Action_Text: "Fazer login no __provider__",
     
     // User Preference Modal
     User_Preference_Title: "Preferências do Usuário",
@@ -103,8 +103,9 @@ export const pt = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "Você foi automaticamente desconectado de **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Aviso: Alterar seu provedor de email irá desconectá-lo automaticamente de sua conta atual.",
+    Provider_Changed_Login_Message: "Você pode fazer login na sua conta __provider__",
     
-    // Granular Error Messages (inspired by QuickReplies)
+    // Granular Error Messages
     Error_Fill_Required_Fields: "Erro ao processar solicitação. Por favor, preencha todos os campos obrigatórios ❌",
     Error_Fail_Internal: "Erro interno. Tente novamente mais tarde.",
     Error_Network_Failure: "Falha na conexão de rede. Verifique sua conexão com a internet e tente novamente.",
@@ -208,4 +209,90 @@ export const pt = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Processando: \"__query__\"...",
+    LLM_User_Query_Display: "**Sua consulta é:** __query__",
+    LLM_AI_Thinking: "_pensando_...",
+    LLM_Email_Ready_User: "Olá __name__, seu e-mail intitulado **__subject__** está pronto para enviar.",
+    LLM_Tool_Detected: "**Ferramenta Detectada** para consulta: \"__query__\"\n\n**Ferramenta:** __tool__",
+    LLM_No_Tool_Detected: "Nenhuma ferramenta adequada encontrada para consulta: \"__query__\"",
+    LLM_Error_Processing: "**Erro processando consulta:** \"__query__\"\n\n**Erro:** __error__",
+    Tool_Call_Result: "Resultado da Chamada da Ferramenta",
+    Tool_Name_Label: "Ferramenta",
+    Tool_Args_Label: "Argumentos",
+    Query_Processed_Success: "Consulta processada com sucesso",
+    Invalid_Tool_Name: "Nome de ferramenta inválido detectado",
+    LLM_Parsing_Failed: "Falha ao analisar resposta do LLM",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Enviar Email",
+    Tool_Extract_Attachment: "Extrair Anexos",
+    Tool_Summarize_And_Send: "Resumir & Enviar Email",
+    Tool_Report: "Gerar Relatório",
+
+    // Send Email Modal
+    Send_Email_Modal_Title: "Enviar e-mail",
+    Send_Email_To_Label: "Para",
+    Send_Email_To_Placeholder: "Digite os endereços de e-mail dos destinatários (separados por vírgula)",
+    Send_Email_CC_Label: "CC (Opcional)",
+    Send_Email_CC_Placeholder: "Digite os endereços de e-mail CC (separados por vírgula)",
+    Send_Email_Subject_Label: "Assunto",
+    Send_Email_Subject_Placeholder: "Digite o assunto do e-mail",
+    Send_Email_Content_Label: "Mensagem",
+    Send_Email_Content_Placeholder: "Digite o conteúdo da sua mensagem",
+    Send_Email_Send_Button: "Enviar e-mail",
+    Send_Email_Cancel_Button: "Cancelar",
+    Send_Email_Modal_Opened: "Modal de composição de e-mail aberto com sucesso",
+    Send_Email_Success: "E-mail enviado com sucesso ✅",
+    Send_Email_Failed: "Falha ao enviar e-mail: __error__",
+    Send_Email_Error_No_From_Email: "Não é possível determinar o endereço de e-mail do remetente",
+    Send_Email_Validation_To_Required: "Pelo menos um destinatário é obrigatório",
+    Send_Email_Validation_Subject_Required: "Assunto é obrigatório",
+    Send_Email_Validation_Content_Required: "Conteúdo da mensagem é obrigatório",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "E-mail pronto para enviar",
+    Email_Send_Button: "Enviar",
+    Email_Edit_And_Send_Button: "Editar e Enviar",
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "✅ E-mail enviado com sucesso",
+    Send_Email_Failed_With_Emoji: "❌ Falha ao enviar e-mail: __error__",
+
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Falha ao fazer logout. O provedor de email '__provider__' não é suportado.",
+    LOGOUT_SUCCESS: "Você foi desconectado com sucesso do __provider__.",
+    LOGOUT_FAILED: "Falha ao fazer logout. Por favor, tente novamente.",
+    LOGOUT_ERROR: "Ocorreu um erro durante o logout: __error__",
+    EMAIL_SENT_CONFIRMATION: "Email enviado.",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Enviar",
+    EDIT_SEND_ACTION_TEXT: "Editar e Enviar",
+
+    // LLM Error Messages
+    LLM_No_Response: "Nenhuma resposta recebida do serviço de IA. Tente novamente.",
+    LLM_No_Choices: "O serviço de IA retornou uma resposta vazia. Reformule sua solicitação.",
+    LLM_Request_Failed: "Falha na comunicação com o serviço de IA",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "Nenhuma mensagem encontrada para resumir com base em seus critérios.",
+    Summary_Generation_Failed: "Não foi possível gerar um resumo das mensagens. Tente novamente.",
+    LLM_Summary_Email_Ready_User: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar.",
+    LLM_Parsing_Error: "Não consegui entender sua solicitação. Tente reformular com endereços de e-mail ou conteúdo mais simples.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**Resposta da IA:** Olá __name__, seu e-mail intitulado **__subject__** está pronto para enviar para __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**Resposta da IA:** Olá __name__, seu e-mail com resumo do canal: **__channelName__** intitulado \"**__subject__**\" está pronto para enviar para __recipients__",
+
+    // New format constants for specific display format
+    LLM_Email_To_Label: "**Para:**",
+    LLM_Email_CC_Label: "**Cópia:**",
+    LLM_Email_Subject_Label: "**Assunto:**",
+    LLM_Email_Ready_Formatted: "Olá __name__, seu e-mail está pronto para enviar",
+    LLM_Summary_Email_Ready_Formatted: "Olá __name__, seu e-mail com resumo do canal: **__channelName__** está pronto para enviar",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Os dados do e-mail não estão mais disponíveis. Por favor, tente sua solicitação novamente.",
+    Error_Please_Try_Again: "Por favor, tente novamente.",
+    Error_Processing_Summary_Request: "Houve um problema ao processar sua solicitação de resumo. Por favor, tente novamente.",
 }; 

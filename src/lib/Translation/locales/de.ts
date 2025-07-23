@@ -63,10 +63,11 @@ export const de = {
     Error_Preparing_Logout: "Fehler beim Vorbereiten der Abmeldung: __error__",
     
     // Logout action messages
-    Provider_Not_Supported_Logout: "**__provider__ wird für die Abmeldung nicht unterstützt.**\n\nBitte wenden Sie sich an Ihren Administrator für Unterstützung.",
-    Logout_Success: "**Erfolgreich von Ihrem __provider__-Konto abgemeldet.**",
-    Logout_Failed: "**Abmeldung von Ihrem E-Mail-Konto fehlgeschlagen.**\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
-    Logout_Error: "**Fehler beim Abmeldeprozess aufgetreten:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Abmelden fehlgeschlagen. Der E-Mail-Anbieter '__provider__' wird nicht unterstützt.",
+    LOGOUT_SUCCESS: "Sie wurden erfolgreich von __provider__ abgemeldet.",
+    LOGOUT_FAILED: "Abmelden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    LOGOUT_ERROR: "Beim Abmelden ist ein Fehler aufgetreten: __error__",
+    EMAIL_SENT_CONFIRMATION: "E-Mail gesendet.",
     
     // Notification messages
     Helper_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Hier sind einige schnelle Tipps für den Einstieg!",
@@ -78,7 +79,8 @@ export const de = {
     Report_Command: "verwenden Sie `/email report` - Tägliche E-Mail-Statistiken abrufen",
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
-    Login_Action_Text: "Bei Ihrem E-Mail-Konto anmelden",
+    Login_Action_Text: "Bei __provider__ anmelden",
+    SUCCESS_CONFIGURATION_UPDATED: "Ihre Einstellungen wurden erfolgreich aktualisiert.",
     
     // User Preference Modal
     User_Preference_Title: "Benutzereinstellungen",
@@ -107,6 +109,7 @@ export const de = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "Sie wurden automatisch von **__oldProvider__** abgemeldet",
     Provider_Change_Warning: "⚠️ Warnung: Das Ändern Ihres E-Mail-Anbieters wird Sie automatisch von Ihrem aktuellen Konto abmelden.",
+    Provider_Changed_Login_Message: "Sie können sich bei Ihrem __provider__ Konto anmelden",
     
     // Granular Error Messages
     Error_Fill_Required_Fields: "Fehler beim Verarbeiten der Anfrage. Bitte füllen Sie alle erforderlichen Felder aus ❌",
@@ -212,4 +215,84 @@ export const de = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Verarbeitung: \"__query__\"...",
+    LLM_User_Query_Display: "**Ihre Anfrage ist:** __query__",
+    LLM_AI_Thinking: "_denken_...",
+    LLM_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit dem Titel **__subject__** ist versandbereit.",
+    LLM_Tool_Detected: "**Tool Erkannt** für Anfrage: \"__query__\"\n\n**Tool:** __tool__",
+    LLM_No_Tool_Detected: "Kein geeignetes Tool für Anfrage gefunden: \"__query__\"",
+    LLM_Error_Processing: "**Fehler bei der Verarbeitung der Anfrage:** \"__query__\"\n\n**Fehler:** __error__",
+    Tool_Call_Result: "Tool-Aufruf Ergebnis",
+    Tool_Name_Label: "Tool",
+    Tool_Args_Label: "Argumente",
+    Query_Processed_Success: "Anfrage erfolgreich verarbeitet",
+    Invalid_Tool_Name: "Ungültiger Tool-Name erkannt",
+    LLM_Parsing_Failed: "Fehler beim Parsen der LLM-Antwort",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "E-Mail Senden",
+    Tool_Extract_Attachment: "Anhänge Extrahieren",
+    Tool_Summarize_And_Send: "Zusammenfassen & E-Mail Senden",
+    Tool_Report: "Bericht Erstellen",
+
+    // Send Email Modal
+    Send_Email_Modal_Title: "E-Mail senden",
+    Send_Email_To_Label: "An",
+    Send_Email_To_Placeholder: "E-Mail-Adressen der Empfänger eingeben (durch Kommas getrennt)",
+    Send_Email_CC_Label: "CC (Optional)",
+    Send_Email_CC_Placeholder: "CC E-Mail-Adressen eingeben (durch Kommas getrennt)",
+    Send_Email_Subject_Label: "Betreff",
+    Send_Email_Subject_Placeholder: "E-Mail-Betreff eingeben",
+    Send_Email_Content_Label: "Nachricht",
+    Send_Email_Content_Placeholder: "Geben Sie Ihren Nachrichteninhalt ein",
+    Send_Email_Send_Button: "E-Mail senden",
+    Send_Email_Cancel_Button: "Abbrechen",
+    Send_Email_Modal_Opened: "E-Mail Kompositions-Modal erfolgreich geöffnet",
+    Send_Email_Success: "E-Mail erfolgreich gesendet ✅",
+    Send_Email_Failed: "Fehler beim Senden der E-Mail: __error__",
+    Send_Email_Error_No_From_Email: "Absender-E-Mail-Adresse kann nicht bestimmt werden",
+    Send_Email_Validation_To_Required: "Empfänger-E-Mail-Adresse ist erforderlich",
+    Send_Email_Validation_Subject_Required: "E-Mail-Betreff ist erforderlich",
+    Send_Email_Validation_Content_Required: "E-Mail-Inhalt ist erforderlich",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "E-Mail ist versandbereit",
+    Email_Send_Button: "Senden",
+    Email_Edit_And_Send_Button: "Bearbeiten & Senden",
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "E-Mail erfolgreich gesendet",
+    Send_Email_Failed_With_Emoji: "Fehler beim Senden der E-Mail: __error__",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Senden",
+    EDIT_SEND_ACTION_TEXT: "Bearbeiten & Senden",
+
+    // LLM Error Messages
+    LLM_No_Response: "Keine Antwort vom KI-Dienst erhalten. Bitte versuchen Sie es erneut.",
+    LLM_No_Choices: "KI-Dienst gab eine leere Antwort zurück. Bitte formulieren Sie Ihre Anfrage neu.",
+    LLM_Request_Failed: "Kommunikation mit KI-Dienst fehlgeschlagen",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "Keine Nachrichten gefunden, die basierend auf Ihren Kriterien zusammengefasst werden können.",
+    Summary_Generation_Failed: "Eine Zusammenfassung der Nachrichten konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    LLM_Summary_Email_Ready_User: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist versandbereit.",
+    LLM_Parsing_Error: "Ich konnte Ihre Anfrage nicht verstehen. Bitte versuchen Sie es mit einfacheren E-Mail-Adressen oder Inhalten umzuformulieren.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**KI-Antwort:** Hallo __name__, Ihre E-Mail mit dem Titel **__subject__** ist bereit zum Senden an __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**KI-Antwort:** Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** mit dem Titel \"**__subject__**\" ist bereit zum Senden an __recipients__",
+
+    // New format constants for specific display format
+    LLM_Email_To_Label: "**An:**",
+    LLM_Email_CC_Label: "**Kopie:**",
+    LLM_Email_Subject_Label: "**Betreff:**",
+    LLM_Email_Ready_Formatted: "Hallo __name__, Ihre E-Mail ist bereit zum Senden",
+    LLM_Summary_Email_Ready_Formatted: "Hallo __name__, Ihre E-Mail mit Zusammenfassung aus Kanal: **__channelName__** ist bereit zum Senden",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "E-Mail-Daten sind nicht mehr verfügbar. Bitte versuchen Sie Ihre Anfrage erneut.",
+    Error_Please_Try_Again: "Bitte versuchen Sie es erneut.",
+    Error_Processing_Summary_Request: "Es gab ein Problem bei der Verarbeitung Ihrer Zusammenfassungsanfrage. Bitte versuchen Sie es erneut.",
 }; 

@@ -74,7 +74,7 @@ export const en = {
     Report_Command: "use `/email report` - Get daily email statistics report",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
-    Login_Action_Text: "Login to your email account",
+    Login_Action_Text: "Login to __provider__",
     
     // User Preference Modal
     User_Preference_Title: "User Preferences",
@@ -103,8 +103,9 @@ export const en = {
     // Provider change messages
     Provider_Changed_Auto_Logout: "You have been automatically logged out from **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Warning: Changing your email provider will automatically log you out from your current account.",
+    Provider_Changed_Login_Message: "You can login to your __provider__ account",
     
-    // Granular Error Messages
+    // Granular Error Messages 
     Error_Fill_Required_Fields: "Failed to process request. Please fill all the required fields ❌",
     Error_Fail_Internal: "Internal error. Please try again later.",
     Error_Network_Failure: "Network connection failed. Please check your internet connection and try again.",
@@ -209,4 +210,97 @@ export const en = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+    // Tool Calling Messages
+    LLM_Processing_Query: "Processing: \"__query__\"...",
+    LLM_User_Query_Display: "**Your query is:** __query__",
+    LLM_AI_Thinking: "_thinking_...",
+    LLM_Email_Ready_User: "Hey __name__, your email titled **__subject__** is ready to send.",
+    LLM_Tool_Detected: "**Tool Detected** for query: \"__query__\"\n\n**Tool:** __tool__",
+    LLM_No_Tool_Detected: "No suitable tool found for query: \"__query__\"",
+    LLM_Error_Processing: "**Error processing query:** \"__query__\"\n\n**Error:** __error__",
+    Tool_Call_Result: "Tool Call Result",
+    Tool_Name_Label: "Tool",
+    Tool_Args_Label: "Arguments",
+    Query_Processed_Success: "Query processed successfully",
+    Invalid_Tool_Name: "Invalid tool name detected",
+    LLM_Parsing_Failed: "Failed to parse LLM response",
+    
+    // Tool Names (for user display)
+    Tool_Send_Email: "Send Email",
+    Tool_Extract_Attachment: "Extract Attachments",
+    Tool_Summarize_And_Send: "Summarize & Send Email",
+    Tool_Report: "Generate Report",
+    
+    // Send Email Modal
+    Send_Email_Modal_Title: "Send Email",
+    Send_Email_To_Label: "To",
+    Send_Email_To_Placeholder: "Enter recipient email addresses (comma separated)",
+    Send_Email_CC_Label: "CC",
+    Send_Email_CC_Placeholder: "Enter CC email addresses (comma separated)",
+    Send_Email_Subject_Label: "Subject",
+    Send_Email_Subject_Placeholder: "Enter email subject",
+    Send_Email_Content_Label: "Content",
+    Send_Email_Content_Placeholder: "Enter email content",
+    Send_Email_Send_Button: "Send",
+    Send_Email_Cancel_Button: "Cancel",
+    Send_Email_Modal_Opened: "Email composition modal opened",
+    Send_Email_Success: "Email sent successfully ✅",
+    Send_Email_Failed: "Failed to send email: __error__",
+    Send_Email_Error_No_From_Email: "Unable to determine sender email address",
+
+    // Send Email Validation
+    Send_Email_Validation_To_Required: "Recipient email address is required",
+    Send_Email_Validation_Subject_Required: "Email subject is required",
+    Send_Email_Validation_Content_Required: "Email content is required",
+    
+    // Send Email Button Translations
+    Email_Ready_To_Send: "Email Ready to Send",
+    Email_Send_Button: "Send",
+    Email_Edit_And_Send_Button: "Edit & Send",
+    
+    // Send Email with Status
+    Send_Email_Success_With_Emoji: "Email sent successfully",
+    Send_Email_Failed_With_Emoji: "Failed to send email: __error__",
+
+    // New translations
+    PROVIDER_NOT_SUPPORTED_LOGOUT: "Logout failed. The email provider '__provider__' is not supported.",
+    LOGOUT_SUCCESS: "You have been successfully logged out from __provider__.",
+    LOGOUT_FAILED: "Logout failed. Please try again.",
+    LOGOUT_ERROR: "An error occurred during logout: __error__",
+    EMAIL_SENT_CONFIRMATION: "Email sent.",
+
+    // Common Error Messages
+    Common_Unknown_Error: "Unknown error",
+    Common_Failed_Exchange_Code: "Failed to exchange code for tokens",
+
+    // Send/Edit Action Buttons
+    SEND_ACTION_TEXT: "Send",
+    EDIT_SEND_ACTION_TEXT: "Edit & Send",
+
+    // LLM Error Messages
+    LLM_No_Response: "No response received from the AI service. Please try again.",
+    LLM_No_Choices: "AI service returned an empty response. Please try rephrasing your request.",
+    LLM_Request_Failed: "Failed to communicate with AI service",
+
+    // Summarization Messages
+    No_Messages_To_Summarize: "No messages found to summarize based on your criteria.",
+    Summary_Generation_Failed: "Unable to generate a summary of the messages. Please try again.",
+    LLM_Summary_Email_Ready_User: "Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send.",
+    LLM_Parsing_Error: "I couldn't understand your request. Please try rephrasing with simpler email addresses or content.",
+
+    // Email Ready Messages with Recipients
+    LLM_Email_Ready_User_With_Recipients: "**AI response:** Hey __name__, your email titled **__subject__** is ready to send to __recipients__",
+    LLM_Summary_Email_Ready_User_With_Recipients: "**AI response:** Hey __name__, your email with summary from channel: **__channelName__** titled \"**__subject__**\" is ready to send to __recipients__",
+
+    // New format constants for specific display format
+    LLM_Email_To_Label: "**To:**",
+    LLM_Email_CC_Label: "**Cc:**",
+    LLM_Email_Subject_Label: "**Subject:**",
+    LLM_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
+    LLM_Summary_Email_Ready_Formatted: "Hey __name__, your email with summary from channel: **__channelName__** is ready to send",
+
+    // Error message details for MessageFormatter
+    Error_Email_Data_Unavailable: "Email data is no longer available. Please try your request again.",
+    Error_Please_Try_Again: "Please try again.",
+    Error_Processing_Summary_Request: "There was an issue processing your summary request. Please try again.",
 }; 

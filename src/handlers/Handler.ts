@@ -6,6 +6,10 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
+import {
+    RocketChatAssociationModel,
+    RocketChatAssociationRecord,
+} from '@rocket.chat/apps-engine/definition/metadata';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
 import {
@@ -22,6 +26,17 @@ import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
 import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
+import { LLMService } from '../services/LLMService';
+import { ToolExecutorService } from '../services/ToolExecutorService';
+import { handleError, handleErrorAndGetMessage } from '../helper/errorHandler';
+import { SendEmailModal } from '../modal/SendEmailModal';
+import { IToolCall } from '../definition/lib/ToolInterfaces';
+import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
+import { LlmTools } from '../enums/LlmTools';
+import { UsernameService } from '../services/UsernameService';
+import { MessageFormatter } from '../lib/MessageFormatter';
+import { NLQueryHandler } from './NLQuery';
+import { EmailFormats } from '../lib/formats/EmailFormats';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -47,6 +62,8 @@ export class Handler implements IHandler {
         this.threadId = params.threadId;
         this.language = params.language;
     }
+
+
 
     public async Help(): Promise<void> {
         await sendHelperNotification(
@@ -121,7 +138,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -147,9 +164,9 @@ export class Handler implements IHandler {
                         this.app.getLogger()
                     );
                     messageBuilder.setText(
-                        t(Translations.ALREADY_LOGGED_IN, this.language, { 
-                            provider: getProviderDisplayName(emailProvider), 
-                            email: userInfo.email 
+                        t(Translations.ALREADY_LOGGED_IN, this.language, {
+                            provider: getProviderDisplayName(emailProvider),
+                            email: userInfo.email
                         })
                     );
                     return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -168,7 +185,7 @@ export class Handler implements IHandler {
                     } catch (logoutError) {
                         this.app.getLogger().error(t(Translations.LOG_LOGOUT_ERR, this.language), logoutError);
                     }
-                    
+
                     // Fall through to show login button
                 }
             }
@@ -207,9 +224,14 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            messageBuilder.setText(
-                t(Translations.ERROR_PROCESSING_LOGIN, this.language, { error: error.message })
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Login processing',
+                error
             );
+
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -238,7 +260,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.PROVIDER_NOT_IMPLEMENTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -279,9 +301,9 @@ export class Handler implements IHandler {
 
             block.addSectionBlock({
                 text: block.newMarkdownTextObject(
-                    t(Translations.LOGOUT_CONFIRMATION, this.language, { 
-                        provider: getProviderDisplayName(emailProvider), 
-                        email: userInfo.email 
+                    t(Translations.LOGOUT_CONFIRMATION, this.language, {
+                        provider: getProviderDisplayName(emailProvider),
+                        email: userInfo.email
                     })
                 ),
             });
@@ -289,7 +311,7 @@ export class Handler implements IHandler {
             block.addActionsBlock({
                 elements: [
                     block.newButtonElement({
-                        actionId: ActionIds.EMAIL_LOGOUT_ACTION,
+                        actionId: ActionIds.EMAIL_LOGOUT_CONFIRM_ACTION,
                         text: block.newPlainTextObject(t(Translations.CONFIRM_LOGOUT, this.language)),
                         style: ButtonStyle.DANGER,
                     }),
@@ -301,7 +323,14 @@ export class Handler implements IHandler {
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            messageBuilder.setText(t(Translations.ERROR_PREPARING_LOGOUT, this.language, { error: error.message }));
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Logout preparation',
+                error
+            );
+
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
         }
     }
@@ -314,7 +343,7 @@ export class Handler implements IHandler {
                 this.read.getPersistenceReader(),
                 this.sender.id,
             );
-            
+
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
 
             const userPreference = new UserPreferenceStorage(
@@ -343,16 +372,16 @@ export class Handler implements IHandler {
                 .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
 
         } catch (error) {
-            const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
-            const messageBuilder = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser)
-                .setRoom(this.room)
-                .setGroupable(false);
-
-            messageBuilder.setText(t(Translations.CONFIG_ERROR, this.language, { error: error.message }));
-            return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+            return handleError(
+                this.app,
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                this.language,
+                'Config',
+                error
+            );
         }
     }
 
@@ -381,7 +410,7 @@ export class Handler implements IHandler {
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
                 const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
-                
+
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
@@ -418,36 +447,101 @@ export class Handler implements IHandler {
                 this.language
             );
 
-            let categoryReport = '';
-            if (statistics.categoryStats) {
-                for (const category in statistics.categoryStats) {
-                    if (statistics.categoryStats.hasOwnProperty(category)) {
-                        const stats = statistics.categoryStats[category];
-                        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
-                        categoryReport += `**${categoryName}**: ${stats.total} emails (${stats.unread} unread)\n`;
-                    }
-                }
-            }
-
-            // Create a comprehensive report
-            const reportMessage = t(Translations.REPORT_HEADER, this.language) + '\n\n' +
-                                 t(Translations.REPORT_STATISTICS, this.language, {
-                                     receivedToday: statistics.receivedToday.toString(),
-                                     receivedUnreadToday: statistics.receivedUnreadToday.toString(),
-                                     sentToday: statistics.sentToday.toString()
-                                 }) + '\n\n' +
-                                 categoryReport +
-                                 '---';
+            // Use centralized report formatting
+            const reportMessage = EmailFormats.formatEmailReport(statistics, this.language);
             messageBuilder.setText(reportMessage);
-            
+
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
         } catch (error) {
-            this.app.getLogger().error('Report generation error:', error);
-            messageBuilder.setText(
-                t(Translations.REPORT_ERROR, this.language, { error: error.message })
+            const userMessage = handleErrorAndGetMessage(
+                this.app,
+                this.language,
+                'Report generation',
+                error
             );
+
+            messageBuilder.setText(userMessage);
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+        }
+    }
+
+    public async OpenSendEmailModal(emailData: ISendEmailData): Promise<void> {
+        try {
+            // Store room ID for later use in ExecuteViewSubmitHandler
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
+            const modal = await SendEmailModal({
+                app: this.app,
+                modify: this.modify,
+                read: this.read,
+                language: this.language,
+                emailData,
+                context: 'llm',
+            });
+
+            if (!modal) {
+                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
+            }
+
+            if (!this.triggerId) {
+                throw new Error(t(Translations.ERROR_TRIGGER_ID_MISSING, this.language));
+            }
+
+            await this.modify
+                .getUiController()
+                .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
+
+        } catch (error) {
+            return handleError(
+                this.app,
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                this.language,
+                'Modal creation',
+                error
+            );
+        }
+    }
+
+    public async ProcessNaturalLanguageQuery(query: string): Promise<void> {
+        const nlQueryHandler = new NLQueryHandler(
+            this.app,
+            this.read,
+            this.modify,
+            this.http,
+            this.persis,
+            this.sender,
+            this.room,
+            this.language,
+            this.triggerId
+        );
+
+        await nlQueryHandler.processNaturalLanguageQuery(query);
+    }
+
+
+
+    private getToolDisplayName(toolName: string): string {
+        switch (toolName) {
+            case LlmTools.SEND_EMAIL:
+                return t(Translations.TOOL_SEND_EMAIL, this.language);
+            case LlmTools.EXTRACT_ATTACHMENT:
+                return t(Translations.TOOL_EXTRACT_ATTACHMENT, this.language);
+            case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
+                return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
+            case LlmTools.REPORT:
+                return t(Translations.TOOL_REPORT, this.language);
+            default:
+                return toolName;
         }
     }
 } 
