@@ -25,7 +25,8 @@ import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
 import { handleError } from '../helper/errorHandler';
-import { getLLMSettings } from '../config/SettingsManager';
+import { getLLMSettings, getEffectiveLLMSettings } from '../config/SettingsManager';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -127,8 +128,19 @@ export class NLQueryHandler {
             const usernameService = new UsernameService(this.read);
             const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
 
-            // Get LLM settings and create service
-            const llmSettings = await getLLMSettings(this.read.getEnvironmentReader().getSettings());
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
             const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
             const result = await llmService.processNaturalLanguageQuery(enhancedQuery);
             
@@ -278,7 +290,20 @@ export class NLQueryHandler {
             // Create services for summarization
             const { MessageService } = await import('../services/MessageService');
             const messageService = new MessageService();
-            const llmSettings = await getLLMSettings(this.read.getEnvironmentReader().getSettings());
+            
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
             const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
 
             // Retrieve messages from the current room or thread

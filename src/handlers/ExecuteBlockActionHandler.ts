@@ -30,6 +30,7 @@ import { EmailProviders } from '../enums/EmailProviders';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { handleError } from '../helper/errorHandler';
+import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -46,11 +47,61 @@ export class ExecuteBlockActionHandler {
     }
 
     public async handleActions(): Promise<IUIKitResponse> {
-        const { actionId, user, room, triggerId, message, value } = this.context.getInteractionData();
+        try {
+            const { actionId, user, triggerId, message, value } = this.context.getInteractionData();
+            let { room } = this.context.getInteractionData();
+            this.app.getLogger().info('🔥 ExecuteBlockActionHandler triggered with actionId:', actionId, 'value:', value);
 
-        if (!room) {
-            return this.context.getInteractionResponder().successResponse();
-        }
+            // QuickReplies pattern: Handle missing room context in modal interactions
+            const persistenceRead = this.read.getPersistenceReader();
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                persistenceRead,
+                user.id,
+            );
+
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            this.app.getLogger().info('🔥 Retrieved roomId from storage:', roomId);
+            let roomPersistance: any = null;
+            if (roomId) {
+                this.app.getLogger().info('🔥 Getting room by ID:', roomId);
+                roomPersistance = await this.read.getRoomReader().getById(roomId);
+                this.app.getLogger().info('🔥 Room retrieved:', !!roomPersistance);
+            } else {
+                this.app.getLogger().info('🔥 No roomId found in storage');
+            }
+
+            if (room === undefined) {
+                if (roomPersistance) {
+                    room = roomPersistance;
+                    this.app.getLogger().info('🔥 Room assigned from storage. Room now defined:', !!room);
+                    this.app.getLogger().info('🔥 Room object type:', typeof room);
+                    this.app.getLogger().info('🔥 Room ID from assigned room:', room?.id);
+                } else {
+                    this.app.getLogger().error("Room doesn't exist in persistence");
+                    return this.context.getInteractionResponder().errorResponse();
+                }
+            }
+
+            // Ensure room is defined before proceeding
+            if (!room) {
+                this.app.getLogger().error("Room is still undefined after retrieval attempts");
+                this.app.getLogger().info('🔥 roomPersistance was:', !!roomPersistance);
+                this.app.getLogger().info('🔥 roomPersistance type:', typeof roomPersistance);
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            this.app.getLogger().info('🔥 Creating userPreferenceStorage...');
+            // Add QuickReplies pattern variables
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            
+            this.app.getLogger().info('🔥 Getting existingPreference...');
+            const existingPreference = await userPreferenceStorage.getUserPreference();
+            this.app.getLogger().info('🔥 existingPreference retrieved:', !!existingPreference);
 
         const language = await getUserPreferredLanguage(
             this.read.getPersistenceReader(),
@@ -70,8 +121,12 @@ export class ExecuteBlockActionHandler {
             language: language,
         });
 
+        this.app.getLogger().info('🔥 About to enter switch statement with actionId:', actionId);
+        this.app.getLogger().info('🔥 UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID =', UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID);
+        this.app.getLogger().info('🔥 Checking if actionId matches enum:', actionId === UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID);
         switch (actionId) {
             case ActionIds.USER_PREFERENCE_ACTION:
+                this.app.getLogger().info('🔥 Hit USER_PREFERENCE_ACTION case');
                 await handler.Config();
                 break;
             case ActionIds.EMAIL_LOGOUT_ACTION: {
@@ -84,15 +139,92 @@ export class ExecuteBlockActionHandler {
             }
             case UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID:
                 return await this.handleProviderChange(user);
+            case UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID:
+                // QuickReplies pattern: Handle directly in switch case
+                this.app.getLogger().info('🔥 Hit LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID case!');
+                this.app.getLogger().info('🔥 LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID triggered with value:', value);
+                if (value === LLMUsagePreferenceEnum.Personal) {
+                    existingPreference.llmConfiguration = {
+                        ...(existingPreference.llmConfiguration || {}),
+                        llmUsagePreference: LLMUsagePreferenceEnum.Personal
+                    } as any;
+                    await userPreferenceStorage.storeUserPreference(existingPreference);
+                    
+                    const updatedPreference = await userPreferenceStorage.getUserPreference();
+                    const updatedModal = await UserPreferenceModal({
+                        app: this.app,
+                        modify: this.modify,
+                        existingPreference: updatedPreference,
+                    });
+                    
+                    return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                } else {
+                    existingPreference.llmConfiguration = {
+                        llmUsagePreference: LLMUsagePreferenceEnum.Workspace
+                    } as any;
+                    
+                    await userPreferenceStorage.storeUserPreference(existingPreference);
+                    
+                    const updatedPreference = await userPreferenceStorage.getUserPreference();
+                    const updatedModal = await UserPreferenceModal({
+                        app: this.app,
+                        modify: this.modify,
+                        existingPreference: updatedPreference,
+                    });
+                    
+                    return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                }
+                break;
+            case UserPreferenceModalEnum.LLM_PROVIDER_DROPDOWN_ACTION_ID:
+                // QuickReplies pattern: Handle directly in switch case
+                this.app.getLogger().info('🔥 LLM_PROVIDER_DROPDOWN_ACTION_ID triggered with value:', value);
+                const option = value as LLMProviderEnum;
+                if (value) {
+                    if (Object.values(LLMProviderEnum).includes(option)) {
+                        existingPreference.llmConfiguration = {
+                            ...(existingPreference.llmConfiguration || {}),
+                            llmProvider: option,
+                            // Clear all provider-specific settings
+                            selfHosted: undefined,
+                            openai: undefined,
+                            gemini: undefined,
+                            groq: undefined
+                        } as any;
+                        
+                        await userPreferenceStorage.storeUserPreference(existingPreference);
+                        
+                        const updatedPreference = await userPreferenceStorage.getUserPreference();
+                        const updatedModal = await UserPreferenceModal({
+                            app: this.app,
+                            modify: this.modify,
+                            existingPreference: updatedPreference,
+                        });
+                        
+                        return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                    } else {
+                        this.app.getLogger().info('value is not part of LLMProviderEnum enum');
+                    }
+                } else {
+                    this.app.getLogger().info('no value');
+                }
+                break;
             case ActionIds.SEND_EMAIL_DIRECT_ACTION:
                 await this.handleDirectSendEmail(user, room);
                 break;
             case ActionIds.SEND_EMAIL_EDIT_ACTION:
                 await this.handleEditAndSendEmail(user, room, triggerId);
                 break;
+            default:
+                this.app.getLogger().info('🔥 Hit DEFAULT case - no matching actionId found!');
+                this.app.getLogger().info('🔥 Available UserPreference enum values:', Object.values(UserPreferenceModalEnum));
+                break;
         }
 
         return this.context.getInteractionResponder().successResponse();
+        } catch (error) {
+            this.app.getLogger().error('🔥 ERROR in ExecuteBlockActionHandler:', error);
+            return this.context.getInteractionResponder().successResponse();
+        }
     }
 
     private async handleProviderChange(user: any): Promise<IUIKitResponse> {
@@ -383,4 +515,6 @@ export class ExecuteBlockActionHandler {
             this.app.getLogger().error('Error showing message:', error);
         }
     }
+
+
 }

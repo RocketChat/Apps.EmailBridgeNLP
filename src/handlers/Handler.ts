@@ -344,7 +344,9 @@ export class Handler implements IHandler {
                 this.sender.id,
             );
 
+            this.app.getLogger().info('🔥 Storing room ID in Config handler:', this.room.id);
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+            this.app.getLogger().info('🔥 Room ID stored successfully');
 
             const userPreference = new UserPreferenceStorage(
                 this.persis,

@@ -17,10 +17,11 @@ import {
 } from '../lib/Translation/translation';
 import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 import { getLanguageDisplayTextFromCode } from '../helper/userPreference';
-import { IPreference } from '../definition/lib/IUserPreferences';
+import { IPreference, LLMUsagePreference, LLMProviderType, LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
 import { EmailProviders } from '../enums/EmailProviders';
 import { Translations } from '../constants/Translations';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+import { inputElementComponent } from './common/inputElementComponent';
 
 
 
@@ -158,6 +159,169 @@ export async function UserPreferenceModal({
                 text: `⚠️ *${t(Translations.PROVIDER_CHANGE_WARNING, language).replace('⚠️ ', '')}*`,
             },
         } as SectionBlock);
+    }
+
+    // Divider before LLM Configuration
+    blocks.push(blockBuilder.createDividerBlock());
+
+    // LLM Usage Preference
+    const llmUsagePreferenceOptions = [
+        {
+            text: t(Translations.LLM_USAGE_PREFERENCE_WORKSPACE, language),
+            value: LLMUsagePreferenceEnum.Workspace,
+        },
+        {
+            text: t(Translations.LLM_USAGE_PREFERENCE_PERSONAL, language),
+            value: LLMUsagePreferenceEnum.Personal,
+        },
+    ];
+
+    const llmUsagePreferenceDropDownOption = elementBuilder.createDropDownOptions(llmUsagePreferenceOptions);
+    const llmUsagePreferenceDropDown = elementBuilder.addDropDown(
+        {
+            placeholder: t(Translations.LLM_USAGE_PREFERENCE_PLACEHOLDER, language),
+            options: llmUsagePreferenceDropDownOption,
+            initialOption: llmUsagePreferenceDropDownOption.find(
+                (option) => option.value === existingPreference.llmConfiguration?.llmUsagePreference,
+            ),
+            dispatchActionConfig: [Modals.DISPATCH_ACTION_CONFIG_ON_SELECT],
+        },
+        {
+            blockId: UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID,
+        },
+    );
+
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_BLOCK_ID,
+            text: t(Translations.LLM_USAGE_PREFERENCE_LABEL, language),
+            element: llmUsagePreferenceDropDown,
+            optional: false,
+        }),
+    );
+
+    // Personal LLM Configuration (only show when "Personal" is selected)
+    if (existingPreference.llmConfiguration?.llmUsagePreference === LLMUsagePreferenceEnum.Personal) {
+        const llmProviderOptions = [
+            {
+                text: t(Translations.LLM_PROVIDER_SELFHOSTED, language),
+                value: LLMProviderEnum.SelfHosted,
+            },
+            {
+                text: t(Translations.LLM_PROVIDER_OPENAI, language),
+                value: LLMProviderEnum.OpenAI,
+            },
+            {
+                text: t(Translations.LLM_PROVIDER_GEMINI, language),
+                value: LLMProviderEnum.Gemini,
+            },
+            {
+                text: t(Translations.LLM_PROVIDER_GROQ, language),
+                value: LLMProviderEnum.Groq,
+            },
+        ];
+
+        const llmProviderDropDownOption = elementBuilder.createDropDownOptions(llmProviderOptions);
+        const llmProviderDropDown = elementBuilder.addDropDown(
+            {
+                placeholder: t(Translations.LLM_PROVIDER_USER_PLACEHOLDER, language),
+                options: llmProviderDropDownOption,
+                initialOption: llmProviderDropDownOption.find(
+                    (option) => option.value === existingPreference.llmConfiguration?.llmProvider,
+                ),
+                dispatchActionConfig: [Modals.DISPATCH_ACTION_CONFIG_ON_SELECT],
+            },
+            {
+                blockId: UserPreferenceModalEnum.LLM_PROVIDER_DROPDOWN_BLOCK_ID,
+                actionId: UserPreferenceModalEnum.LLM_PROVIDER_DROPDOWN_ACTION_ID,
+            },
+        );
+
+        blocks.push(
+            blockBuilder.createInputBlock({
+                blockId: UserPreferenceModalEnum.LLM_PROVIDER_DROPDOWN_BLOCK_ID,
+                text: t(Translations.LLM_PROVIDER_USER_LABEL, language),
+                element: llmProviderDropDown,
+                optional: false,
+            }),
+        );
+
+        // Provider-specific configuration fields
+        if (existingPreference.llmConfiguration?.llmProvider) {
+            switch (existingPreference.llmConfiguration.llmProvider) {
+                case LLMProviderEnum.SelfHosted:
+                    const selfHostedUrlInput = inputElementComponent(
+                        {
+                            app,
+                            placeholder: t(Translations.SELFHOSTED_URL_PLACEHOLDER, language),
+                            label: t(Translations.SELFHOSTED_URL_LABEL, language),
+                            optional: false,
+                            initialValue: existingPreference.llmConfiguration?.selfHosted?.url,
+                        },
+                        {
+                            blockId: UserPreferenceModalEnum.SELF_HOSTED_URL_BLOCK_ID,
+                            actionId: UserPreferenceModalEnum.SELF_HOSTED_URL_ACTION_ID,
+                        },
+                    );
+                    blocks.push(selfHostedUrlInput);
+                    break;
+
+                case LLMProviderEnum.OpenAI:
+                    const openaiApiKeyInput = inputElementComponent(
+                        {
+                            app,
+                            placeholder: t(Translations.OPENAI_API_KEY_USER_PLACEHOLDER, language),
+                            label: t(Translations.OPENAI_API_KEY_USER_LABEL, language),
+                            optional: false,
+                            initialValue: existingPreference.llmConfiguration?.openai?.apiKey,
+                        },
+                        {
+                            blockId: UserPreferenceModalEnum.OPENAI_API_KEY_BLOCK_ID,
+                            actionId: UserPreferenceModalEnum.OPENAI_API_KEY_ACTION_ID,
+                        },
+                    );
+                    blocks.push(openaiApiKeyInput);
+                    break;
+
+                case LLMProviderEnum.Gemini:
+                    const geminiApiKeyInput = inputElementComponent(
+                        {
+                            app,
+                            placeholder: t(Translations.GEMINI_API_KEY_USER_PLACEHOLDER, language),
+                            label: t(Translations.GEMINI_API_KEY_USER_LABEL, language),
+                            optional: false,
+                            initialValue: existingPreference.llmConfiguration?.gemini?.apiKey,
+                        },
+                        {
+                            blockId: UserPreferenceModalEnum.GEMINI_API_KEY_BLOCK_ID,
+                            actionId: UserPreferenceModalEnum.GEMINI_API_KEY_ACTION_ID,
+                        },
+                    );
+                    blocks.push(geminiApiKeyInput);
+                    break;
+
+                case LLMProviderEnum.Groq:
+                    const groqApiKeyInput = inputElementComponent(
+                        {
+                            app,
+                            placeholder: t(Translations.GROQ_API_KEY_USER_PLACEHOLDER, language),
+                            label: t(Translations.GROQ_API_KEY_USER_LABEL, language),
+                            optional: false,
+                            initialValue: existingPreference.llmConfiguration?.groq?.apiKey,
+                        },
+                        {
+                            blockId: UserPreferenceModalEnum.GROQ_API_KEY_BLOCK_ID,
+                            actionId: UserPreferenceModalEnum.GROQ_API_KEY_ACTION_ID,
+                        },
+                    );
+                    blocks.push(groqApiKeyInput);
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
     const submitButton = elementBuilder.addButton(
