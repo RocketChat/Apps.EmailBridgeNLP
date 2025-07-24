@@ -50,8 +50,6 @@ export const es = {
     Disconnect_Success: "Cuenta de correo electrónico cerrada exitosamente.",
     Disconnect_Failed: "Error al cerrar sesión de tu cuenta de correo electrónico.",
 
-    // Login success notifications (webhook)
-    Login_Success_Notification: "✅ **¡Inicio de sesión exitoso!**\n\nAhora estás conectado a **__provider__** como **__email__**.\n\n¡Ya puedes usar las funciones de EmailBridge NLP!",
 
     // Welcome message content (onInstall)
     Welcome_Title: "**Aplicación Email Assistant**",
@@ -86,6 +84,8 @@ export const es = {
         
         ¡Gracias por elegir **Email Assistant** - Tu Asistente de Email con IA! 🤖
         `,
+        
+    Login_Success_Notification: "**¡Inicio de sesión exitoso!**\n\nAhora estás conectado a **__provider__** como **__email__**.✅ ",
 
     // Handler messages
     Already_Logged_In: "Ya has iniciado sesión con **__provider__** como **__email__**.\n\nSi quieres cerrar sesión, usa `/email logout`.",
