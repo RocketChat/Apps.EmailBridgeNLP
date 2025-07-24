@@ -76,8 +76,8 @@ export const pl = {
         • Kategorie emaili (praca, osobiste, powiadomienia)
         
         ⚙️ **Obsługiwani Dostawcy:**
-        • **Gmail** - Pełna integracja OAuth
-        • **Outlook** - Microsoft 365 i Outlook.com
+        • **Gmail**
+        • **Outlook**
         
         🌍 **Wsparcie Wielojęzyczne:**
         Dostępne w języku angielskim, hiszpańskim, rosyjskim, niemieckim, polskim i portugalskim

@@ -51,13 +51,14 @@ export const en = {
     Disconnect_Failed: "Failed to log out from your email account.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "✅ **Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+    Login_Success_Notification: "\n**Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
 
     // Welcome message content (onInstall)
     Welcome_Title: "**Email Assistant**",
     Welcome_Description: "**Installed and Ready to Connect to Your Email Directly from RocketChat!**",
     Welcome_Text: "Welcome to **Email Assistant** in RocketChat!",
     Welcome_Message: `
+
         🚀 **Get Started in 3 Easy Steps:**
         
         1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
@@ -67,18 +68,18 @@ export const en = {
         📧 **What You Can Do:**
         • **Smart Email Management**: "send email to @John.doe about the meeting"
         • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
-        • **Quick Stats**: Get daily email statistics. Use \`/email stats\`.
+        • **Quick Stats**: Get email statistics. Use \`/email stats\`.
         
         📊 **Email Statistics Feature:**
-        Get personalized daily reports showing:
+        Get personalized email statistics report showing:
         • Total emails received and sent
         • Top senders and recipients
-        • Email categories (work, personal, notifications)
+        • Email categories (general, calendar, github, etc.)
         
         ⚙️ **Supported Providers:**
-        • **Gmail** - Full OAuth integration
-        • **Outlook** - Microsoft 365 and Outlook.com
-        
+        • **Gmail** 
+        • **Outlook**
+
         🌍 **Multi-Language Support:**
         Available in English, Spanish, Russian, German, Polish, and Portuguese
         

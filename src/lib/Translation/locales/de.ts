@@ -51,7 +51,7 @@ export const de = {
     Disconnect_Failed: "Fehler beim Abmelden von Ihrem E-Mail-Konto.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "✅ **Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.\n\nSie können jetzt EmailBridge NLP-Funktionen verwenden!",
+    Login_Success_Notification: "\n**Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.\n\nSie können jetzt EmailBridge NLP-Funktionen verwenden!",
 
     // Welcome message content (onInstall)
     Welcome_Title: "**Email Assistant**",
@@ -76,8 +76,8 @@ export const de = {
         • E-Mail-Kategorien (Arbeit, Privat, Benachrichtigungen)
         
         ⚙️ **Unterstützte Anbieter:**
-        • **Gmail** - Vollständige OAuth-Integration
-        • **Outlook** - Microsoft 365 und Outlook.com
+        • **Gmail**
+        • **Outlook**
         
         🌍 **Mehrsprachige Unterstützung:**
         Verfügbar in Englisch, Spanisch, Russisch, Deutsch, Polnisch und Portugiesisch
@@ -173,6 +173,11 @@ export const de = {
     Error_OAuth_Callback_Failed: "OAuth-Callback fehlgeschlagen. Bitte versuchen Sie den Authentifizierungsprozess erneut.",
     Error_Settings_Not_Found: "E-Mail-Einstellungen nicht konfiguriert. Bitte kontaktieren Sie Ihren Administrator.",
     Error_Provider_Mismatch: "E-Mail-Anbieter-Konfigurationsfehler. Bitte kontaktieren Sie Ihren Administrator.",
+
+    // Admin Configuration Error Messages
+    Admin_Config_Missing_OAuth_Settings: "⚙️ **Administrator-Setup Erforderlich**\n\n**__provider__ Authentifizierung ist nicht konfiguriert.**\n\nDer Administrator muss OAuth-Einstellungen in den App-Einstellungen konfigurieren:\n\n**Erforderliche Einstellungen:**\n• Client ID\n• Client Secret\n• Redirect URI\n\nBitte kontaktieren Sie Ihren Systemadministrator, um die Einrichtung abzuschließen.",
+    Admin_Config_Missing_Gmail_Settings: "⚙️ **Gmail OAuth Nicht Konfiguriert**\n\nIhr Administrator muss Gmail-Authentifizierung in den App-Einstellungen einrichten.\n\n**Fehlende Konfiguration:**\n• Google OAuth Client ID\n• Google OAuth Client Secret\n• OAuth Redirect URI\n\nBitte kontaktieren Sie Ihren Administrator, um diese Einstellungen zu konfigurieren.",
+    Admin_Config_Missing_Outlook_Settings: "⚙️ **Outlook OAuth Nicht Konfiguriert**\n\nIhr Administrator muss Outlook-Authentifizierung in den App-Einstellungen einrichten.\n\n**Fehlende Konfiguration:**\n• Outlook OAuth Client ID\n• Outlook OAuth Client Secret\n• Outlook Redirect URI\n\nBitte kontaktieren Sie Ihren Administrator, um diese Einstellungen zu konfigurieren.",
 
     // Success Messages
     Success_Connection_Established: "E-Mail-Verbindung erfolgreich hergestellt ✅",
