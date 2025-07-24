@@ -24,8 +24,8 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
-import { handleError } from '../helper/errorHandler';
-import { getLLMSettings, getEffectiveLLMSettings } from '../config/SettingsManager';
+import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
+import { getEffectiveLLMSettings } from '../config/SettingsManager';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 
 export class NLQueryHandler {
@@ -152,7 +152,7 @@ export class NLQueryHandler {
             this.app.getLogger().error('LLM processing error:', error);
             return {
                 toolCalls: null,
-                error: this.categorizeError(error)
+                error: handleLLMErrorAndGetMessage(this.app, 'NLQueryHandler', error, this.language)
             };
         }
     }
@@ -186,24 +186,7 @@ export class NLQueryHandler {
         return !errorType || notifiableErrors.includes(errorType);
     }
 
-    private categorizeError(error: any): string {
-        const errorMessage = error.message?.toLowerCase() || '';
 
-        if (errorMessage.includes('network') || errorMessage.includes('connection') || errorMessage.includes('timeout')) {
-            return t(Translations.ERROR_NETWORK_FAILURE, this.language);
-        }
-
-        if (errorMessage.includes('auth') || errorMessage.includes('permission') || errorMessage.includes('unauthorized')) {
-            return t(Translations.ERROR_PERMISSION_DENIED, this.language);
-        }
-
-        if (errorMessage.includes('not found') || errorMessage.includes('missing')) {
-            return t(Translations.ERROR_EMAIL_DATA_UNAVAILABLE, this.language);
-        }
-
-        // Default to a user-friendly generic error
-        return t(Translations.COMMON_UNKNOWN_ERROR, this.language);
-    }
 
     private async handleToolExecution(toolCall: IToolCall, appUser: IUser): Promise<void> {
         // Parse tool arguments - LLM now provides clean JSON
@@ -263,7 +246,7 @@ export class NLQueryHandler {
         } catch (error) {
             this.app.getLogger().error('Error handling email tools:', error);
             await this.sendUserFriendlyError(
-                this.categorizeError(error),
+                handleLLMErrorAndGetMessage(this.app, 'Email Tools Handler', error, this.language),
                 appUser,
                 'data_processing_error'
             );
@@ -450,7 +433,7 @@ export class NLQueryHandler {
         } catch (error) {
             this.app.getLogger().error('Error executing tool:', error);
             await this.sendUserFriendlyError(
-                this.categorizeError(error),
+                handleLLMErrorAndGetMessage(this.app, 'Tool Execution', error, this.language),
                 appUser,
                 'tool_execution_error'
             );

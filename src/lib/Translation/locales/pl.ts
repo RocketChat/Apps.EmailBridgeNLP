@@ -274,7 +274,7 @@ export const pl = {
 
     // LLM Error Messages
     LLM_No_Response: "Nie otrzymano odpowiedzi z usługi AI. Spróbuj ponownie.",
-    LLM_No_Choices: "Usługa AI zwróciła pustą odpowiedź. Spróbuj przeformułować swoje zapytanie.",
+    LLM_No_Choices: "Błąd podczas łączenia z usługą AI. Sprawdź swój klucz API lub URL.",
     LLM_Request_Failed: "Komunikacja z usługą AI nie powiodła się",
 
     // Summarization Messages

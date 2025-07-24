@@ -288,7 +288,7 @@ export const en = {
 
     // LLM Error Messages
     LLM_No_Response: "No response received from the AI service. Please try again.",
-    LLM_No_Choices: "AI service returned an empty response. Please try rephrasing your request.",
+    LLM_No_Choices: "Error connecting to LLM provider. Please check your API key or URL.",
     LLM_Request_Failed: "Failed to communicate with AI service",
 
     // Summarization Messages

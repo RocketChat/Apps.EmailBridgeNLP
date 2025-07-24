@@ -280,7 +280,7 @@ export const pt = {
 
     // LLM Error Messages
     LLM_No_Response: "Nenhuma resposta recebida do serviço de IA. Tente novamente.",
-    LLM_No_Choices: "O serviço de IA retornou uma resposta vazia. Reformule sua solicitação.",
+    LLM_No_Choices: "Erro ao conectar com o serviço de IA. Verifique sua chave API ou URL.",
     LLM_Request_Failed: "Falha na comunicação com o serviço de IA",
 
     // Summarization Messages

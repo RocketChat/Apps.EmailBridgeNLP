@@ -280,7 +280,7 @@ export const ru = {
 
     // LLM Error Messages
     LLM_No_Response: "Не получен ответ от службы ИИ. Попробуйте еще раз.",
-    LLM_No_Choices: "Служба ИИ вернула пустой ответ. Переформулируйте свой запрос.",
+    LLM_No_Choices: "Ошибка при подключении к службе ИИ. Проверьте ваш API-ключ или URL.",
     LLM_Request_Failed: "Ошибка связи со службой ИИ",
 
     // Summarization Messages

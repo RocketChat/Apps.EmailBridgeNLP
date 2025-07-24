@@ -5,8 +5,9 @@ import { LlmPrompts } from '../constants/prompts';
 import { IToolCall, ILLMResponse } from '../definition/lib/ToolInterfaces';
 import { LlmTools } from '../enums/LlmTools';
 import { ILLMSettings } from '../definition/lib/ILLMSettings';
-import { handleErrorAndGetMessage } from '../helper/errorHandler';
+import { handleErrorAndGetMessage, handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { t, Language } from '../lib/Translation/translation';
+import { LLMProviderEnum } from '../definition/lib/IUserPreferences';
 
 export class LLMService {
     private readonly llmSettings: ILLMSettings;
@@ -55,13 +56,13 @@ export class LLMService {
         
         // Route to appropriate provider based on settings
         switch (this.llmSettings.provider) {
-            case 'openai':
+            case LLMProviderEnum.OpenAI:
                 return await this.processWithOpenAI(systemPromptWithDates, query);
-            case 'gemini':
+            case LLMProviderEnum.Gemini:
                 return await this.processWithGemini(systemPromptWithDates, query);
-            case 'groq':
+            case LLMProviderEnum.Groq:
                 return await this.processWithGroq(systemPromptWithDates, query);
-            case 'self-hosted':
+            case LLMProviderEnum.SelfHosted:
             default:
                 return await this.processWithSelfHosted(systemPromptWithDates, query);
         }
@@ -120,7 +121,7 @@ export class LLMService {
 
             return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
-            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'OpenAI Provider', error);
+            const errorMessage = handleLLMErrorAndGetMessage(this.app, 'OpenAI Provider', error, this.language);
             throw new Error(errorMessage);
         }
     }
@@ -194,7 +195,7 @@ export class LLMService {
             const parsed = this.parseContentForTools(content);
             return { toolCalls: parsed.tools, rawResponse: llmResponse, error: parsed.error };
         } catch (error) {
-            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Gemini Provider', error);
+            const errorMessage = handleLLMErrorAndGetMessage(this.app, 'Gemini Provider', error, this.language);
             throw new Error(errorMessage);
         }
     }
@@ -254,7 +255,7 @@ export class LLMService {
 
             return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
-            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Groq Provider', error);
+            const errorMessage = handleLLMErrorAndGetMessage(this.app, 'Groq Provider', error, this.language);
             throw new Error(errorMessage);
         }
     }
@@ -271,21 +272,9 @@ export class LLMService {
         if (apiUrl.endsWith('/')) {
             apiUrl = apiUrl.slice(0, -1);
         }
-        
-        // Add /v1/chat/completions if not already present (common for OpenAI-compatible APIs)
-        if (!apiUrl.includes('/chat/completions') && !apiUrl.includes('/generate') && !apiUrl.includes('/api/chat')) {
-            apiUrl += '/v1/chat/completions';
-        }
-
-        // Add debugging info
-        this.app.getLogger().info('Self-hosted LLM Request:', {
-            originalUrl: this.llmSettings.selfHostedUrl,
-            processedUrl: apiUrl,
-            query: query
-        });
 
         const payload = {
-            model: 'llama3', // Default model name for self-hosted
+            model: 'llama3',
             messages: [
                 {
                     role: 'system',
@@ -308,10 +297,7 @@ export class LLMService {
         };
 
         try {
-            this.app.getLogger().info('Making request to self-hosted LLM:', {
-                url: apiUrl,
-                headers: request.headers
-            });
+
             
             const response = await this.http.post(apiUrl, request);
 
@@ -348,7 +334,7 @@ export class LLMService {
                 response: error.response?.data
             });
             
-            const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Self-hosted Provider', error);
+            const errorMessage = handleLLMErrorAndGetMessage(this.app, 'Self-hosted Provider', error, this.language);
             throw new Error(errorMessage);
         }
     }
@@ -362,16 +348,16 @@ export class LLMService {
             let response;
             
             switch (this.llmSettings.provider) {
-                case 'openai':
+                case LLMProviderEnum.OpenAI:
                     response = await this.generateSummaryWithOpenAI(prompt);
                     break;
-                case 'gemini':
+                case LLMProviderEnum.Gemini:
                     response = await this.generateSummaryWithGemini(prompt);
                     break;
-                case 'groq':
+                case LLMProviderEnum.Groq:
                     response = await this.generateSummaryWithGroq(prompt);
                     break;
-                case 'self-hosted':
+                case LLMProviderEnum.SelfHosted:
                 default:
                     response = await this.generateSummaryWithSelfHosted(prompt);
                     break;
@@ -518,7 +504,7 @@ export class LLMService {
         }
 
         const payload = {
-            model: 'llama3', // Default model name for self-hosted
+            model: 'llama3',
             messages: [
                 {
                     role: 'system',
@@ -614,7 +600,6 @@ export class LLMService {
                 return { tools: [toolCall] };
             }
 
-            // If no function_call found but it's valid JSON
                 return { tools: [], error: t(Translations.LLM_NO_TOOL_DETECTED, this.language) };
 
         } catch (e) {

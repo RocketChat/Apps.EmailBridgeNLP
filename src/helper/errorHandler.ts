@@ -42,6 +42,23 @@ export function handleErrorAndGetMessage(
     return categorizeError(error, language);
 }
 
+export function handleLLMErrorAndGetMessage(
+    app: EmailBridgeNlpApp,
+    context: string,
+    error: Error,
+    language?: Language,
+): string {
+    app.getLogger().error(`${context} error:`, error);
+
+    // For LLM errors, return the raw error message if available
+    // This includes API key issues, invalid URLs, rate limits, etc.
+    if (error.message && error.message.trim() !== '') {
+        return error.message;
+    }
+    
+    return t(Translations.LLM_API_OR_URL_ERROR, language);
+}
+
 function categorizeError(error: Error, language: Language): string {
     const errorMessage = error.message?.toLowerCase() || '';
 

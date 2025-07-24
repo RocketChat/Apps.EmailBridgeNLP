@@ -280,7 +280,7 @@ export const de = {
 
     // LLM Error Messages
     LLM_No_Response: "Keine Antwort vom KI-Dienst erhalten. Bitte versuchen Sie es erneut.",
-    LLM_No_Choices: "KI-Dienst gab eine leere Antwort zurück. Bitte formulieren Sie Ihre Anfrage neu.",
+    LLM_No_Choices: "Fehler beim Verbinden mit dem KI-Dienst. Bitte überprüfen Sie Ihren API-Schlüssel oder URL.",
     LLM_Request_Failed: "Kommunikation mit KI-Dienst fehlgeschlagen",
 
     // Summarization Messages
