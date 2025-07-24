@@ -20,7 +20,7 @@ export const de = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth Redirect URI für Outlook - sollte enden mit /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "verbinden, status, trennen, hilfe, bericht",
+    Email_Command_Params: "login, logout, config, llm-config, help, report",
     Email_Command_Description: "Verbinden und verwalten Sie Ihre E-Mail-Konto-Integration mit KI-Unterstützung.",
 
     // OAuth Pages
@@ -35,7 +35,7 @@ export const de = {
     // Action Labels
     Connect_Email_Action_Label: "E-Mail-Konto verbinden",
     Check_Status_Action_Label: "Verbindungsstatus prüfen",
-    Disconnect_Email_Action_Label: "E-Mail trennen",
+    Disconnect_Email_Action_Label: "Abmelden von E-Mail-Konto",
     Send_Email_Action_Label: "E-Mail senden",
     View_Inbox_Action_Label: "Posteingang anzeigen",
 
@@ -47,8 +47,8 @@ export const de = {
     Authentication_Required: "Authentifizierung erforderlich. Bitte verbinden Sie Ihr E-Mail-Konto.",
     Connection_Status_Connected: "E-Mail-Konto ist verbunden und einsatzbereit.",
     Connection_Status_Disconnected: "Kein E-Mail-Konto verbunden.",
-    Disconnect_Success: "E-Mail-Konto erfolgreich getrennt.",
-    Disconnect_Failed: "Trennen Ihres E-Mail-Kontos fehlgeschlagen.",
+    Disconnect_Success: "E-Mail-Konto erfolgreich abgemeldet.",
+    Disconnect_Failed: "Abmelden Ihres E-Mail-Kontos fehlgeschlagen.",
 
     // Handler messages
     Already_Logged_In: "Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",

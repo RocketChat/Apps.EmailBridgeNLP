@@ -20,7 +20,7 @@ export const en = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "connect, status, disconnect, help, report",
+    Email_Command_Params: "login, logout, config, llm-config, help, report",
     Email_Command_Description: "Connect and manage your email account integration with AI assistance.",
 
     // OAuth Pages
@@ -34,8 +34,8 @@ export const en = {
 
     // Action Labels
     Connect_Email_Action_Label: "Connect Email Account",
-    Check_Status_Action_Label: "Check Connection Status",
-    Disconnect_Email_Action_Label: "Disconnect Email",
+    Check_Status_Action_Label: "Check Logged In Status",
+    Disconnect_Email_Action_Label: "Logout from Email Account",
     Send_Email_Action_Label: "Send Email",
     View_Inbox_Action_Label: "View Inbox",
 
@@ -47,11 +47,11 @@ export const en = {
     Authentication_Required: "Authentication required. Please connect your email account.",
     Connection_Status_Connected: "Email account is connected and ready to use.",
     Connection_Status_Disconnected: "No email account is connected.",
-    Disconnect_Success: "Email account disconnected successfully.",
-    Disconnect_Failed: "Failed to disconnect your email account.",
+    Disconnect_Success: "Email account logged out successfully.",
+    Disconnect_Failed: "Failed to log out from your email account.",
 
     // Handler messages
-    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to disconnect, use `/email logout`.",
+    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to Logout, use `/email logout`.",
     Outlook_Coming_Soon: "**Outlook authentication will be available soon!**\n\nFor now, please use **Gmail** for email authentication.\n\n",
     Provider_Not_Implemented: "**__provider__ authentication is not yet implemented.**\n\nCurrently only **Gmail** is supported for authentication.\n\n",
     Connect_Account_Message: "**Connect your __provider__ account to Rocket Chat**",

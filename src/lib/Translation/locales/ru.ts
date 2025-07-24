@@ -20,7 +20,7 @@ export const ru = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI для Outlook - должен заканчиваться на /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "подключить, статус, отключить, помощь, отчет",
+    Email_Command_Params: "login, logout, config, llm-config, help, report",
     Email_Command_Description: "Подключите и управляйте интеграцией вашей учетной записи электронной почты с помощью ИИ.",
 
     // OAuth Pages
@@ -47,8 +47,8 @@ export const ru = {
     Authentication_Required: "Требуется аутентификация. Подключите свою учетную запись электронной почты.",
     Connection_Status_Connected: "Учетная запись электронной почты подключена и готова к использованию.",
     Connection_Status_Disconnected: "Нет подключенной учетной записи электронной почты.",
-    Disconnect_Success: "Учетная запись электронной почты успешно отключена.",
-    Disconnect_Failed: "Не удалось отключить вашу учетную запись электронной почты.",
+    Disconnect_Success: "Учетная запись электронной почты успешно вышла из системы.",
+    Disconnect_Failed: "Не удалось выйти из учетной записи электронной почты.",
 
     // Handler messages
     Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите отключиться, используйте `/email logout`.",

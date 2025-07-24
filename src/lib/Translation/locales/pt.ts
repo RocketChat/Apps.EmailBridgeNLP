@@ -20,7 +20,7 @@ export const pt = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI para Outlook - deve terminar com /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "conectar, status, desconectar, ajuda, relatório",
+    Email_Command_Params: "login, logout, config, llm-config, help, report",
     Email_Command_Description: "Conecte e gerencie a integração da sua conta de email com assistência de IA.",
 
     // OAuth Pages
@@ -47,8 +47,8 @@ export const pt = {
     Authentication_Required: "Autenticação necessária. Conecte sua conta de email.",
     Connection_Status_Connected: "Conta de email está conectada e pronta para uso.",
     Connection_Status_Disconnected: "Nenhuma conta de email está conectada.",
-    Disconnect_Success: "Conta de email desconectada com sucesso.",
-    Disconnect_Failed: "Falha ao desconectar sua conta de email.",
+    Disconnect_Success: "Conta de email fechada com sucesso.",
+    Disconnect_Failed: "Falha ao fechar sessão da sua conta de email.",
 
     // Handler messages
     Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser desconectar, use `/email logout`.",
