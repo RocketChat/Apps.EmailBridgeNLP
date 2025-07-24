@@ -37,6 +37,8 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
             language: preference.language || currentPreference.language,
             emailProvider: preference.emailProvider || currentPreference.emailProvider,
             reportCategories: userSelectedCategories,
+            showProviderWarning: preference.showProviderWarning || currentPreference.showProviderWarning,
+            llmConfiguration: preference.llmConfiguration || currentPreference.llmConfiguration,
         };
 
         const association = new RocketChatAssociationRecord(

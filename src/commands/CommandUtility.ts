@@ -66,6 +66,13 @@ export class CommandUtility implements ICommandUtility {
         }
 
         const command = this.params[0].toLowerCase();
+        
+        // Handle "llm config" command
+        if (command === CommandParam.LLM_CONFIG && this.params.length >= 2 && this.params[1].toLowerCase() === 'config') {
+            await handler.LLMConfig();
+            return;
+        }
+        
         switch (command) {
             case CommandParam.HELP:
                 await handler.Help();

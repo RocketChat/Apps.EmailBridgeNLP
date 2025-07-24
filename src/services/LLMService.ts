@@ -264,6 +264,26 @@ export class LLMService {
             throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, this.language));
         }
 
+        // Ensure proper endpoint format for self-hosted LLMs
+        let apiUrl = this.llmSettings.selfHostedUrl.trim();
+        
+        // Remove trailing slash if present
+        if (apiUrl.endsWith('/')) {
+            apiUrl = apiUrl.slice(0, -1);
+        }
+        
+        // Add /v1/chat/completions if not already present (common for OpenAI-compatible APIs)
+        if (!apiUrl.includes('/chat/completions') && !apiUrl.includes('/generate') && !apiUrl.includes('/api/chat')) {
+            apiUrl += '/v1/chat/completions';
+        }
+
+        // Add debugging info
+        this.app.getLogger().info('Self-hosted LLM Request:', {
+            originalUrl: this.llmSettings.selfHostedUrl,
+            processedUrl: apiUrl,
+            query: query
+        });
+
         const payload = {
             model: 'llama3', // Default model name for self-hosted
             messages: [
@@ -288,7 +308,12 @@ export class LLMService {
         };
 
         try {
-            const response = await this.http.post(this.llmSettings.selfHostedUrl, request);
+            this.app.getLogger().info('Making request to self-hosted LLM:', {
+                url: apiUrl,
+                headers: request.headers
+            });
+            
+            const response = await this.http.post(apiUrl, request);
 
             if (!response?.data) {
                 throw new Error(t(Translations.LLM_NO_RESPONSE, this.language));
@@ -313,6 +338,16 @@ export class LLMService {
 
             return { toolCalls, rawResponse: llmResponse, error };
         } catch (error) {
+            // Enhanced error logging for self-hosted LLM debugging
+            this.app.getLogger().error('Self-hosted LLM Error Details:', {
+                originalUrl: this.llmSettings.selfHostedUrl,
+                processedUrl: apiUrl,
+                error: error.message,
+                errorType: error.constructor.name,
+                statusCode: error.statusCode,
+                response: error.response?.data
+            });
+            
             const errorMessage = handleErrorAndGetMessage(this.app, this.language, 'Self-hosted Provider', error);
             throw new Error(errorMessage);
         }

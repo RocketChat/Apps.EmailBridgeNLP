@@ -7,6 +7,7 @@ import {
 import {
     IUIKitResponse,
     UIKitViewSubmitInteractionContext,
+    UIKitInteractionType,
 } from '@rocket.chat/apps-engine/definition/uikit';
 
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
@@ -18,20 +19,23 @@ import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
+import { handleErrorAndGetMessage } from '../helper/errorHandler';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ActionIds } from '../enums/ActionIds';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { Translations } from '../constants/Translations';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
+import { LLMConfigurationModalEnum } from '../enums/modals/LLMConfigurationModal';
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { handleError } from '../helper/errorHandler';
+import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
-    
+
     constructor(
         protected readonly app: EmailBridgeNlpApp,
         protected readonly read: IRead,
@@ -50,6 +54,10 @@ export class ExecuteViewSubmitHandler {
             return await this.handleUserPreferenceSubmit(user, view);
         }
 
+        if (view.id === LLMConfigurationModalEnum.VIEW_ID) {
+            return await this.handleLLMConfigurationSubmit(user, view);
+        }
+
         if (view.id.startsWith(SendEmailModalEnum.VIEW_ID)) {
             return await this.handleSendEmailSubmit(user, view);
         }
@@ -59,7 +67,7 @@ export class ExecuteViewSubmitHandler {
 
     private async handleUserPreferenceSubmit(user: any, view: any): Promise<IUIKitResponse> {
         let room: IRoom | undefined;
-        
+
         try {
             // Get room context first (outside try block to avoid scope issues)
             const roomInteractionStorage = new RoomInteractionStorage(
@@ -87,7 +95,7 @@ export class ExecuteViewSubmitHandler {
                     this.persistence,
                     user.id,
                 );
-                
+
                 if (room) {
                     await sendNotification(this.read, this.modify, user, room, {
                         message: t(Translations.ERROR_FILL_REQUIRED_FIELDS, currentLanguage)
@@ -166,19 +174,19 @@ export class ExecuteViewSubmitHandler {
             if (room) {
                 if (oldEmailProvider !== emailProviderValue && wasLoggedOut) {
                     // Provider changed and user was logged out - show login button for new provider
-                    const logoutMessage = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, { 
+                    const logoutMessage = t(Translations.PROVIDER_CHANGED_AUTO_LOGOUT, userLanguage, {
                         oldProvider: getProviderDisplayName(oldEmailProvider)
                     });
-                    const loginMessage = t(Translations.PROVIDER_CHANGED_LOGIN_MESSAGE, userLanguage, { 
+                    const loginMessage = t(Translations.PROVIDER_CHANGED_LOGIN_MESSAGE, userLanguage, {
                         provider: getProviderDisplayName(emailProviderValue as EmailProviders)
                     });
                     const combinedMessage = `${logoutMessage}\n${loginMessage}`;
-                    
+
                     await this.sendNotificationWithLoginButton(
-                        user, 
-                        room, 
-                        combinedMessage, 
-                        emailProviderValue as EmailProviders, 
+                        user,
+                        room,
+                        combinedMessage,
+                        emailProviderValue as EmailProviders,
                         userLanguage
                     );
                 } else if (hasChanges) {
@@ -203,7 +211,7 @@ export class ExecuteViewSubmitHandler {
                 if (room) {
                     // Determine specific error type and use appropriate granular message
                     let errorMessage: string;
-                    
+
                     if (error.message?.includes('network') || error.message?.includes('connection')) {
                         errorMessage = t(Translations.ERROR_NETWORK_FAILURE, currentLanguage);
                     } else if (error.message?.includes('config') || error.message?.includes('setting')) {
@@ -228,7 +236,7 @@ export class ExecuteViewSubmitHandler {
 
     private async handleSendEmailSubmit(user: any, view: any): Promise<IUIKitResponse> {
         let room: IRoom | undefined;
-        
+
         try {
             // Get room context
             const roomInteractionStorage = new RoomInteractionStorage(
@@ -303,11 +311,11 @@ export class ExecuteViewSubmitHandler {
 
                     const message = await this.read.getMessageReader().getById(messageId);
                     if (!message) return this.context.getInteractionResponder().successResponse();
-                    
+
                     // Replace the buttons with a confirmation message
                     const messageBuilder = await this.modify.getUpdater().message(messageId, appUser);
                     const blockBuilder = this.modify.getCreator().getBlockBuilder();
-                    
+
                     blockBuilder.addSectionBlock({
                         text: blockBuilder.newMarkdownTextObject('Email sent.')
                     });
@@ -365,10 +373,10 @@ export class ExecuteViewSubmitHandler {
     }
 
     private async sendNotificationWithLoginButton(
-        user: any, 
-        room: IRoom, 
-        message: string, 
-        provider: EmailProviders, 
+        user: any,
+        room: IRoom,
+        message: string,
+        provider: EmailProviders,
         language: Language
     ): Promise<void> {
         try {
@@ -421,4 +429,180 @@ export class ExecuteViewSubmitHandler {
             await sendNotification(this.read, this.modify, user, room, { message });
         }
     }
-} 
+
+    private async handleLLMConfigurationSubmit(user: any, view: any): Promise<IUIKitResponse> {
+        let room: IRoom | undefined;
+
+        try {
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            room = roomId ? await this.read.getRoomReader().getById(roomId) : undefined;
+
+            const currentLanguage = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            const llmUsagePreferenceValue = this.getFormValue(view.state, LLMConfigurationModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID);
+            const llmProviderValue = this.getFormValue(view.state, LLMConfigurationModalEnum.LLM_PROVIDER_DROPDOWN_ACTION_ID);
+            const selfHostedUrlValue = this.getFormValue(view.state, LLMConfigurationModalEnum.SELF_HOSTED_URL_ACTION_ID);
+            const openaiApiKeyValue = this.getFormValue(view.state, LLMConfigurationModalEnum.OPENAI_API_KEY_ACTION_ID);
+            const geminiApiKeyValue = this.getFormValue(view.state, LLMConfigurationModalEnum.GEMINI_API_KEY_ACTION_ID);
+            const groqApiKeyValue = this.getFormValue(view.state, LLMConfigurationModalEnum.GROQ_API_KEY_ACTION_ID);
+
+            if (llmUsagePreferenceValue === LLMUsagePreferenceEnum.Personal) {
+                const validationError = this.validatePersonalLLMConfig(
+                    llmProviderValue,
+                    selfHostedUrlValue,
+                    openaiApiKeyValue,
+                    geminiApiKeyValue,
+                    groqApiKeyValue,
+                    currentLanguage
+                );
+
+                if (validationError) {
+                    if (room) {
+                        await sendNotification(this.read, this.modify, user, room, {
+                            message: validationError
+                        });
+                    }
+
+                    return this.context.getInteractionResponder().errorResponse();
+                }
+            }
+
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const existingPreference = await userPreferenceStorage.getUserPreference();
+
+            const currentLLMConfig = existingPreference.llmConfiguration || {} as any;
+            const updatedPreference = {
+                ...existingPreference,
+                llmConfiguration: {
+                    ...currentLLMConfig,
+                    llmUsagePreference: llmUsagePreferenceValue || currentLLMConfig.llmUsagePreference || LLMUsagePreferenceEnum.Workspace,
+                    llmProvider: llmProviderValue || currentLLMConfig.llmProvider || LLMProviderEnum.Groq,
+                    ...(selfHostedUrlValue && { selfHosted: { url: selfHostedUrlValue } }),
+                    ...(openaiApiKeyValue && { openai: { apiKey: openaiApiKeyValue } }),
+                    ...(geminiApiKeyValue && { gemini: { apiKey: geminiApiKeyValue } }),
+                    ...(groqApiKeyValue && { groq: { apiKey: groqApiKeyValue } }),
+                    // Preserve existing API keys if no new values provided
+                    ...(!selfHostedUrlValue && currentLLMConfig.selfHosted && { selfHosted: currentLLMConfig.selfHosted }),
+                    ...(!openaiApiKeyValue && currentLLMConfig.openai && { openai: currentLLMConfig.openai }),
+                    ...(!geminiApiKeyValue && currentLLMConfig.gemini && { gemini: currentLLMConfig.gemini }),
+                    ...(!groqApiKeyValue && currentLLMConfig.groq && { groq: currentLLMConfig.groq }),
+                },
+            };
+
+            await userPreferenceStorage.storeUserPreference(updatedPreference);
+
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, {
+                    message: t(Translations.LLM_CONFIGURATION_SUCCESS, currentLanguage)
+                });
+            }
+
+            return this.context.getInteractionResponder().successResponse();
+
+        } catch (error) {
+            this.app.getLogger().error('Error saving LLM configuration:', error);
+
+            try {
+                if (room) {
+                    const errorLanguage = await getUserPreferredLanguage(
+                        this.read.getPersistenceReader(),
+                        this.persistence,
+                        user.id,
+                    );
+                    if (error.message?.includes('api') ||
+                        error.message?.includes('key') ||
+                        error.message?.includes('token') ||
+                        error.message?.includes('unauthorized') ||
+                        error.message?.includes('invalid') ||
+                        error.message?.includes('authentication') ||
+                        error.message?.includes('forbidden')) {
+
+                        await sendNotification(this.read, this.modify, user, room, {
+                            message: `LLM Configuration Error: ${error.message}`
+                        });
+                    } else {
+                        await handleError(
+                            this.app,
+                            this.read,
+                            this.modify,
+                            user,
+                            room,
+                            errorLanguage,
+                            'LLM Configuration',
+                            error as Error
+                        );
+                    }
+                }
+            } catch (notificationError) {
+                this.app.getLogger().error('Error sending notification:', notificationError);
+            }
+
+            return this.context.getInteractionResponder().successResponse();
+        }
+    }
+
+    private validatePersonalLLMConfig(
+        provider: string,
+        selfHostedUrl: string,
+        openaiApiKey: string,
+        geminiApiKey: string,
+        groqApiKey: string,
+        language: Language
+    ): string | null {
+        if (!provider) {
+            return t(Translations.LLM_CONFIG_PROVIDER_REQUIRED, language);
+        }
+
+        switch (provider) {
+            case LLMProviderEnum.SelfHosted:
+                if (!selfHostedUrl || selfHostedUrl.trim() === '') {
+                    return t(Translations.LLM_CONFIG_SELFHOSTED_URL_REQUIRED, language);
+                }
+                try {
+                    new URL(selfHostedUrl);
+                } catch {
+                    return t(Translations.LLM_CONFIG_INVALID_URL, language);
+                }
+                break;
+
+            case LLMProviderEnum.OpenAI:
+                if (!openaiApiKey || openaiApiKey.trim() === '') {
+                    return t(Translations.LLM_CONFIG_OPENAI_KEY_REQUIRED, language);
+                }
+                if (!openaiApiKey.startsWith('sk-')) {
+                    return t(Translations.LLM_CONFIG_INVALID_OPENAI_KEY, language);
+                }
+                break;
+
+            case LLMProviderEnum.Gemini:
+                if (!geminiApiKey || geminiApiKey.trim() === '') {
+                    return t(Translations.LLM_CONFIG_GEMINI_KEY_REQUIRED, language);
+                }
+                break;
+
+            case LLMProviderEnum.Groq:
+                if (!groqApiKey || groqApiKey.trim() === '') {
+                    return t(Translations.LLM_CONFIG_GROQ_KEY_REQUIRED, language);
+                }
+                break;
+
+            default:
+                return t(Translations.LLM_CONFIG_INVALID_PROVIDER, language);
+        }
+
+        return null;
+    }
+}

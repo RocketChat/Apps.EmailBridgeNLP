@@ -92,6 +92,16 @@ export const Translations = {
     EMAIL_PROVIDER_PREFERENCE_LABEL: 'Email_Provider_Preference_Label',
     EMAIL_PROVIDER_PREFERENCE_DESCRIPTION: 'Email_Provider_Preference_Description',
 
+    // LLM Configuration Modal
+    LLM_CONFIGURATION_TITLE: 'LLM_Configuration_Title',
+    LLM_CONFIGURATION_BUTTON_LABEL: 'LLM_Configuration_Button_Label',
+    LLM_CONFIGURATION_UPDATE_BUTTON: 'LLM_Configuration_Update_Button',
+    LLM_CONFIGURATION_CLOSE_BUTTON: 'LLM_Configuration_Close_Button',
+    LLM_CONFIGURATION_SUCCESS: 'LLM_Configuration_Success',
+    LLM_CONFIGURATION_ERROR: 'LLM_Configuration_Error',
+    LLM_CONFIG_COMMAND: 'LLM_Config_Command',
+    LLM_API_OR_URL_ERROR: 'LLM_API_Or_URL_Error',
+
     // Language Names
     LANGUAGE: 'Language',
     LANGUAGE_EN: 'Language_EN',
@@ -250,7 +260,7 @@ export const Translations = {
     LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',
     LLM_AI_THINKING: 'LLM_AI_Thinking',
     LLM_EMAIL_READY_USER: 'LLM_Email_Ready_User',
-    LLM_TOOL_DETECTED: 'LLM_Tool_Detected', 
+    LLM_TOOL_DETECTED: 'LLM_Tool_Detected',
     LLM_NO_TOOL_DETECTED: 'LLM_No_Tool_Detected',
     LLM_ERROR_PROCESSING: 'LLM_Error_Processing',
     TOOL_CALL_RESULT: 'Tool_Call_Result',
@@ -259,7 +269,7 @@ export const Translations = {
     QUERY_PROCESSED_SUCCESS: 'Query_Processed_Success',
     INVALID_TOOL_NAME: 'Invalid_Tool_Name',
     LLM_PARSING_FAILED: 'LLM_Parsing_Failed',
-    
+
     // Tool Names (for user display)
     TOOL_SEND_EMAIL: 'Tool_Send_Email',
     TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
@@ -279,7 +289,7 @@ export const Translations = {
     SEND_EMAIL_SEND_BUTTON: 'Send_Email_Send_Button',
     SEND_EMAIL_CANCEL_BUTTON: 'Send_Email_Cancel_Button',
     SEND_EMAIL_MODAL_OPENED: 'Send_Email_Modal_Opened',
-    
+
     // Send Email Button translations
     EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',
     EMAIL_SEND_BUTTON: 'Email_Send_Button',
@@ -301,7 +311,7 @@ export const Translations = {
 
     // LLM Error Messages
     LLM_NO_RESPONSE: 'LLM_No_Response',
-    LLM_NO_CHOICES: 'LLM_No_Choices', 
+    LLM_NO_CHOICES: 'LLM_No_Choices',
     LLM_REQUEST_FAILED: 'LLM_Request_Failed',
 
     // Summarization Messages
@@ -316,7 +326,7 @@ export const Translations = {
     LLM_SUMMARY_EMAIL_READY_USER_WITH_RECIPIENTS: 'LLM_Summary_Email_Ready_User_With_Recipients',
 
     // New format constants for specific display format
-    LLM_EMAIL_TO_LABEL: 'LLM_Email_To_Label', 
+    LLM_EMAIL_TO_LABEL: 'LLM_Email_To_Label',
     LLM_EMAIL_CC_LABEL: 'LLM_Email_CC_Label',
     LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',
     LLM_EMAIL_READY_FORMATTED: 'LLM_Email_Ready_Formatted',
@@ -339,7 +349,7 @@ export const Translations = {
     GEMINI_API_KEY_DESCRIPTION: 'Gemini_API_Key_Description',
     GROQ_API_KEY_LABEL: 'Groq_API_Key_Label',
     GROQ_API_KEY_DESCRIPTION: 'Groq_API_Key_Description',
-    
+
     // User LLM Configuration Preferences
     LLM_USAGE_PREFERENCE_LABEL: 'LLM_Usage_Preference_Label',
     LLM_USAGE_PREFERENCE_PLACEHOLDER: 'LLM_Usage_Preference_Placeholder',
@@ -359,4 +369,14 @@ export const Translations = {
     GEMINI_API_KEY_USER_PLACEHOLDER: 'Gemini_API_Key_User_Placeholder',
     GROQ_API_KEY_USER_LABEL: 'Groq_API_Key_User_Label',
     GROQ_API_KEY_USER_PLACEHOLDER: 'Groq_API_Key_User_Placeholder',
-} as const; 
+
+    // LLM Configuration Validation Messages
+    LLM_CONFIG_PROVIDER_REQUIRED: 'LLM_Config_Provider_Required',
+    LLM_CONFIG_SELFHOSTED_URL_REQUIRED: 'LLM_Config_SelfHosted_URL_Required',
+    LLM_CONFIG_INVALID_URL: 'LLM_Config_Invalid_URL',
+    LLM_CONFIG_OPENAI_KEY_REQUIRED: 'LLM_Config_OpenAI_Key_Required',
+    LLM_CONFIG_INVALID_OPENAI_KEY: 'LLM_Config_Invalid_OpenAI_Key',
+    LLM_CONFIG_GEMINI_KEY_REQUIRED: 'LLM_Config_Gemini_Key_Required',
+    LLM_CONFIG_GROQ_KEY_REQUIRED: 'LLM_Config_Groq_Key_Required',
+    LLM_CONFIG_INVALID_PROVIDER: 'LLM_Config_Invalid_Provider',
+} as const;

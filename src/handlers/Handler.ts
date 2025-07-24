@@ -20,6 +20,7 @@ import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { t, Language } from '../lib/Translation/translation';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
+import { LLMConfigurationModal } from '../modal/LLMConfigurationModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
@@ -99,12 +100,17 @@ export class Handler implements IHandler {
             ),
         });
 
-        // Add user preferences button
+        // Add user preferences and LLM configuration buttons
         block.addActionsBlock({
             elements: [
                 block.newButtonElement({
                     actionId: ActionIds.USER_PREFERENCE_ACTION,
                     text: block.newPlainTextObject(t(Translations.USER_PREFERENCE_BUTTON_LABEL, this.language)),
+                    style: ButtonStyle.PRIMARY,
+                }),
+                block.newButtonElement({
+                    actionId: ActionIds.LLM_CONFIGURATION_ACTION,
+                    text: block.newPlainTextObject(t(Translations.LLM_CONFIGURATION_BUTTON_LABEL, this.language)),
                     style: ButtonStyle.PRIMARY,
                 }),
             ],
@@ -382,6 +388,56 @@ export class Handler implements IHandler {
                 this.room,
                 this.language,
                 'Config',
+                error
+            );
+        }
+    }
+
+    public async LLMConfig(): Promise<void> {
+        try {
+            // Store room ID for later use in ExecuteViewSubmitHandler
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
+            const userPreference = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            const existingPreference = await userPreference.getUserPreference();
+
+            const modal = await LLMConfigurationModal({
+                app: this.app,
+                modify: this.modify,
+                existingPreference: existingPreference,
+            });
+
+            if (!modal) {
+                throw new Error(t(Translations.ERROR_MODAL_CREATION_FAILED, this.language));
+            }
+
+            if (!this.triggerId) {
+                throw new Error(t(Translations.ERROR_TRIGGER_ID_MISSING, this.language));
+            }
+
+            await this.modify
+                .getUiController()
+                .openSurfaceView(modal, { triggerId: this.triggerId }, this.sender);
+
+        } catch (error) {
+            return handleError(
+                this.app,
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                this.language,
+                'LLMConfig',
                 error
             );
         }

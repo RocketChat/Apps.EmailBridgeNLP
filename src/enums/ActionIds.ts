@@ -6,6 +6,7 @@ export enum ActionIds {
     
     // User Preference Actions
     USER_PREFERENCE_ACTION = 'prefs',
+    LLM_CONFIGURATION_ACTION = 'llm_config',
     
     // Modal Actions (if needed for consistency)
     USER_PREFERENCE_SUBMIT = 'prefs_submit',
