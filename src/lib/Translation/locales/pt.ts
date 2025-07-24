@@ -20,7 +20,7 @@ export const pt = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI para Outlook - deve terminar com /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "login, logout, config, llm-config, help, report",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Conecte e gerencie a integração da sua conta de email com assistência de IA.",
 
     // OAuth Pages
@@ -71,7 +71,7 @@ export const pt = {
     Login_Command: "use `/email login` - Fazer login na sua conta de email",
     Logout_Command: "use `/email logout` - Fazer logout da conta de email",
     Config_Command: "use `/email config` - Abrir preferências do usuário e configurações",
-    Report_Command: "use `/email report` - Obter relatório diário de estatísticas de email",
+    Stats_Command: "use `/email stats` - Obter relatório diário de estatísticas de email",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
     Login_Action_Text: "Fazer login no __provider__",
@@ -200,14 +200,14 @@ export const pt = {
     Log_Btn_Fallback: "Falha ao criar notificação com botão de login, recorrendo à notificação de texto",
     Log_Fallback_Err: "Falha ao enviar notificação de texto de fallback",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ não é suportado para relatórios.**\n\nPor favor, entre em contato com seu administrador para assistência.",
-    Report_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar o relatório novamente.",
-    Report_Error: "❌ **Erro ao gerar relatório de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
-    Report_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
-    Report_Statistics: "**Recebidos**: __receivedToday__ emails\n**Enviados**: __sentToday__ emails\n**Não lidos**: __totalUnread__ emails",
-    Report_Token_Expired: "❌ **Sua autenticação expirou.**\n\nUse `/email login` para reconectar sua conta __provider__ e tente novamente.",
-    Report_Categories_Label: "Report Categories",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ não é suportado para estatísticas.**\n\nPor favor, entre em contato com seu administrador para assistência.",
+    Stats_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar as estatísticas novamente.",
+    Stats_Error: "❌ **Erro ao gerar estatísticas de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
+    Stats_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
+    Stats_Statistics: "**Recebidos**: __receivedToday__ emails\n**Enviados**: __sentToday__ emails\n**Não lidos**: __totalUnread__ emails",
+    Stats_Token_Expired: "❌ **Sua autenticação expirou.**\n\nUse `/email login` para reconectar sua conta __provider__ e tente novamente.",
+    Stats_Categories_Label: "Categorias de Estatísticas",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -237,7 +237,7 @@ export const pt = {
     Tool_Send_Email: "Enviar Email",
     Tool_Extract_Attachment: "Extrair Anexos",
     Tool_Summarize_And_Send: "Resumir & Enviar Email",
-    Tool_Report: "Gerar Relatório",
+    Tool_Stats: "Gerar Estatísticas",
 
     // Send Email Modal
     Send_Email_Modal_Title: "Enviar e-mail",

@@ -45,7 +45,7 @@ export interface IPreference {
     language: Language;
     emailProvider: EmailProviders;
     showProviderWarning?: boolean; // Optional flag to show provider change warning in modal
-    reportCategories?: string[];
+    statsCategories?: string[];
     llmConfiguration?: ILLMConfiguration;
 }
 

@@ -20,7 +20,7 @@ export const es = {
     Outlook_OAuth_Redirect_URI_Description: "URI de redirección OAuth para Outlook - debe terminar con /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "login, logout, config, llm-config, help, report",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Conectar y gestionar la integración de su cuenta de email con asistencia de IA.",
 
     // OAuth Pages
@@ -203,15 +203,15 @@ export const es = {
     Log_Btn_Fallback: "Error al crear notificación con botón de inicio de sesión, recurriendo a notificación de texto",
     Log_Fallback_Err: "Error al enviar notificación de texto de respaldo",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ no es compatible para reportes.**\n\nPor favor, contacta a tu administrador para asistencia.",
-    Report_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar el reporte nuevamente.",
-    Report_Error: "❌ **Error al generar el reporte de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
-    Report_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
-    Report_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
-    Report_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
-    Report_Categories_Label: "Report Categories",
-    Report_Command: "usa `/email report` - Obtener informe diario de estadísticas de correo",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ no es compatible para estadísticas.**\n\nPor favor, contacta a tu administrador para asistencia.",
+    Stats_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar las estadísticas nuevamente.",
+    Stats_Error: "❌ **Error al generar las estadísticas de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Stats_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
+    Stats_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
+    Stats_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
+    Stats_Categories_Label: "Categorías de Estadísticas",
+    Stats_Command: "usa `/email stats` - Obtener informe diario de estadísticas de correo",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -241,7 +241,7 @@ export const es = {
     Tool_Send_Email: "Enviar Email",
     Tool_Extract_Attachment: "Extraer Adjuntos",
     Tool_Summarize_And_Send: "Resumir y Enviar Email",
-    Tool_Report: "Generar Reporte",
+    Tool_Stats: "Generar Estadísticas",
 
     // Send Email Modal
     Send_Email_Modal_Title: 'Enviar Correo',

@@ -15,7 +15,7 @@
 	"Outlook_OAuth_Client_Secret_Description": "OAuth client secret for Microsoft authentication (Outlook only)",
 	"Outlook_OAuth_Redirect_URI_Label": "Outlook OAuth Redirect URI",
 	"Outlook_OAuth_Redirect_URI_Description": "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/outlook-oauth-callback",
-	"Email_Command_Params": "login, logout, config, llm-config, help, report",
+	"Email_Command_Params": "login, logout, config, llm-config, help, stats",
 	"Email_Command_Description": "Connect and manage your email account integration with AI assistance.",
 	"Authentication_Error_Title": "Authentication Error",
 	"Authentication_Success_Title": "Authentication Successful!",

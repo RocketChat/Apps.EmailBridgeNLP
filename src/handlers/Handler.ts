@@ -441,7 +441,7 @@ export class Handler implements IHandler {
         }
     }
 
-    public async Report(): Promise<void> {
+    public async Stats(): Promise<void> {
         const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
 
         const messageBuilder = this.modify
@@ -460,12 +460,12 @@ export class Handler implements IHandler {
             );
             const userPreference = await userPreferenceStorage.getUserPreference();
             const emailProvider = userPreference.emailProvider;
-            const categories = userPreference.reportCategories;
+            const categories = userPreference.statsCategories;
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
+                const message = t(Translations.STATS_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -482,7 +482,7 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(t(Translations.REPORT_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
+                messageBuilder.setText(t(Translations.STATS_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
@@ -503,9 +503,9 @@ export class Handler implements IHandler {
                 this.language
             );
 
-            // Use centralized report formatting
-            const reportMessage = EmailFormats.formatEmailReport(statistics, this.language);
-            messageBuilder.setText(reportMessage);
+            // Use centralized stats formatting
+            const statsMessage = EmailFormats.formatEmailStats(statistics, this.language);
+            messageBuilder.setText(statsMessage);
 
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
@@ -513,7 +513,7 @@ export class Handler implements IHandler {
             const userMessage = handleErrorAndGetMessage(
                 this.app,
                 this.language,
-                'Report generation',
+                'Stats generation',
                 error
             );
 
@@ -595,8 +595,8 @@ export class Handler implements IHandler {
                 return t(Translations.TOOL_EXTRACT_ATTACHMENT, this.language);
             case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
                 return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
-            case LlmTools.REPORT:
-                return t(Translations.TOOL_REPORT, this.language);
+            case LlmTools.STATS:
+                return t(Translations.TOOL_STATS, this.language);
             default:
                 return toolName;
         }

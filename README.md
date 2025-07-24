@@ -80,16 +80,16 @@ Say goodbye to context switching between your email client and team chat! With *
 - **`/email login`**: Login to your email account  
 - **`/email logout`**: Logout from your email account  
 - **`/email config`**: Open user preferences and settings  
-- **`/email report`**: Get daily email statistics report
+- **`/email stats`**: Get daily email statistics report
 
 Natural Language command exmples:
 
 - **`/email summarize this thread/channel and send it as email to boss@rc.com who refuses to use chat`**: summarize thread/channel and send as email to specified recipient(s) 
 - **`/email post in the channel for everyone the budget for 2025 email pdf received between 5/1/2025 and 6/24/2025`**: searchs the emails, extracts the attachment and upload it in channel. 
-- **`/email please give me report for yesterday`**: Get daily email statistics report
+- **`/email please give me stats for yesterday`**: Get daily email statistics report
 
 ### User Preferences Modal:
-User can go to User Preferences by entering `/email config` or by clicking "User Preferences" button in helper message. User can config email provider, language, categories to keep in report , adding new categories etc in it.
+User can go to User Preferences by entering `/email config` or by clicking "User Preferences" button in helper message. User can config email provider, language, categories to keep in stats , adding new categories etc in it.
 
 
 <h2>Development & Debugging 🐛</h2>

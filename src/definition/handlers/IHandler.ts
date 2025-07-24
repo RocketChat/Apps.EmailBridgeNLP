@@ -38,7 +38,7 @@ export interface IHandler {
     sendDefault(): Promise<void>;
     Login(): Promise<void>;
     Logout(): Promise<void>;
-    Report(): Promise<void>;
+    Stats(): Promise<void>;
     Config(): Promise<void>;
     ProcessNaturalLanguageQuery(query: string): Promise<void>;
     OpenSendEmailModal(emailData: ISendEmailData): Promise<void>;

@@ -56,8 +56,8 @@ export function handleLLMErrorAndGetMessage(
     if (statusCode) {
         return `${statusCode} error`;
     }
-
-    return t(Translations.LLM_API_OR_URL_ERROR, language || Language.en);
+    
+    return t(Translations.LLM_API_OR_URL_ERROR, language);
 }
 
 function categorizeError(error: Error, language: Language): string {
@@ -103,8 +103,8 @@ function categorizeError(error: Error, language: Language): string {
         return t(Translations.ERROR_PREPARING_LOGOUT, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
     }
 
-    if (errorMessage.includes('report') || error.message?.includes('Report')) {
-        return t(Translations.REPORT_ERROR, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
+    if (errorMessage.includes('stats') || error.message?.includes('Stats')) {
+        return t(Translations.STATS_ERROR, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
     }
 
     if (errorMessage.includes('config') || error.message?.includes('Config')) {

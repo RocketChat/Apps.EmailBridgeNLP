@@ -34,10 +34,10 @@ Fields:
 - "end_date": string (YYYY-MM-DD) — Optional
 - "people": [string] — Optional list of usernames starting with @, to consider for extracting messages in conversation
 
-3. report  
-→ Generates a summary report of recent email statistics.  
+3. stats  
+→ Generates a summary stats report of recent email statistics.  
 Fields:
-- "days": integer — Number of days to generate report for
+- "days": integer — Number of days to generate stats for
 
 4. extract-attachments  
 → Extracts and downloads email attachments from specified emails.  
@@ -74,11 +74,11 @@ FORMAT RULES:
 const PROMPT_EXAMPLES = `
 EXAMPLES:
 
-User: /email generate report for last 7 days  
+User: /email generate stats for last 7 days  
 Assistant:
 {
 "function_call": {
-    "name": "report",
+    "name": "stats",
     "arguments": {
         "days": 7
     }

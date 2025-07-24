@@ -54,7 +54,7 @@ export class OutlookService {
         if (receivedResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
             sentResponse.statusCode === 401 || totalResponse.statusCode === 401) {
             const providerName = getProviderDisplayName(EmailProviders.OUTLOOK);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
 
         const receivedData = JSON.parse(receivedResponse.content || '{}');
