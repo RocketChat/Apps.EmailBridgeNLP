@@ -57,7 +57,7 @@ Say goodbye to context switching between your email client and team chat! With *
     npm ci
     ```
 4. **Configure API Keys & Authentication** (Administrators)
-    📖 **See [AUTH_CONFIG.md](AUTH_CONFIG.md) for detailed setup instructions** on how to obtain:
+    📖 **See [AUTH_&_LLM_SETUP.md](AUTH_&_LLM_SETUP.md) for detailed setup instructions** on how to obtain:
     - Gmail/Google OAuth credentials
     - Outlook/Microsoft OAuth credentials  
     - OpenAI, Gemini, Groq, or self-hosted LLM API keys
