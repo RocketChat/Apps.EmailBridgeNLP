@@ -7,6 +7,7 @@ import {
     IModify,
     IPersistence,
     IRead,
+    IAppInstallationContext,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
@@ -33,6 +34,7 @@ import { ExecuteViewClosedHandler } from './src/handlers/ExecuteViewClosedHandle
 import { ElementBuilder } from './src/lib/ElementBuilder';
 import { BlockBuilder } from './src/lib/BlockBuilder';
 import { IAppUtils } from './src/definition/lib/IAppUtils';
+import { sendWelcomeMessageOnInstall } from './src/helper/notification';
 
 export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
     private elementBuilder: ElementBuilder;
@@ -67,6 +69,22 @@ export class EmailBridgeNlpApp extends App implements IUIKitInteractionHandler {
         await configuration.slashCommands.provideSlashCommand(
             new EmailCommand(this),
         );
+    }
+
+    public async onInstall(
+        context: IAppInstallationContext,
+        read: IRead,
+        http: IHttp,
+        persistence: IPersistence,
+        modify: IModify
+    ): Promise<void> {
+        try {
+            const { user } = context;
+            await sendWelcomeMessageOnInstall(this.getID(), user, read, modify, persistence);
+        } catch (error) {
+            this.getLogger().error(`Failed to send welcome message: ${error.message}`);
+        }
+        return;
     }
 
     public getUtils(): IAppUtils {

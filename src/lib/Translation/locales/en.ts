@@ -51,7 +51,41 @@ export const en = {
     Disconnect_Failed: "Failed to log out from your email account.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "**Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+    Login_Success_Notification: "✅ **Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Installed and Ready to Connect to Your Email Directly from RocketChat!**",
+    Welcome_Text: "Welcome to **Email Assistant** in RocketChat!",
+    Welcome_Message: `
+        🚀 **Get Started in 3 Easy Steps:**
+        
+        1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
+        2️⃣ **Configure Settings**: Use \`/email config\` and \`/email llm-config\` to set your preferences
+        3️⃣ **Start Using AI**: Send natural language commands like \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **What You Can Do:**
+        • **Smart Email Management**: "send email to @John.doe about the meeting"
+        • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
+        • **Quick Stats**: Get daily email statistics. Use \`/email stats\`.
+        
+        📊 **Email Statistics Feature:**
+        Get personalized daily reports showing:
+        • Total emails received and sent
+        • Top senders and recipients
+        • Email categories (work, personal, notifications)
+        
+        ⚙️ **Supported Providers:**
+        • **Gmail** - Full OAuth integration
+        • **Outlook** - Microsoft 365 and Outlook.com
+        
+        🌍 **Multi-Language Support:**
+        Available in English, Spanish, Russian, German, Polish, and Portuguese
+        
+        Need help? Type \`/email help\` anytime!
+        
+        Thanks for choosing **Email Assistant** - Your AI powered Email Assistant! 🤖
+        `,
 
     // Handler messages
     Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to Logout, use `/email logout`.",

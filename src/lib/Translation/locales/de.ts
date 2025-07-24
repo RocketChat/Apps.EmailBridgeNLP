@@ -51,7 +51,41 @@ export const de = {
     Disconnect_Failed: "Fehler beim Abmelden von Ihrem E-Mail-Konto.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "**Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.✅ ",
+    Login_Success_Notification: "✅ **Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.\n\nSie können jetzt EmailBridge NLP-Funktionen verwenden!",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Installiert und Bereit, Ihre E-Mail mit KI zu Verbinden!**",
+    Welcome_Text: "Willkommen bei **Email Assistant** in RocketChat!",
+    Welcome_Message: `
+        🚀 **Starten Sie in 3 Einfachen Schritten:**
+        
+        1️⃣ **E-Mail Verbinden**: Verwenden Sie \`/email login\` um Gmail oder Outlook zu verbinden
+        2️⃣ **Einstellungen Konfigurieren**: Verwenden Sie \`/email config\` um Ihre Einstellungen festzulegen
+        3️⃣ **KI Verwenden**: Senden Sie natürlichsprachliche Befehle wie "E-Mails von gestern zusammenfassen"
+        
+        📧 **Was Sie Tun Können:**
+        • **Intelligentes E-Mail-Management**: "E-Mail an john@company.com über das Meeting senden"
+        • **Kanal-Zusammenfassungen**: "diese Unterhaltung zusammenfassen und an manager@company.com mailen"
+        • **Schnelle Statistiken**: Tägliche E-Mail-Statistiken und Einblicke erhalten. Verwenden Sie \`/email stats\`.
+        
+        📊 **E-Mail-Statistik-Funktion:**
+        Erhalten Sie personalisierte tägliche Berichte mit:
+        • Gesamte empfangene und gesendete E-Mails
+        • Top-Absender und -Empfänger
+        • E-Mail-Kategorien (Arbeit, Privat, Benachrichtigungen)
+        
+        ⚙️ **Unterstützte Anbieter:**
+        • **Gmail** - Vollständige OAuth-Integration
+        • **Outlook** - Microsoft 365 und Outlook.com
+        
+        🌍 **Mehrsprachige Unterstützung:**
+        Verfügbar in Englisch, Spanisch, Russisch, Deutsch, Polnisch und Portugiesisch
+        
+        Brauchen Sie Hilfe? Geben Sie jederzeit \`/email help\` ein!
+        
+        Danke für die Wahl von **Email Assistant** - Ihr KI E-Mail-Assistent! 🤖
+        `,
 
     // Handler messages
     Already_Logged_In: "Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",

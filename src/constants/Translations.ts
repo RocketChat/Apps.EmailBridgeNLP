@@ -54,6 +54,12 @@ export const Translations = {
     // Login success notifications (webhook)
     LOGIN_SUCCESS_NOTIFICATION: 'Login_Success_Notification',
 
+    // Welcome message content (onInstall)
+    WELCOME_TITLE: 'Welcome_Title',
+    WELCOME_DESCRIPTION: 'Welcome_Description',
+    WELCOME_TEXT: 'Welcome_Text',
+    WELCOME_MESSAGE: 'Welcome_Message',
+
     // Handler Messages
     ALREADY_LOGGED_IN: 'Already_Logged_In',
     OUTLOOK_COMING_SOON: 'Outlook_Coming_Soon',

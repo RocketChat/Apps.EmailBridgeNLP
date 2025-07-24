@@ -51,7 +51,41 @@ export const pl = {
     Disconnect_Failed: "Nie udało się wylogować twojego konta e-mail.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "✅ **Logowanie pomyślne!**\n\nJesteś teraz połączony z **__provider__** jako **__email__**.✅ ",
+    Login_Success_Notification: "✅ **Logowanie pomyślne!**\n\nJesteś teraz połączony z **__provider__** jako **__email__**.\n\nMożesz teraz używać funkcji EmailBridge NLP!",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Aplikacja Email Assistant**",
+    Welcome_Description: "**Zainstalowana i Gotowa do Połączenia Twojego Email z AI!**",
+    Welcome_Text: "Witamy w **Email Assistant** w RocketChat!",
+    Welcome_Message: `
+        🚀 **Zacznij w 3 Prostych Krokach:**
+        
+        1️⃣ **Połącz Email**: Użyj \`/email login\` aby połączyć Gmail lub Outlook
+        2️⃣ **Skonfiguruj Ustawienia**: Użyj \`/email config\` aby ustawić preferencje
+        3️⃣ **Używaj AI**: Wysyłaj komendy w języku naturalnym jak \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **Co Możesz Robić:**
+        • **Inteligentne Zarządzanie Email**: "wyślij email do john@company.com o spotkaniu"
+        • **Podsumowania Kanału**: "podsumuj tę rozmowę i wyślij emailem do manager@company.com"
+        • **Szybkie Statystyki**: Otrzymuj codzienne statystyki email i insights. Użyj \`/email stats\`.
+        
+        📊 **Funkcja Statystyk Email:**
+        Otrzymuj spersonalizowane dzienne raporty pokazujące:
+        • Łączną liczbę otrzymanych i wysłanych emaili
+        • Głównych nadawców i odbiorców
+        • Kategorie emaili (praca, osobiste, powiadomienia)
+        
+        ⚙️ **Obsługiwani Dostawcy:**
+        • **Gmail** - Pełna integracja OAuth
+        • **Outlook** - Microsoft 365 i Outlook.com
+        
+        🌍 **Wsparcie Wielojęzyczne:**
+        Dostępne w języku angielskim, hiszpańskim, rosyjskim, niemieckim, polskim i portugalskim
+        
+        Potrzebujesz pomocy? Wpisz \`/email help\` w dowolnym momencie!
+        
+        Dziękujemy za wybór **Email Assistant** - Twojego AI Asystenta Email! 🤖
+        `,
 
     // Handler messages
     Already_Logged_In: "Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
