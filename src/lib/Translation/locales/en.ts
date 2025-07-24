@@ -58,7 +58,6 @@ export const en = {
     Welcome_Description: "**Installed and Ready to Connect to Your Email Directly from RocketChat!**",
     Welcome_Text: "Welcome to **Email Assistant** in RocketChat!",
     Welcome_Message: `
-
         🚀 **Get Started in 3 Easy Steps:**
         
         1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
