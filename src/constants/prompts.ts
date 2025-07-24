@@ -67,7 +67,9 @@ FORMAT RULES:
     - Extract emails from @username [email] format
     - Include direct email addresses as-is
     - Combine all valid emails into the "to" array
-    - "send to @john.gk [john@gmail.com] and alice@company.com" → use ["john@gmail.com", "alice@company.com"]`;
+    - "send to @john.gk [john@gmail.com] and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
+11. For user queries like "send an email to @john.gk [john@gmail.com]" OR "send an email" send a welcome to rocket chat email to user .
+    `;
 
 const PROMPT_EXAMPLES = `
 EXAMPLES:

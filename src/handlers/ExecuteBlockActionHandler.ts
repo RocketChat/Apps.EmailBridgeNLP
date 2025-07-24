@@ -197,9 +197,9 @@ export class ExecuteBlockActionHandler {
                 break;
 
             // LLM Configuration Modal Actions
-            case 'llm-usage-preference-action':
+            case ActionIds.LLM_USAGE_PREFERENCE_ACTION:
                 return await this.handleLLMUsagePreferenceChange(user, value, existingPreference, userPreferenceStorage);
-            case 'llm-provider-action':
+            case ActionIds.LLM_PROVIDER_ACTION:
                 return await this.handleLLMProviderChange(user, value, existingPreference, userPreferenceStorage);
 
             default:
