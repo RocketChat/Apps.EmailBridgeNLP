@@ -56,7 +56,13 @@ Say goodbye to context switching between your email client and team chat! With *
     ```sh
     npm ci
     ```
-4. Deploy app using:
+4. **Configure API Keys & Authentication** (Administrators)
+    📖 **See [AUTH_CONFIG.md](AUTH_CONFIG.md) for detailed setup instructions** on how to obtain:
+    - Gmail/Google OAuth credentials
+    - Outlook/Microsoft OAuth credentials  
+    - OpenAI, Gemini, Groq, or self-hosted LLM API keys
+
+5. Deploy app using:
 
     ```sh
     rc-apps deploy --url <server_url> --username <username> --password <password>
