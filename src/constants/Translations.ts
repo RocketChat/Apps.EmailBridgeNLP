@@ -51,6 +51,9 @@ export const Translations = {
     DISCONNECT_SUCCESS: 'Disconnect_Success',
     DISCONNECT_FAILED: 'Disconnect_Failed',
 
+    // Login success notifications (webhook)
+    LOGIN_SUCCESS_NOTIFICATION: 'Login_Success_Notification',
+
     // Handler Messages
     ALREADY_LOGGED_IN: 'Already_Logged_In',
     OUTLOOK_COMING_SOON: 'Outlook_Coming_Soon',

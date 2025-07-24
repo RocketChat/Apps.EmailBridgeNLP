@@ -50,8 +50,11 @@ export const pl = {
     Disconnect_Success: "Konto e-mail zostało pomyślnie wylogowane.",
     Disconnect_Failed: "Nie udało się wylogować twojego konta e-mail.",
 
+    // Login success notifications (webhook)
+    Login_Success_Notification: "✅ **Logowanie pomyślne!**\n\nJesteś teraz połączony z **__provider__** jako **__email__**.✅ ",
+
     // Handler messages
-    Already_Logged_In: "Jesteś już zalogowany jako **__provider__** (**__email__**).\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
+    Already_Logged_In: "Jesteś już zalogowany z **__provider__** jako **__email__**.\n\nJeśli chcesz się wylogować, użyj `/email logout`.",
     Outlook_Coming_Soon: "**Uwierzytelnianie Outlook będzie wkrótce dostępne!**\n\nNa razie użyj **Gmail** do uwierzytelniania e-mail.\n\n",
     Provider_Not_Implemented: "**Uwierzytelnianie __provider__ nie jest jeszcze zaimplementowane.**\n\nObecnie tylko **Gmail** jest obsługiwane do uwierzytelniania.\n\n",
     Connect_Account_Message: "**Połącz swoje konto __provider__ z Rocket Chat**",

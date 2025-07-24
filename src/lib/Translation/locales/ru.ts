@@ -47,11 +47,14 @@ export const ru = {
     Authentication_Required: "Требуется аутентификация. Подключите свою учетную запись электронной почты.",
     Connection_Status_Connected: "Учетная запись электронной почты подключена и готова к использованию.",
     Connection_Status_Disconnected: "Нет подключенной учетной записи электронной почты.",
-    Disconnect_Success: "Учетная запись электронной почты успешно вышла из системы.",
+    Disconnect_Success: "Учетная запись электронной почты успешно отключена.",
     Disconnect_Failed: "Не удалось выйти из учетной записи электронной почты.",
 
+    // Login success notifications (webhook)
+    Login_Success_Notification: "**Вход выполнен успешно!**\n\nВы подключены к **__provider__** как **__email__**.✅ ",
+
     // Handler messages
-    Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите отключиться, используйте `/email logout`.",
+    Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите выйти, используйте `/email logout`.",
     Outlook_Coming_Soon: "**Аутентификация Outlook будет доступна в ближайшее время!**\n\nПока что используйте **Gmail** для аутентификации электронной почты.\n\n",
     Provider_Not_Implemented: "**Аутентификация __provider__ еще не реализована.**\n\nВ настоящее время поддерживается только **Gmail** для аутентификации.\n\n",
     Connect_Account_Message: "**Подключите свою учетную запись __provider__ к Rocket Chat**",

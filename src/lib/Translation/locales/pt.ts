@@ -47,11 +47,14 @@ export const pt = {
     Authentication_Required: "Autenticação necessária. Conecte sua conta de email.",
     Connection_Status_Connected: "Conta de email está conectada e pronta para uso.",
     Connection_Status_Disconnected: "Nenhuma conta de email está conectada.",
-    Disconnect_Success: "Conta de email fechada com sucesso.",
-    Disconnect_Failed: "Falha ao fechar sessão da sua conta de email.",
+    Disconnect_Success: "Conta de e-mail desconectada com sucesso.",
+    Disconnect_Failed: "Falha ao desconectar da conta de e-mail.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "**Login bem-sucedido!**\n\nVocê está agora conectado ao **__provider__** como **__email__**.✅ ",
 
     // Handler messages
-    Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser desconectar, use `/email logout`.",
+    Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser fazer logout, use `/email logout`.",
     Outlook_Coming_Soon: "**Autenticação do Outlook estará disponível em breve!**\n\nPor enquanto, use **Gmail** para autenticação de email.\n\n",
     Provider_Not_Implemented: "**Autenticação __provider__ ainda não está implementada.**\n\nAtualmente apenas **Gmail** é suportado para autenticação.\n\n",
     Connect_Account_Message: "**Conecte sua conta __provider__ ao Rocket Chat**",

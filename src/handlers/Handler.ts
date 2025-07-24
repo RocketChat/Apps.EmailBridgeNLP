@@ -131,6 +131,14 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
+            // Store room ID for webhook notification after successful login
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
             // Get user's preferred email provider from their personal settings
             const userPreferenceStorage = new UserPreferenceStorage(
                 this.persis,

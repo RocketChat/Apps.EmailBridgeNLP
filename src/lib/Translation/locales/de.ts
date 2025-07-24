@@ -48,7 +48,10 @@ export const de = {
     Connection_Status_Connected: "E-Mail-Konto ist verbunden und einsatzbereit.",
     Connection_Status_Disconnected: "Kein E-Mail-Konto verbunden.",
     Disconnect_Success: "E-Mail-Konto erfolgreich abgemeldet.",
-    Disconnect_Failed: "Abmelden Ihres E-Mail-Kontos fehlgeschlagen.",
+    Disconnect_Failed: "Fehler beim Abmelden von Ihrem E-Mail-Konto.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "**Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.✅ ",
 
     // Handler messages
     Already_Logged_In: "Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",

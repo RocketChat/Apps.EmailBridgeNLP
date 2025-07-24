@@ -50,6 +50,9 @@ export const en = {
     Disconnect_Success: "Email account logged out successfully.",
     Disconnect_Failed: "Failed to log out from your email account.",
 
+    // Login success notifications (webhook)
+    Login_Success_Notification: "**Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+
     // Handler messages
     Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to Logout, use `/email logout`.",
     Outlook_Coming_Soon: "**Outlook authentication will be available soon!**\n\nFor now, please use **Gmail** for email authentication.\n\n",
