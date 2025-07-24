@@ -45,18 +45,28 @@ export function handleErrorAndGetMessage(
 export function handleLLMErrorAndGetMessage(
     app: EmailBridgeNlpApp,
     context: string,
-    error: Error,
+    error: any,
     language?: Language,
 ): string {
     app.getLogger().error(`${context} error:`, error);
 
-    // For LLM errors, return the raw error message if available
-    // This includes API key issues, invalid URLs, rate limits, etc.
-    if (error.message && error.message.trim() !== '') {
-        return error.message;
+    // Try common error message locations
+    const errorMessage = 
+        error.message ||
+        error.response?.data?.error?.message ||
+        error.response?.data?.error ||
+        error.response?.data ||
+        error.data?.error?.message ||
+        error.data?.error ||
+        error.data ||
+        error.content;
+
+    // Return raw error if found, otherwise fallback to i18n
+    if (errorMessage && typeof errorMessage === 'string' && errorMessage.trim()) {
+        return errorMessage;
     }
-    
-    return t(Translations.LLM_API_OR_URL_ERROR, language);
+
+    return t(Translations.LLM_API_OR_URL_ERROR, language || Language.en);
 }
 
 function categorizeError(error: Error, language: Language): string {

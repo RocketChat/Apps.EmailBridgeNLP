@@ -272,6 +272,12 @@ export class LLMService {
         if (apiUrl.endsWith('/')) {
             apiUrl = apiUrl.slice(0, -1);
         }
+                
+        // Add /v1/chat/completions if not already present (common for OpenAI-compatible APIs)
+        if (!apiUrl.includes('/chat/completions') && !apiUrl.includes('/generate') && !apiUrl.includes('/api/chat')) {
+            apiUrl += '/v1/chat/completions';
+        }
+
 
         const payload = {
             model: 'llama3',
