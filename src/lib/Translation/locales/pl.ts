@@ -95,7 +95,7 @@ export const pl = {
     LLM_Configuration_Close_Button: "Zamknij",
     LLM_Configuration_Success: "Konfiguracja LLM została pomyślnie zaktualizowana!",
     LLM_Configuration_Error: "Błąd podczas aktualizacji konfiguracji LLM:",
-    LLM_Config_Command: "użyj `/email llm config` - Otwórz ustawienia konfiguracji LLM",
+    LLM_Config_Command: "użyj `/email llm-config` - Otwórz ustawienia konfiguracji LLM",
 
     // Language names
     Language: "Język",

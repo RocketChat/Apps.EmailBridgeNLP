@@ -60,20 +60,29 @@ export class CommandUtility implements ICommandUtility {
             language,
         });
 
-        if (this.params.length === 0) {
-            await handler.sendDefault();
-            return;
+        switch (this.params.length) {
+            case 0: {
+                await handler.sendDefault();
+                break;
+            }
+            case 1: {
+                await this.handleSingleParam(handler);
+                break;
+            }
+            default: {
+                await this.handleMultipleParams(handler);
+                break;
+            }
         }
+    }
 
+    private async handleSingleParam(handler: Handler): Promise<void> {
         const command = this.params[0].toLowerCase();
         
-        // Handle "llm config" command
-        if (command === CommandParam.LLM_CONFIG && this.params.length >= 2 && this.params[1].toLowerCase() === 'config') {
-            await handler.LLMConfig();
-            return;
-        }
-        
         switch (command) {
+            case CommandParam.LLM_CONFIG:
+                await handler.LLMConfig();
+                break;
             case CommandParam.HELP:
                 await handler.Help();
                 break;
@@ -95,5 +104,10 @@ export class CommandUtility implements ICommandUtility {
                 break;
             }
         }
+    }
+
+    private async handleMultipleParams(handler: Handler): Promise<void> {
+        const query = this.params.join(' ');
+        await handler.ProcessNaturalLanguageQuery(query);
     }
 } 

@@ -95,7 +95,7 @@ export const ru = {
     LLM_Configuration_Close_Button: "Закрыть",
     LLM_Configuration_Success: "Конфигурация LLM успешно обновлена!",
     LLM_Configuration_Error: "Не удалось обновить конфигурацию LLM:",
-    LLM_Config_Command: "используйте `/email llm config` - Открыть настройки LLM",
+    LLM_Config_Command: "используйте `/email llm-config` - Открыть настройки LLM",
 
     // Language names
     Language: "Язык",
