@@ -483,24 +483,15 @@ export class ExecuteViewSubmitHandler {
             );
             const existingPreference = await userPreferenceStorage.getUserPreference();
 
-            const currentLLMConfig = existingPreference.llmConfiguration || {} as any;
-            const updatedPreference = {
-                ...existingPreference,
-                llmConfiguration: {
-                    ...currentLLMConfig,
-                    llmUsagePreference: llmUsagePreferenceValue || currentLLMConfig.llmUsagePreference || LLMUsagePreferenceEnum.Workspace,
-                    llmProvider: llmProviderValue || currentLLMConfig.llmProvider || LLMProviderEnum.Groq,
-                    ...(selfHostedUrlValue && { selfHosted: { url: selfHostedUrlValue } }),
-                    ...(openaiApiKeyValue && { openai: { apiKey: openaiApiKeyValue } }),
-                    ...(geminiApiKeyValue && { gemini: { apiKey: geminiApiKeyValue } }),
-                    ...(groqApiKeyValue && { groq: { apiKey: groqApiKeyValue } }),
-                    // Preserve existing API keys if no new values provided
-                    ...(!selfHostedUrlValue && currentLLMConfig.selfHosted && { selfHosted: currentLLMConfig.selfHosted }),
-                    ...(!openaiApiKeyValue && currentLLMConfig.openai && { openai: currentLLMConfig.openai }),
-                    ...(!geminiApiKeyValue && currentLLMConfig.gemini && { gemini: currentLLMConfig.gemini }),
-                    ...(!groqApiKeyValue && currentLLMConfig.groq && { groq: currentLLMConfig.groq }),
-                },
-            };
+            const updatedPreference = this.buildUpdatedLLMPreference(
+                existingPreference,
+                llmUsagePreferenceValue,
+                llmProviderValue,
+                selfHostedUrlValue,
+                openaiApiKeyValue,
+                geminiApiKeyValue,
+                groqApiKeyValue
+            );
 
             await userPreferenceStorage.storeUserPreference(updatedPreference);
 
@@ -552,6 +543,53 @@ export class ExecuteViewSubmitHandler {
 
             return this.context.getInteractionResponder().successResponse();
         }
+    }
+
+    private buildUpdatedLLMPreference(
+        existingPreference: any,
+        llmUsagePreferenceValue: string,
+        llmProviderValue: string,
+        selfHostedUrlValue: string,
+        openaiApiKeyValue: string,
+        geminiApiKeyValue: string,
+        groqApiKeyValue: string
+    ): any {
+        const currentLLMConfig = existingPreference.llmConfiguration || {};
+        
+        const newLLMConfig: any = {
+            llmUsagePreference: llmUsagePreferenceValue || currentLLMConfig.llmUsagePreference || LLMUsagePreferenceEnum.Workspace,
+            llmProvider: llmProviderValue || currentLLMConfig.llmProvider || LLMProviderEnum.Groq,
+        };
+
+        // Handle provider-specific configurations
+        if (selfHostedUrlValue) {
+            newLLMConfig.selfHosted = { url: selfHostedUrlValue };
+        } else if (currentLLMConfig.selfHosted) {
+            newLLMConfig.selfHosted = currentLLMConfig.selfHosted;
+        }
+
+        if (openaiApiKeyValue) {
+            newLLMConfig.openai = { apiKey: openaiApiKeyValue };
+        } else if (currentLLMConfig.openai) {
+            newLLMConfig.openai = currentLLMConfig.openai;
+        }
+
+        if (geminiApiKeyValue) {
+            newLLMConfig.gemini = { apiKey: geminiApiKeyValue };
+        } else if (currentLLMConfig.gemini) {
+            newLLMConfig.gemini = currentLLMConfig.gemini;
+        }
+
+        if (groqApiKeyValue) {
+            newLLMConfig.groq = { apiKey: groqApiKeyValue };
+        } else if (currentLLMConfig.groq) {
+            newLLMConfig.groq = currentLLMConfig.groq;
+        }
+
+        return {
+            ...existingPreference,
+            llmConfiguration: newLLMConfig,
+        };
     }
 
     private validatePersonalLLMConfig(
