@@ -50,20 +50,11 @@ export function handleLLMErrorAndGetMessage(
 ): string {
     app.getLogger().error(`${context} error:`, error);
 
-    // Try common error message locations
-    const errorMessage = 
-        error.message ||
-        error.response?.data?.error?.message ||
-        error.response?.data?.error ||
-        error.response?.data ||
-        error.data?.error?.message ||
-        error.data?.error ||
-        error.data ||
-        error.content;
-
-    // Return raw error if found, otherwise fallback to i18n
-    if (errorMessage && typeof errorMessage === 'string' && errorMessage.trim()) {
-        return errorMessage;
+    // Get status code from HTTP response
+    const statusCode = error.statusCode || error.response?.status || error.status;
+    
+    if (statusCode) {
+        return `${statusCode} error`;
     }
 
     return t(Translations.LLM_API_OR_URL_ERROR, language || Language.en);

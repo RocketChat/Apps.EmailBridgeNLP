@@ -19,7 +19,7 @@ import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
-import { handleErrorAndGetMessage } from '../helper/errorHandler';
+import { handleErrorAndGetMessage, handleError, handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { ActionIds } from '../enums/ActionIds';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
@@ -30,7 +30,6 @@ import { LLMConfigurationModalEnum } from '../enums/modals/LLMConfigurationModal
 import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
-import { handleError } from '../helper/errorHandler';
 import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
 
 export class ExecuteViewSubmitHandler {
@@ -513,16 +512,10 @@ export class ExecuteViewSubmitHandler {
                         this.persistence,
                         user.id,
                     );
-                    if (error.message?.includes('api') ||
-                        error.message?.includes('key') ||
-                        error.message?.includes('token') ||
-                        error.message?.includes('unauthorized') ||
-                        error.message?.includes('invalid') ||
-                        error.message?.includes('authentication') ||
-                        error.message?.includes('forbidden')) {
-
+                    if (error.message) {
+                        const errorMessage = handleLLMErrorAndGetMessage(this.app, 'LLM Configuration', error, errorLanguage);
                         await sendNotification(this.read, this.modify, user, room, {
-                            message: `LLM Configuration Error: ${error.message}`
+                            message: `⚠️ ${errorMessage}`
                         });
                     } else {
                         await handleError(
