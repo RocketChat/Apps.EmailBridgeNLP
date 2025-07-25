@@ -17,6 +17,10 @@ export enum UserPreferenceModalEnum {
     NEW_CATEGORY_INPUT_ACTION_ID = 'new-category-action',
     ADD_CATEGORY_ACTION_ID = 'add-category-action',
     
+    // System Prompt input
+    SYSTEM_PROMPT_INPUT_BLOCK_ID = 'system-prompt-block',
+    SYSTEM_PROMPT_INPUT_ACTION_ID = 'system-prompt-action',
+    
     // LLM Configuration
     LLM_USAGE_PREFERENCE_DROPDOWN_BLOCK_ID = 'llm-usage-preference-block',
     LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID = 'llm-usage-preference-action',

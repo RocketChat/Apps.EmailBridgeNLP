@@ -82,6 +82,7 @@ export class ExecuteViewSubmitHandler {
             const emailProviderValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID);
             const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.STATS_CATEGORIES_INPUT_ACTION_ID) || [];
             const newCategoriesRaw = this.getFormValue(view.state, UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID) || "";
+            const systemPromptValue = this.getFormValue(view.state, UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_ACTION_ID) || "";
 
             // Process and combine categories - store what user actually selected
             const newCategories = newCategoriesRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
@@ -118,6 +119,7 @@ export class ExecuteViewSubmitHandler {
                 language: languageValue,
                 emailProvider: emailProviderValue as EmailProviders,
                 statsCategories: [...new Set(combinedCategories as string[])],
+                systemPrompt: systemPromptValue.trim() || undefined,
             };
 
             // Update user preference

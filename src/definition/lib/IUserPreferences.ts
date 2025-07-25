@@ -47,6 +47,7 @@ export interface IPreference {
     showProviderWarning?: boolean; // Optional flag to show provider change warning in modal
     statsCategories?: string[];
     llmConfiguration?: ILLMConfiguration;
+    systemPrompt?: string; // Custom system prompt for email tone customization
 }
 
 export interface IUserPreferenceStorage {

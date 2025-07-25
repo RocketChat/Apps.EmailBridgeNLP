@@ -68,7 +68,6 @@ FORMAT RULES:
     - Include direct email addresses as-is
     - Combine all valid emails into the "to" array
     - "send to @john.gk [john@gmail.com] and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
-11. For user queries like "send an email to @john.gk [john@gmail.com]" OR "send an email" send a welcome to rocket chat email to user .
     `;
 
 const PROMPT_EXAMPLES = `
@@ -139,6 +138,12 @@ CRITICAL JSON REQUIREMENTS:
 - Dates must be correct and computed based on {CURRENT_DATE}.
 - Response must be valid and exactly match field types.`;
 
+const USER_PREFERENCES_PROMPT = `
+---
+USER PREFERENCES:
+The user has set the following system prompt, so respond in the following tone, but maintain the technical requirements given above: 
+{USER_SYSTEM_PROMPT}`;
+
 
 export const LlmPrompts = {
     SYSTEM_PROMPT: `${EMAIL_ASSISTANT_INTRO}
@@ -156,9 +161,11 @@ export const LlmPrompts = {
     ${CRITICAL_JSON_REQUIREMENTS}
     `,
     
-    SUMMARIZE_PROMPT: `You are an AI assistant specializing in clear and concise conversation summaries. Your task is to summarize the following Rocket.Chat conversation from the channel "__channelName__".
+    USER_PREFERENCES_PROMPT,
+    
+    SUMMARIZE_PROMPT: `You are an AI assistant specializing in giving clear and concise conversation summaries. Your task is to summarize the following Rocket.Chat conversation from the channel "__channelName__".
 
-    The summary should be easy for anyone to read, even if they were not part of the conversation. Structure your response as follows:
+    The summary should be easy for anyone to read, even if they were not part of the conversation. Structure your response as follows. You can tweak the structure according to the conversation(only if needed):
 
     1.  **MAIN POINTS:** Start with a brief, one or two-sentence overview of the entire conversation.
     2.  **KEY TOPICS & DECISIONS:** Use bullet points to list the main topics discussed and any decisions that were made.

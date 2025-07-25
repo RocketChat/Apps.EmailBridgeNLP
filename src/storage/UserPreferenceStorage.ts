@@ -39,6 +39,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
             statsCategories: userSelectedCategories,
             showProviderWarning: preference.showProviderWarning || currentPreference.showProviderWarning,
             llmConfiguration: preference.llmConfiguration || currentPreference.llmConfiguration,
+            systemPrompt: preference.systemPrompt !== undefined ? preference.systemPrompt : currentPreference.systemPrompt,
         };
 
         const association = new RocketChatAssociationRecord(

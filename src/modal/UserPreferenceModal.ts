@@ -38,6 +38,27 @@ export async function UserPreferenceModal({
     const language = existingPreference.language as Language;
     const blocks: (InputBlock | DividerBlock | SectionBlock | ActionsBlock)[] = [];
 
+    // System Prompt Input
+    const systemPromptInput = elementBuilder.createPlainTextInput(
+        {
+            text: t(Translations.SYSTEM_PROMPT_PLACEHOLDER, language),
+            initialValue: existingPreference.systemPrompt || '',
+            multiline: true,
+        },
+        {
+            blockId: UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_BLOCK_ID,
+            text: t(Translations.SYSTEM_PROMPT_LABEL, language),
+            element: systemPromptInput,
+            optional: true,
+        })
+    );
+
     // Stats Categories Selection - show default categories in dropdown but don't force selection
     const userCategories = existingPreference.statsCategories || [];
     const defaultCategories = ['github', 'calendar', 'social'];
@@ -84,6 +105,7 @@ export async function UserPreferenceModal({
             optional: true,
         })
     );
+
     // Divider
     blocks.push(blockBuilder.createDividerBlock());
     // Language Selection

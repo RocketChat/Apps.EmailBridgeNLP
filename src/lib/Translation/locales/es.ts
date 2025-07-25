@@ -259,6 +259,11 @@ export const es = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "Prompt del Sistema",
+    System_Prompt_Placeholder: "Personaliza el tono de tus emails (ej. [Eres John, un desarrollador de software en Rocket Chat. Eres muy ocupado y así lo son todos con quienes correspondes, por lo que haces tu mejor esfuerzo para mantener tus emails lo más cortos posible y concisos. Prefiere emails de una línea. Haz tu mejor esfuerzo para ser amable, y no seas tan informal que suene grosero....])",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Procesando: \"__query__\"...",
     LLM_User_Query_Display: "**Tu consulta es:** __query__",

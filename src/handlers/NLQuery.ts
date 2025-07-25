@@ -141,7 +141,7 @@ export class NLQueryHandler {
                 this.read.getEnvironmentReader().getSettings(),
                 userPreference
             );
-            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
             const result = await llmService.processNaturalLanguageQuery(enhancedQuery);
 
             return {
@@ -287,7 +287,7 @@ export class NLQueryHandler {
                 this.read.getEnvironmentReader().getSettings(),
                 userPreference
             );
-            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
 
             // Retrieve messages from the current room or thread
             const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);

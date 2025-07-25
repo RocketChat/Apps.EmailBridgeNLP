@@ -264,6 +264,11 @@ export const Translations = {
     // User Preference Modal
     NEW_CATEGORY_LABEL: 'New_Category_Label',
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
+    
+    // System Prompt Configuration
+    SYSTEM_PROMPT_LABEL: 'System_Prompt_Label',
+    SYSTEM_PROMPT_PLACEHOLDER: 'System_Prompt_Placeholder',
+    
     // Tool Calling Messages
     LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
     LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',

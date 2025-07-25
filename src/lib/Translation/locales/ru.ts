@@ -255,6 +255,11 @@ export const ru = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "Системный Промпт",
+    System_Prompt_Placeholder: "Настройте тон ваших писем (напр. [Вы Джон, разработчик в Rocket Chat. Вы очень заняты и так же заняты все с кем вы общаетесь, поэтому вы делаете свою лучшую работу, чтобы сохранить свои письма такими короткими, как это возможно и конкретными. Предпочитайте письма одной строкой. Сделайте свое лучшее, чтобы быть вежливым, и не быть слишком неформальным, чтобы не звучать грубо....])",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Обработка: \"__query__\"...",
     LLM_User_Query_Display: "**Ваш запрос:** __query__",
