@@ -10,7 +10,7 @@ export const pt = {
     Google_OAuth_Client_Secret_Description: "OAuth client secret para autenticação Google (apenas Gmail)",
     OAuth_Redirect_URI_Label: "OAuth Redirect URI",
     OAuth_Redirect_URI_Description: "OAuth redirect URI - deve terminar com /api/apps/public/[app-id]/oauth-callback",
-    
+
     // Outlook OAuth Settings
     Outlook_OAuth_Client_ID_Label: "Outlook OAuth Client ID",
     Outlook_OAuth_Client_ID_Description: "OAuth client ID para autenticação Outlook/Microsoft",
@@ -18,11 +18,11 @@ export const pt = {
     Outlook_OAuth_Client_Secret_Description: "OAuth client secret para autenticação Outlook/Microsoft",
     Outlook_OAuth_Redirect_URI_Label: "Outlook OAuth Redirect URI",
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI para Outlook - deve terminar com /api/apps/public/[app-id]/oauth-callback",
-    
+
     // Commands
     Email_Command_Params: "conectar, status, desconectar, ajuda, relatório",
     Email_Command_Description: "Conecte e gerencie a integração da sua conta de email com assistência de IA.",
-    
+
     // OAuth Pages
     Authentication_Error_Title: "Erro de Autenticação",
     Authentication_Success_Title: "Autenticação Bem-sucedida!",
@@ -31,14 +31,14 @@ export const pt = {
     Close_Window_Label: "Fechar Janela",
     Features_Available_Message: "Agora você pode usar os recursos do Assistente de Email no Rocket.Chat!",
     Safe_To_Close_Message: "Você pode fechar esta janela com segurança e retornar ao Rocket.Chat.",
-    
+
     // Action Labels
     Connect_Email_Action_Label: "Conectar Conta de Email",
     Check_Status_Action_Label: "Verificar Status de Conexão",
     Disconnect_Email_Action_Label: "Desconectar Email",
     Send_Email_Action_Label: "Enviar Email",
     View_Inbox_Action_Label: "Ver Caixa de Entrada",
-    
+
     // Messages
     OAuth_Connection_Success: "Conectado com sucesso à sua conta de email!",
     OAuth_Connection_Failed: "Falha ao conectar à sua conta de email. Tente novamente.",
@@ -49,7 +49,7 @@ export const pt = {
     Connection_Status_Disconnected: "Nenhuma conta de email está conectada.",
     Disconnect_Success: "Conta de email desconectada com sucesso.",
     Disconnect_Failed: "Falha ao desconectar sua conta de email.",
-    
+
     // Handler messages
     Already_Logged_In: "Você já está logado com **__provider__** como **__email__**.\n\nSe quiser desconectar, use `/email logout`.",
     Outlook_Coming_Soon: "**Autenticação do Outlook estará disponível em breve!**\n\nPor enquanto, use **Gmail** para autenticação de email.\n\n",
@@ -75,7 +75,7 @@ export const pt = {
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
     Login_Action_Text: "Fazer login no __provider__",
-    
+
     // User Preference Modal
     User_Preference_Title: "Preferências do Usuário",
     User_Preference_Button_Label: "⚙️ Preferências do Usuário",
@@ -87,7 +87,16 @@ export const pt = {
     User_Preference_Error: "**Falha ao atualizar preferências do usuário:**\n__error__",
     Email_Provider_Preference_Label: "Provedor de Email",
     Email_Provider_Preference_Description: "Escolha seu provedor de email preferido para autenticação",
-    
+
+    // LLM Configuration Modal
+    LLM_Configuration_Title: "Configuração LLM",
+    LLM_Configuration_Button_Label: "Configuração LLM",
+    LLM_Configuration_Update_Button: "Atualizar Configuração",
+    LLM_Configuration_Close_Button: "Fechar",
+    LLM_Configuration_Success: "Configuração LLM atualizada com sucesso!",
+    LLM_Configuration_Error: "Falha ao atualizar a configuração LLM:",
+    LLM_Config_Command: "use `/email llm-config` - Abrir configurações LLM",
+
     // Language names
     Language: "Idioma",
     Language_EN: "Inglês",
@@ -96,15 +105,15 @@ export const pt = {
     Language_PL: "Polonês",
     Language_PT: "Português",
     Language_RU: "Russo",
-    
+
     // Config error messages
     Config_Error: "Erro de configuração: __error__",
-    
+
     // Provider change messages
     Provider_Changed_Auto_Logout: "Você foi automaticamente desconectado de **__oldProvider__**",
     Provider_Change_Warning: "⚠️ Aviso: Alterar seu provedor de email irá desconectá-lo automaticamente de sua conta atual.",
     Provider_Changed_Login_Message: "Você pode fazer login na sua conta __provider__",
-    
+
     // Granular Error Messages
     Error_Fill_Required_Fields: "Erro ao processar solicitação. Por favor, preencha todos os campos obrigatórios ❌",
     Error_Fail_Internal: "Erro interno. Tente novamente mais tarde.",
@@ -121,38 +130,38 @@ export const pt = {
     Error_OAuth_Callback_Failed: "Callback OAuth falhou. Tente o processo de autenticação novamente.",
     Error_Settings_Not_Found: "Configurações de email não configuradas. Entre em contato com seu administrador.",
     Error_Provider_Mismatch: "Incompatibilidade na configuração do provedor de email. Entre em contato com seu administrador.",
-    
+
     // Success Messages
     Success_Connection_Established: "Conexão de email estabelecida com sucesso ✅",
     Success_User_Info_Retrieved: "Informações do usuário recuperadas com sucesso ✅",
     Success_Token_Refreshed: "Token de autenticação atualizado com sucesso ✅",
     Success_Logout_Complete: "Desconectado com sucesso de sua conta de email ✅",
     Success_Configuration_Updated: "Configuração de email atualizada com sucesso ✅",
-    
+
     // OAuth Specific Errors
     OAuth_Error_Authorization_Denied: "Autorização foi negada. Tente novamente e conceda as permissões necessárias.",
     OAuth_Error_Invalid_State: "Parâmetro de estado OAuth inválido. Isso pode ser um problema de segurança. Tente novamente.",
     OAuth_Error_Code_Exchange_Failed: "Erro ao trocar código de autorização por tokens. Tente novamente.",
     OAuth_Error_Invalid_Grant: "Grant OAuth inválido. Seu código de autorização pode ter expirado. Tente novamente.",
     OAuth_Error_Scope_Insufficient: "Permissões de escopo OAuth insuficientes. Entre em contato com seu administrador.",
-    
+
     // User-Friendly Error Messages
     User_Friendly_Auth_Error: "**Falha na Autenticação**\n\nNão conseguimos conectar à sua conta de email. Isso pode ser porque:\n• Suas credenciais expiraram\n• O serviço está temporariamente indisponível\n• Há um problema de configuração\n\nTente novamente ou entre em contato com seu administrador se o problema persistir.",
     User_Friendly_Network_Error: "**Problema de Conexão**\n\nEstamos tendo problemas para conectar ao serviço de email. Por favor:\n• Verifique sua conexão com a internet\n• Tente novamente em alguns momentos\n• Entre em contato com o suporte se o problema continuar",
     User_Friendly_Config_Error: "**Problema de Configuração**\n\nHá um problema com a configuração do serviço de email. Entre em contato com seu administrador para resolver este problema.",
-    
+
     // Modal Error Messages
     Modal_Error_Failed_To_Open: "Erro ao abrir modal de preferências. Tente novamente.",
     Modal_Error_Save_Failed: "Erro ao salvar preferências. Verifique sua entrada e tente novamente.",
     Modal_Error_Invalid_Input: "Entrada inválida fornecida. Verifique suas entradas e tente novamente.",
-    
+
     // Form Validation Messages
     Validation_Email_Required: "Endereço de email é obrigatório.",
     Validation_Email_Invalid: "Insira um endereço de email válido.",
     Validation_Field_Required: "Este campo é obrigatório.",
     Validation_Field_Too_Long: "Entrada é muito longa. Comprimento máximo é __max__ caracteres.",
     Validation_Field_Too_Short: "Entrada é muito curta. Comprimento mínimo é __min__ caracteres.",
-    
+
     // OAuth Endpoint Error Messages
     OAuth_Endpoint_Error_Obtaining_Token: "Erro ao obter token de acesso: __error__",
     OAuth_Endpoint_General_Error: "Ocorreu um erro: __error__",
@@ -161,36 +170,36 @@ export const pt = {
     OAuth_Endpoint_Authentication_Failed: "Autenticação falhou",
     OAuth_Endpoint_OAuth_Error: "Erro OAuth: __error__ - __description__",
     OAuth_Endpoint_Enhanced_Error: "__prefix__: __message__",
-    
+
     // Modal and UI Error Messages
     Error_Modal_Creation_Failed: "Falha ao criar modal de preferências do usuário",
     Error_Trigger_ID_Missing: "ID do gatilho não disponível para abrir modal",
-    
+
     // Storage Error Messages
     Storage_Failed_Save_Credentials: "Falha ao salvar credenciais OAuth",
-    Storage_Failed_Delete_Credentials: "Falha ao excluir credenciais OAuth", 
+    Storage_Failed_Delete_Credentials: "Falha ao excluir credenciais OAuth",
     Storage_Failed_Save_State: "Falha ao salvar estado OAuth",
-    
+
     // Generic Account Reference
     Generic_Account: "sua conta",
-    
+
     // OAuth Endpoint Short Keys (shorter names as requested)
     OAuth_Redir_Err: "Incompatibilidade de URI de redirecionamento. Certifique-se de que seu registro de aplicativo Azure inclui o URI exato: __uri__",
     OAuth_SSL_Err: "Erro de Protocolo SSL/TLS. Para desenvolvimento localhost, certifique-se de que o registro do aplicativo Azure inclui URI de redirecionamento HTTP (não HTTPS)",
     Provider_Label: "__provider__",
-    
+
     // Logger Messages (ultra-short keys)
     Log_Logout_Err: "Erro durante tentativa de limpeza de logout",
-    Log_Async_Logout: "Erro em ação de logout assíncrona", 
+    Log_Async_Logout: "Erro em ação de logout assíncrona",
     Log_Async_Pref: "Erro em ação de preferência de usuário assíncrona",
     Log_Pref_Handle: "Erro em handleUserPreferenceAction",
     Log_Auto_Logout: "Erro durante logout automático na mudança de provedor",
     Log_Pref_Submit: "Erro em handleUserPreferenceSubmit",
     Log_Notif_Err: "Falha ao enviar notificação de erro",
-    Log_Success_Err: "Falha ao enviar notificação de sucesso", 
+    Log_Success_Err: "Falha ao enviar notificação de sucesso",
     Log_Btn_Fallback: "Falha ao criar notificação com botão de login, recorrendo à notificação de texto",
     Log_Fallback_Err: "Falha ao enviar notificação de texto de fallback",
-    
+
     // Report feature messages
     Report_Provider_Not_Supported: "❌ **__provider__ não é suportado para relatórios.**\n\nPor favor, entre em contato com seu administrador para assistência.",
     Report_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar o relatório novamente.",
@@ -223,7 +232,7 @@ export const pt = {
     Query_Processed_Success: "Consulta processada com sucesso",
     Invalid_Tool_Name: "Nome de ferramenta inválido detectado",
     LLM_Parsing_Failed: "Falha ao analisar resposta do LLM",
-    
+
     // Tool Names (for user display)
     Tool_Send_Email: "Enviar Email",
     Tool_Extract_Attachment: "Extrair Anexos",
@@ -249,12 +258,12 @@ export const pt = {
     Send_Email_Validation_To_Required: "Pelo menos um destinatário é obrigatório",
     Send_Email_Validation_Subject_Required: "Assunto é obrigatório",
     Send_Email_Validation_Content_Required: "Conteúdo da mensagem é obrigatório",
-    
+
     // Send Email Button Translations
     Email_Ready_To_Send: "E-mail pronto para enviar",
     Email_Send_Button: "Enviar",
     Email_Edit_And_Send_Button: "Editar e Enviar",
-    
+
     // Send Email with Status
     Send_Email_Success_With_Emoji: "✅ E-mail enviado com sucesso",
     Send_Email_Failed_With_Emoji: "❌ Falha ao enviar e-mail: __error__",
@@ -271,7 +280,7 @@ export const pt = {
 
     // LLM Error Messages
     LLM_No_Response: "Nenhuma resposta recebida do serviço de IA. Tente novamente.",
-    LLM_No_Choices: "O serviço de IA retornou uma resposta vazia. Reformule sua solicitação.",
+    LLM_No_Choices: "Erro ao conectar com o serviço de IA. Verifique sua chave API ou URL.",
     LLM_Request_Failed: "Falha na comunicação com o serviço de IA",
 
     // Summarization Messages
@@ -295,4 +304,49 @@ export const pt = {
     Error_Email_Data_Unavailable: "Os dados do e-mail não estão mais disponíveis. Por favor, tente sua solicitação novamente.",
     Error_Please_Try_Again: "Por favor, tente novamente.",
     Error_Processing_Summary_Request: "Houve um problema ao processar sua solicitação de resumo. Por favor, tente novamente.",
-}; 
+
+    // LLM Configuration Settings
+    LLM_Provider_Label: "Provedor de LLM",
+    LLM_Provider_Description: "Selecione o provedor de modelo de linguagem IA para processar comandos de e-mail",
+    LLM_Provider_Default_Label: "Padrão (Auto-hospedado)",
+    LLM_Provider_OpenAI_Label: "OpenAI",
+    LLM_Provider_Gemini_Label: "Google Gemini",
+    LLM_Provider_Groq_Label: "Groq",
+    OpenAI_API_Key_Label: "Chave API do OpenAI",
+    OpenAI_API_Key_Description: "Sua chave API do OpenAI para acessar modelos GPT (necessário apenas ao usar o provedor OpenAI)",
+    Gemini_API_Key_Label: "Chave API do Google Gemini",
+    Gemini_API_Key_Description: "Sua chave API do Google AI Studio para acessar modelos Gemini (necessário apenas ao usar o provedor Gemini)",
+    Groq_API_Key_Label: "Chave API do Groq",
+    Groq_API_Key_Description: "Sua chave API do Groq para acessar modelos Llama (necessário apenas ao usar o provedor Groq)",
+
+    // User LLM Preferences
+    LLM_Usage_Preference_Label: "Preferência de Uso de LLM",
+    LLM_Usage_Preference_Placeholder: "Escolher preferência de uso de LLM",
+    LLM_Usage_Preference_Personal: "Pessoal",
+    LLM_Usage_Preference_Workspace: "Espaço de trabalho",
+    LLM_Provider_User_Label: "Provedor de LLM",
+    LLM_Provider_User_Placeholder: "Escolher provedor de LLM",
+    LLM_Provider_SelfHosted: "Auto-hospedado",
+    LLM_Provider_OpenAI: "OpenAI",
+    LLM_Provider_Gemini: "Gemini",
+    LLM_Provider_Groq: "Groq",
+    SelfHosted_URL_Label: "URL do LLM auto-hospedado",
+    SelfHosted_URL_Placeholder: "Digite sua URL do LLM auto-hospedado",
+    OpenAI_API_Key_User_Label: "Chave API do OpenAI",
+    OpenAI_API_Key_User_Placeholder: "Digite sua chave API do OpenAI",
+    Gemini_API_Key_User_Label: "Chave API do Gemini",
+    Gemini_API_Key_User_Placeholder: "Digite sua chave API do Gemini",
+    Groq_API_Key_User_Label: "Chave API do Groq",
+    Groq_API_Key_User_Placeholder: "Digite sua chave API do Groq",
+
+    // LLM Configuration Validation Messages
+    LLM_Config_Provider_Required: "Por favor, selecione um provedor LLM",
+    LLM_Config_SelfHosted_URL_Required: "URL auto-hospedada é necessária para o provedor selecionado",
+    LLM_Config_Invalid_URL: "Por favor, digite uma URL válida",
+    LLM_Config_OpenAI_Key_Required: "Chave API do OpenAI é necessária para o provedor selecionado",
+    LLM_Config_Invalid_OpenAI_Key: "Chave API do OpenAI deve começar com 'sk-'",
+    LLM_Config_Gemini_Key_Required: "Chave API do Gemini é necessária para o provedor selecionado",
+    LLM_Config_Groq_Key_Required: "Chave API do Groq é necessária para o provedor selecionado",
+    LLM_Config_Invalid_Provider: "Provedor LLM inválido selecionado",
+    LLM_API_Or_URL_Error: "Por favor, verifique sua API do LLM ou URL",
+};

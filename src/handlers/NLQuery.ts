@@ -24,7 +24,9 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
-import { handleError } from '../helper/errorHandler';
+import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
+import { getEffectiveLLMSettings } from '../config/SettingsManager';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -38,7 +40,8 @@ export class NLQueryHandler {
         private readonly sender: IUser,
         private readonly room: IRoom,
         private readonly language: Language,
-        private readonly triggerId?: string
+        private readonly triggerId?: string,
+        private readonly threadId?: string
     ) {}
 
     private extractUsernamesFromCurrentQuery(): string[] {
@@ -50,14 +53,14 @@ export class NLQueryHandler {
         // Get enhanced query with email mappings
         const enhancedQuery = await usernameService.enhanceQueryWithEmails(this.originalQuery);
         const usernamePairs = UsernameService.extractUsernameEmailPairs(enhancedQuery);
-        
+
         const toEmails = Array.isArray(args.to) ? args.to : [args.to].filter(Boolean);
         const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : [];
-        
+
         // Map emails back to usernames
         const toUsernames: string[] = [];
         const ccUsernames: string[] = [];
-        
+
         for (const pair of usernamePairs) {
             if (toEmails.includes(pair.email)) {
                 toUsernames.push(pair.username);
@@ -65,13 +68,13 @@ export class NLQueryHandler {
                 ccUsernames.push(pair.username);
             }
         }
-        
+
         return { toUsernames, ccUsernames };
     }
 
     public async processNaturalLanguageQuery(query: string): Promise<void> {
         const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
-        
+
         // Store the original query for username extraction
         this.originalQuery = query;
 
@@ -91,7 +94,7 @@ export class NLQueryHandler {
                 await this.handleToolExecution(toolCalls[0], appUser);
             } else {
                 await this.sendUserFriendlyError(
-                    t(Translations.LLM_NO_RESPONSE, this.language), 
+                    t(Translations.LLM_NO_RESPONSE, this.language),
                     appUser,
                     'no_response'
                 );
@@ -100,7 +103,7 @@ export class NLQueryHandler {
         } catch (error) {
             this.app.getLogger().error('ProcessNaturalLanguageQuery error:', error);
             await this.sendUserFriendlyError(
-                t(Translations.COMMON_UNKNOWN_ERROR, this.language), 
+                t(Translations.LLM_API_OR_URL_ERROR, this.language),
                 appUser,
                 'system_error'
             );
@@ -125,10 +128,22 @@ export class NLQueryHandler {
             const usernameService = new UsernameService(this.read);
             const enhancedQuery = await usernameService.enhanceQueryWithEmails(query);
 
-            // Process enhanced query with LLM
-            const llmService = new LLMService(this.http, this.app.getLogger());
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
             const result = await llmService.processNaturalLanguageQuery(enhancedQuery);
-            
+
             return {
                 toolCalls: result.toolCalls,
                 error: result.error || null
@@ -137,7 +152,7 @@ export class NLQueryHandler {
             this.app.getLogger().error('LLM processing error:', error);
             return {
                 toolCalls: null,
-                error: this.categorizeError(error)
+                error: handleLLMErrorAndGetMessage(this.app, 'NLQueryHandler', error, this.language)
             };
         }
     }
@@ -161,34 +176,17 @@ export class NLQueryHandler {
         // Only notify users for specific error types that they can act on
         const notifiableErrors = [
             'no_response',
-            'parsing_error', 
+            'parsing_error',
             'authentication_error',
             'data_not_found',
             'network_error',
             'system_error'
         ];
-        
+
         return !errorType || notifiableErrors.includes(errorType);
     }
 
-    private categorizeError(error: any): string {
-        const errorMessage = error.message?.toLowerCase() || '';
-        
-        if (errorMessage.includes('network') || errorMessage.includes('connection') || errorMessage.includes('timeout')) {
-            return t(Translations.ERROR_NETWORK_FAILURE, this.language);
-        }
-        
-        if (errorMessage.includes('auth') || errorMessage.includes('permission') || errorMessage.includes('unauthorized')) {
-            return t(Translations.ERROR_PERMISSION_DENIED, this.language);
-        }
-        
-        if (errorMessage.includes('not found') || errorMessage.includes('missing')) {
-            return t(Translations.ERROR_EMAIL_DATA_UNAVAILABLE, this.language);
-        }
-        
-        // Default to a user-friendly generic error
-        return t(Translations.COMMON_UNKNOWN_ERROR, this.language);
-    }
+
 
     private async handleToolExecution(toolCall: IToolCall, appUser: IUser): Promise<void> {
         // Parse tool arguments - LLM now provides clean JSON
@@ -197,7 +195,7 @@ export class NLQueryHandler {
             args = JSON.parse(toolCall.function.arguments);
         } catch (parseError) {
             await this.sendUserFriendlyError(
-                t(Translations.LLM_PARSING_ERROR, this.language), 
+                t(Translations.LLM_PARSING_ERROR, this.language),
                 appUser,
                 'parsing_error'
             );
@@ -216,19 +214,22 @@ export class NLQueryHandler {
     private async handleEmailTools(toolCall: IToolCall, args: any, appUser: IUser): Promise<void> {
         try {
             let emailData: ISendEmailData;
-            
+
             if (toolCall.function.name === LlmTools.SEND_EMAIL) {
                 // Map emails back to usernames for To and CC separately
                 const usernameService = new UsernameService(this.read);
                 const { toUsernames, ccUsernames } = await this.mapEmailsToUsernames(args, usernameService);
-                
+
+                const toEmails = Array.isArray(args.to) ? args.to as string[] : [args.to].filter(Boolean) as string[];
+                const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc as string[] : [args.cc].filter(Boolean) as string[]) : undefined;
+
                 emailData = {
-                    to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                    cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                    to: [...new Set(toEmails)],
+                    cc: ccEmails ? [...new Set(ccEmails)] : undefined,
                     subject: args.subject || '',
                     content: args.content || '',
-                    toUsernames: toUsernames, // Store To usernames for avatar display
-                    ccUsernames: ccUsernames, // Store CC usernames for avatar display
+                    toUsernames: [...new Set(toUsernames)], // Remove duplicate usernames
+                    ccUsernames: [...new Set(ccUsernames)], // Remove duplicate usernames
                 };
             } else {
                 // Handle summarize-and-send-email tool
@@ -245,7 +246,7 @@ export class NLQueryHandler {
         } catch (error) {
             this.app.getLogger().error('Error handling email tools:', error);
             await this.sendUserFriendlyError(
-                this.categorizeError(error),
+                handleLLMErrorAndGetMessage(this.app, 'Email Tools Handler', error, this.language),
                 appUser,
                 'data_processing_error'
             );
@@ -272,10 +273,24 @@ export class NLQueryHandler {
             // Create services for summarization
             const { MessageService } = await import('../services/MessageService');
             const messageService = new MessageService();
-            const llmService = new LLMService(this.http, this.app.getLogger());
 
-            // Retrieve messages from the current room
-            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams);
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
+
+            // Retrieve messages from the current room or thread
+            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
 
             if (messages.length === 0) {
                 throw new Error(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
@@ -301,22 +316,26 @@ export class NLQueryHandler {
                 summarizeParams
             );
 
+            const toEmails = Array.isArray(args.to) ? args.to as string[] : [args.to].filter(Boolean) as string[];
+            const ccEmails = args.cc ? (Array.isArray(args.cc) ? args.cc as string[] : [args.cc].filter(Boolean) as string[]) : undefined;
+            const toUsernames = this.extractUsernamesFromCurrentQuery();
+
             return {
-                to: Array.isArray(args.to) ? args.to : [args.to].filter(Boolean),
-                cc: args.cc ? (Array.isArray(args.cc) ? args.cc : [args.cc].filter(Boolean)) : undefined,
+                to: [...new Set(toEmails)],
+                cc: ccEmails ? [...new Set(ccEmails)] : undefined,
                 subject: emailResult.subject,
                 content: emailResult.content,
-                toUsernames: this.extractUsernamesFromCurrentQuery(), // For summarize, all usernames go to To field
+                toUsernames: [...new Set(toUsernames)], // Remove duplicate usernames
                 ccUsernames: [], // No CC usernames for summarize
             };
         } catch (error) {
             this.app.getLogger().error('Error preparing summarize email data:', error);
             // Re-throw user-friendly error messages, but convert system errors to generic ones
-            if (error.message === t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language) || 
+            if (error.message === t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language) ||
                 error.message === t(Translations.SUMMARY_GENERATION_FAILED, this.language)) {
                 throw error;
             }
-            
+
             // For any other system errors, throw a generic user-friendly message
             throw new Error(t(Translations.ERROR_PROCESSING_SUMMARY_REQUEST, this.language));
         }
@@ -349,12 +368,12 @@ export class NLQueryHandler {
             .setGroupable(false);
 
         const block = this.modify.getCreator().getBlockBuilder();
-        
+
         // Use MessageFormatter for consistent formatting
         const channelName = toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL
-            ? this.room.displayName || 'Channel' 
+            ? this.room.displayName || 'Channel'
             : undefined;
-        
+
         const formattedMessage = await MessageFormatter.formatEmailReadyMessage(
             this.sender.name || this.sender.username,
             emailData,
@@ -362,7 +381,7 @@ export class NLQueryHandler {
             this.read,
             channelName
         );
-        
+
         block.addSectionBlock({
             text: block.newMarkdownTextObject(formattedMessage),
         });
@@ -414,10 +433,10 @@ export class NLQueryHandler {
         } catch (error) {
             this.app.getLogger().error('Error executing tool:', error);
             await this.sendUserFriendlyError(
-                this.categorizeError(error),
+                handleLLMErrorAndGetMessage(this.app, 'Tool Execution', error, this.language),
                 appUser,
                 'tool_execution_error'
             );
         }
     }
-} 
+}

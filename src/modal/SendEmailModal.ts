@@ -129,7 +129,9 @@ export async function SendEmailModal({
     const { elementBuilder, blockBuilder } = app.getUtils();
     const blocks: (InputBlock | ContextBlock | SectionBlock | DividerBlock)[] = [];
 
-    const toFieldValue = emailData?.to ? emailData.to.join(', ') : '';
+    // Remove duplicates from To field emails
+    const uniqueToEmails = emailData?.to ? [...new Set(emailData.to)] : [];
+    const toFieldValue = uniqueToEmails.join(', ');
 
     // To field (required)
     const toElement = elementBuilder.createPlainTextInput(
@@ -152,9 +154,10 @@ export async function SendEmailModal({
         }),
     );
 
-    // Show avatars below To field if there are To usernames
+    // Show avatars below To field if there are To usernames (remove duplicates)
     if (emailData?.toUsernames && emailData.toUsernames.length > 0) {
-        const toAvatarElements = await createAvatarElementsFromUsernames(emailData.toUsernames, read);
+        const uniqueToUsernames = [...new Set(emailData.toUsernames)];
+        const toAvatarElements = await createAvatarElementsFromUsernames(uniqueToUsernames, read);
         if (toAvatarElements.length > 0) {
             blocks.push(
                 blockBuilder.createContextBlock({
@@ -164,12 +167,13 @@ export async function SendEmailModal({
         }
     }
 
-    // CC field (optional)
+    // CC field (optional) - remove duplicates from CC emails
+    const uniqueCcEmails = emailData?.cc ? [...new Set(emailData.cc)] : [];
     const ccElement = elementBuilder.createPlainTextInput(
         {
             text: t(Translations.SEND_EMAIL_CC_PLACEHOLDER, language),
             multiline: false,
-            initialValue: emailData?.cc ? emailData.cc.join(', ') : '',
+            initialValue: uniqueCcEmails.join(', '),
         },
         {
             blockId: SendEmailModalEnum.CC_BLOCK_ID,
@@ -185,9 +189,10 @@ export async function SendEmailModal({
         }),
     );
 
-    // Show avatars below CC field if there are CC usernames
+    // Show avatars below CC field if there are CC usernames (remove duplicates)
     if (emailData?.ccUsernames && emailData.ccUsernames.length > 0) {
-        const ccAvatarElements = await createAvatarElementsFromUsernames(emailData.ccUsernames, read);
+        const uniqueCcUsernames = [...new Set(emailData.ccUsernames)];
+        const ccAvatarElements = await createAvatarElementsFromUsernames(uniqueCcUsernames, read);
         if (ccAvatarElements.length > 0) {
             blocks.push(
                 blockBuilder.createContextBlock({

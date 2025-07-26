@@ -111,10 +111,22 @@ export const HeaderBuilders = {
     }),
 } as const;
 
+// LLM API Endpoints
+export const LlmApiUrls = {
+    OPENAI: 'https://api.openai.com/v1/chat/completions',
+    GEMINI: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
+    GROQ: 'https://api.groq.com/openai/v1/chat/completions',
+} as const;
+
+// LLM Models
+export const LlmModels = {
+    OPENAI: 'gpt-4o-mini',
+    GEMINI: 'gemini-2.0-flash-exp', 
+    GROQ: 'llama3-70b-8192',
+} as const;
+
 // LLM Configuration
 export const LlmConfig = {
-    ENDPOINT: 'http://llama3-8b.local:12345/v1/chat/completions',
-    MODEL_PATH: './dist/Llama-3-8B-Instruct-q4f16_1-MLC/',
     MAX_TOKENS: 2000,
     TEMPERATURE: 0.7,
     TIMEOUT: 30000, // 30 seconds

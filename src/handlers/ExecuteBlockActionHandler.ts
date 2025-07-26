@@ -24,12 +24,14 @@ import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { UserPreferenceModalEnum } from '../enums/modals/UserPreferenceModal';
 import { UserPreferenceModal } from '../modal/UserPreferenceModal';
+import { LLMConfigurationModal } from '../modal/LLMConfigurationModal';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
 import { EmailProviders } from '../enums/EmailProviders';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { handleError } from '../helper/errorHandler';
+import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -46,17 +48,54 @@ export class ExecuteBlockActionHandler {
     }
 
     public async handleActions(): Promise<IUIKitResponse> {
-        const { actionId, user, room, triggerId, message, value } = this.context.getInteractionData();
+        // Declare variables outside try block for access in catch block
+        let user: any;
+        let room: any;
+        let language: any;
 
-        if (!room) {
-            return this.context.getInteractionResponder().successResponse();
-        }
+        try {
+            const { actionId, triggerId, message, value } = this.context.getInteractionData();
+            user = this.context.getInteractionData().user;
+            room = this.context.getInteractionData().room;
 
-        const language = await getUserPreferredLanguage(
-            this.read.getPersistenceReader(),
-            this.persistence,
-            user.id,
-        );
+            const persistenceRead = this.read.getPersistenceReader();
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                persistenceRead,
+                user.id,
+            );
+
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            let roomPersistance: any = null;
+            if (roomId) {
+                roomPersistance = await this.read.getRoomReader().getById(roomId);
+            }
+
+            if (room === undefined) {
+                if (roomPersistance) {
+                    room = roomPersistance;
+                } else {
+                    return this.context.getInteractionResponder().errorResponse();
+                }
+            }
+
+            if (!room) {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+
+            const existingPreference = await userPreferenceStorage.getUserPreference();
+
+            language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
 
         const handler = new Handler({
             app: this.app,
@@ -74,6 +113,9 @@ export class ExecuteBlockActionHandler {
             case ActionIds.USER_PREFERENCE_ACTION:
                 await handler.Config();
                 break;
+            case ActionIds.LLM_CONFIGURATION_ACTION:
+                await handler.LLMConfig();
+                break;
             case ActionIds.EMAIL_LOGOUT_ACTION: {
                 await handler.Logout();
                 break;
@@ -84,15 +126,110 @@ export class ExecuteBlockActionHandler {
             }
             case UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID:
                 return await this.handleProviderChange(user);
+            case UserPreferenceModalEnum.LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID:
+                if (value === LLMUsagePreferenceEnum.Personal) {
+                    existingPreference.llmConfiguration = {
+                        ...(existingPreference.llmConfiguration || {}),
+                        llmUsagePreference: LLMUsagePreferenceEnum.Personal
+                    } as any;
+                    await userPreferenceStorage.storeUserPreference(existingPreference);
+
+                    const updatedPreference = await userPreferenceStorage.getUserPreference();
+                    const updatedModal = await UserPreferenceModal({
+                        app: this.app,
+                        modify: this.modify,
+                        existingPreference: updatedPreference,
+                    });
+
+                    return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                } else {
+                    existingPreference.llmConfiguration = {
+                        llmUsagePreference: LLMUsagePreferenceEnum.Workspace
+                    } as any;
+
+                    await userPreferenceStorage.storeUserPreference(existingPreference);
+
+                    const updatedPreference = await userPreferenceStorage.getUserPreference();
+                    const updatedModal = await UserPreferenceModal({
+                        app: this.app,
+                        modify: this.modify,
+                        existingPreference: updatedPreference,
+                    });
+
+                    return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                }
+                break;
+            case UserPreferenceModalEnum.LLM_PROVIDER_DROPDOWN_ACTION_ID:
+                const option = value as LLMProviderEnum;
+                if (value) {
+                    if (Object.values(LLMProviderEnum).includes(option)) {
+                        existingPreference.llmConfiguration = {
+                            ...(existingPreference.llmConfiguration || {}),
+                            llmProvider: option,
+                            selfHosted: undefined,
+                            openai: undefined,
+                            gemini: undefined,
+                            groq: undefined
+                        } as any;
+
+                        await userPreferenceStorage.storeUserPreference(existingPreference);
+
+                        const updatedPreference = await userPreferenceStorage.getUserPreference();
+                        const updatedModal = await UserPreferenceModal({
+                            app: this.app,
+                            modify: this.modify,
+                            existingPreference: updatedPreference,
+                        });
+
+                        return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+                    } else {
+                        this.app.getLogger().info('value is not part of LLMProviderEnum enum');
+                    }
+                } else {
+                    this.app.getLogger().info('no value');
+                }
+                break;
             case ActionIds.SEND_EMAIL_DIRECT_ACTION:
                 await this.handleDirectSendEmail(user, room);
                 break;
             case ActionIds.SEND_EMAIL_EDIT_ACTION:
                 await this.handleEditAndSendEmail(user, room, triggerId);
                 break;
+
+            // LLM Configuration Modal Actions
+            case ActionIds.LLM_USAGE_PREFERENCE_ACTION:
+                return await this.handleLLMUsagePreferenceChange(user, value, existingPreference, userPreferenceStorage);
+            case ActionIds.LLM_PROVIDER_ACTION:
+                return await this.handleLLMProviderChange(user, value, existingPreference, userPreferenceStorage);
+
+            default:
+                break;
         }
 
         return this.context.getInteractionResponder().successResponse();
+        } catch (error) {
+            this.app.getLogger().error('Error handling block action:', error);
+
+            // Use errorHandler for proper error handling
+            if (room && user) {
+                try {
+                    await handleError(
+                        this.app,
+                        this.read,
+                        this.modify,
+                        user,
+                        room,
+                        language,
+                        'Block Action Handler',
+                        error as Error
+                    );
+                } catch (notificationError) {
+                    this.app.getLogger().error('Error sending error notification:', notificationError);
+                }
+            }
+
+            return this.context.getInteractionResponder().errorResponse();
+        }
     }
 
     private async handleProviderChange(user: any): Promise<IUIKitResponse> {
@@ -383,4 +520,77 @@ export class ExecuteBlockActionHandler {
             this.app.getLogger().error('Error showing message:', error);
         }
     }
+
+    private async handleLLMUsagePreferenceChange(
+        user: any,
+        value: any,
+        existingPreference: any,
+        userPreferenceStorage: any
+    ): Promise<IUIKitResponse> {
+        try {
+            if (value === LLMUsagePreferenceEnum.Personal) {
+                existingPreference.llmConfiguration = {
+                    ...(existingPreference.llmConfiguration || {}),
+                    llmUsagePreference: LLMUsagePreferenceEnum.Personal
+                };
+            } else {
+                existingPreference.llmConfiguration = {
+                    ...(existingPreference.llmConfiguration || {}),
+                    llmUsagePreference: LLMUsagePreferenceEnum.Workspace
+                };
+            }
+
+            await userPreferenceStorage.storeUserPreference(existingPreference);
+
+            const updatedPreference = await userPreferenceStorage.getUserPreference();
+            const updatedModal = await LLMConfigurationModal({
+                app: this.app,
+                modify: this.modify,
+                existingPreference: updatedPreference,
+            });
+
+            return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+        } catch (error) {
+            this.app.getLogger().error('Error handling LLM usage preference change:', error);
+            return this.context.getInteractionResponder().successResponse();
+        }
+    }
+
+    private async handleLLMProviderChange(
+        user: any,
+        value: any,
+        existingPreference: any,
+        userPreferenceStorage: any
+    ): Promise<IUIKitResponse> {
+        try {
+            const option = value as LLMProviderEnum;
+            if (value && Object.values(LLMProviderEnum).includes(option)) {
+                existingPreference.llmConfiguration = {
+                    ...(existingPreference.llmConfiguration || {}),
+                    llmProvider: option,
+                    selfHosted: undefined,
+                    openai: undefined,
+                    gemini: undefined,
+                    groq: undefined
+                };
+
+                await userPreferenceStorage.storeUserPreference(existingPreference);
+
+                const updatedPreference = await userPreferenceStorage.getUserPreference();
+                const updatedModal = await LLMConfigurationModal({
+                    app: this.app,
+                    modify: this.modify,
+                    existingPreference: updatedPreference,
+                });
+
+                return this.context.getInteractionResponder().updateModalViewResponse(updatedModal);
+            }
+
+            return this.context.getInteractionResponder().successResponse();
+        } catch (error) {
+            this.app.getLogger().error('Error handling LLM provider change:', error);
+            return this.context.getInteractionResponder().successResponse();
+        }
+    }
+
 }

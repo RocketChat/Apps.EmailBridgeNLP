@@ -42,6 +42,24 @@ export function handleErrorAndGetMessage(
     return categorizeError(error, language);
 }
 
+export function handleLLMErrorAndGetMessage(
+    app: EmailBridgeNlpApp,
+    context: string,
+    error: any,
+    language?: Language,
+): string {
+    app.getLogger().error(`${context} error:`, error);
+
+    // Get status code from HTTP response
+    const statusCode = error.statusCode || error.response?.status || error.status;
+    
+    if (statusCode) {
+        return `${statusCode} error`;
+    }
+
+    return t(Translations.LLM_API_OR_URL_ERROR, language || Language.en);
+}
+
 function categorizeError(error: Error, language: Language): string {
     const errorMessage = error.message?.toLowerCase() || '';
 
