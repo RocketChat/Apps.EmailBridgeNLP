@@ -20,7 +20,7 @@ export const ru = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI для Outlook - должен заканчиваться на /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "подключить, статус, отключить, помощь, отчет",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Подключите и управляйте интеграцией вашей учетной записи электронной почты с помощью ИИ.",
 
     // OAuth Pages
@@ -48,10 +48,47 @@ export const ru = {
     Connection_Status_Connected: "Учетная запись электронной почты подключена и готова к использованию.",
     Connection_Status_Disconnected: "Нет подключенной учетной записи электронной почты.",
     Disconnect_Success: "Учетная запись электронной почты успешно отключена.",
-    Disconnect_Failed: "Не удалось отключить вашу учетную запись электронной почты.",
+    Disconnect_Failed: "Не удалось выйти из учетной записи электронной почты.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "✅ **Вход выполнен успешно!**\n\nВы подключены к **__provider__** как **__email__**.\n\nТеперь вы можете использовать функции EmailBridge NLP!",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Установлено и Готово Соединить Вашу Почту с ИИ!**",
+    Welcome_Text: "Добро пожаловать в **Email Assistant** в RocketChat!",
+    Welcome_Message: `
+        🚀 **Начните в 3 Простых Шага:**
+        
+        1️⃣ **Подключите Почту**: Используйте \`/email login\` для подключения Gmail или Outlook
+        2️⃣ **Настройте Параметры**: Используйте \`/email config\` для установки предпочтений
+        3️⃣ **Используйте ИИ**: Отправляйте команды на естественном языке как \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **Что Вы Можете Делать:**
+        • **Умное Управление Почтой**: "отправить письмо john@company.com о встрече"
+        • **Обзоры Каналов**: "обобщить этот разговор и отправить по почте manager@company.com"
+        • **Быстрая Статистика**: Получать ежедневную статистику почты и аналитику. Используйте \`/email stats\`.
+        
+        📊 **Функция Статистики Почты:**
+        Получайте персонализированные ежедневные отчеты показывающие:
+        • Общее количество полученных и отправленных писем
+        • Основные отправители и получатели
+        • Категории писем (работа, личное, уведомления)
+        
+        ⚙️ **Поддерживаемые Провайдеры:**
+        • **Gmail**
+        • **Outlook**
+        
+        🌍 **Мультиязыковая Поддержка:**
+        Доступно на английском, испанском, русском, немецком, польском и португальском
+        
+        Нужна помощь? Напишите \`/email help\` в любое время!
+        
+        Спасибо за выбор **Email Assistant** - Вашего ИИ Помощника Почты! 🤖
+        `,
 
     // Handler messages
-    Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите отключиться, используйте `/email logout`.",
+    Already_Logged_In: "Вы уже вошли в **__provider__** как **__email__**.\n\nЕсли хотите выйти, используйте `/email logout`.",
     Outlook_Coming_Soon: "**Аутентификация Outlook будет доступна в ближайшее время!**\n\nПока что используйте **Gmail** для аутентификации электронной почты.\n\n",
     Provider_Not_Implemented: "**Аутентификация __provider__ еще не реализована.**\n\nВ настоящее время поддерживается только **Gmail** для аутентификации.\n\n",
     Connect_Account_Message: "**Подключите свою учетную запись __provider__ к Rocket Chat**",
@@ -71,7 +108,7 @@ export const ru = {
     Login_Command: "используйте `/email login` - Войти в свою учетную запись электронной почты",
     Logout_Command: "используйте `/email logout` - Выйти из учетной записи электронной почты",
     Config_Command: "используйте `/email config` - Открыть пользовательские настройки и конфигурацию",
-    Report_Command: "используйте `/email report` - Получить ежедневный отчет статистики электронной почты",
+    Stats_Command: "используйте `/email stats` - Получить ежедневный отчет статистики электронной почты",
     Default_Greeting: "Привет __name__! Я Email Bot 👋. Я могу помочь вам со всеми вашими потребностями электронной почты.",
     Use_Help_Command: "Используйте `/email help`, чтобы узнать обо всех доступных функциях и командах.",
     Login_Action_Text: "Войти в __provider__",
@@ -200,14 +237,14 @@ export const ru = {
     Log_Btn_Fallback: "Не удалось создать уведомление с кнопкой входа, переход к текстовому уведомлению",
     Log_Fallback_Err: "Не удалось отправить резервное текстовое уведомление",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ не поддерживается для отчетов.**\n\nПожалуйста, обратитесь к администратору за помощью.",
-    Report_Not_Authenticated: "❌ **Вы не аутентифицированы с __provider__.**\n\nИспользуйте `/email login` для входа в систему сначала, затем попробуйте создать отчет снова.",
-    Report_Error: "❌ **Ошибка при создании отчета электронной почты:**\n__error__\n\nПожалуйста, попробуйте снова или обратитесь к администратору.",
-    Report_Header: "\n📊 **Отчет Статистики Электронной Почты(последние 24 часа)**",
-    Report_Statistics: "**Получено**: __receivedToday__ писем\n**Отправлено**: __sentToday__ писем\n**Непрочитанные**: __totalUnread__ писем",
-    Report_Token_Expired: "❌ **Срок действия вашей аутентификации истек.**\n\nИспользуйте `/email login`, чтобы повторно подключить свою учетную запись __provider__ и повторить попытку.",
-    Report_Categories_Label: "Report Categories",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ не поддерживается для статистики.**\n\nПожалуйста, обратитесь к администратору за помощью.",
+    Stats_Not_Authenticated: "❌ **Вы не аутентифицированы с __provider__.**\n\nИспользуйте `/email login` для входа в систему сначала, затем попробуйте создать статистику снова.",
+    Stats_Error: "❌ **Ошибка при создании статистики электронной почты:**\n__error__\n\nПожалуйста, попробуйте снова или обратитесь к администратору.",
+    Stats_Header: "\n📊 **Отчет Статистики Электронной Почты(последние 24 часа)**",
+    Stats_Statistics: "**Получено**: __receivedToday__ писем\n**Отправлено**: __sentToday__ писем\n**Непрочитанные**: __totalUnread__ писем",
+    Stats_Token_Expired: "❌ **Срок действия вашей аутентификации истек.**\n\nИспользуйте `/email login`, чтобы повторно подключить свою учетную запись __provider__ и повторить попытку.",
+    Stats_Categories_Label: "Категории Статистики",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -218,6 +255,11 @@ export const ru = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "Системный Промпт",
+    System_Prompt_Placeholder: "Настройте тон ваших писем (напр. [Вы Джон, разработчик в Rocket Chat. Вы очень заняты и так же заняты все с кем вы общаетесь, поэтому вы делаете свою лучшую работу, чтобы сохранить свои письма такими короткими, как это возможно и конкретными. Предпочитайте письма одной строкой. Сделайте свое лучшее, чтобы быть вежливым, и не быть слишком неформальным, чтобы не звучать грубо....])",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Обработка: \"__query__\"...",
     LLM_User_Query_Display: "**Ваш запрос:** __query__",
@@ -237,7 +279,7 @@ export const ru = {
     Tool_Send_Email: "Отправить Email",
     Tool_Extract_Attachment: "Извлечь Вложения",
     Tool_Summarize_And_Send: "Резюмировать и Отправить Email",
-    Tool_Report: "Создать Отчет",
+    Tool_Stats: "Создать Статистику",
 
     // Send Email Modal
     Send_Email_Modal_Title: "Отправить письмо",

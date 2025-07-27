@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
 
 export class OutlookService {
     private oauthService: IOAuthService;
@@ -54,7 +54,7 @@ export class OutlookService {
         if (receivedResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
             sentResponse.statusCode === 401 || totalResponse.statusCode === 401) {
             const providerName = getProviderDisplayName(EmailProviders.OUTLOOK);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
 
         const receivedData = JSON.parse(receivedResponse.content || '{}');

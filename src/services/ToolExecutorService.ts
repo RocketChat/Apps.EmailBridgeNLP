@@ -9,7 +9,7 @@ import { EmailServiceFactory } from './auth/EmailServiceFactory';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { EmailProviders } from '../enums/EmailProviders';
-import { GoogleOauthUrls, MicrosoftOauthUrls, HeaderBuilders, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
+import { GoogleOauthUrls, MicrosoftOauthUrls, HeaderBuilders, ContentTypes, HttpHeaders } from '../constants/constants';
 import { IToolExecutionResult } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';

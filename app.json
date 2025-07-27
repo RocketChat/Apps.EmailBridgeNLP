@@ -23,6 +23,9 @@
             "name": "room.read"
         },
         {
+            "name": "room.write"
+        },
+        {
             "name": "user.read"
         },
         {

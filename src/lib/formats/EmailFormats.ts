@@ -44,24 +44,24 @@ export class EmailFormats {
         return { subject, content: emailContent };
     }
 
-    public static formatEmailReport(
+    public static formatEmailStats(
         statistics: IEmailStatistics,
         language: Language
     ): string {
-        // Build category report section
-        const categoryReport = this.formatCategoryStats(statistics.categoryStats);
+        // Build category stats section
+        const categoryStats = this.formatCategoryStats(statistics.categoryStats);
 
-        // Build complete report message
-        const reportMessage = t(Translations.REPORT_HEADER, language) + '\n\n' +
-            t(Translations.REPORT_STATISTICS, language, {
+        // Build complete stats message
+        const statsMessage = t(Translations.STATS_HEADER, language) + '\n\n' +
+            t(Translations.STATS_STATISTICS, language, {
                 receivedToday: statistics.receivedToday.toString(),
                 receivedUnreadToday: statistics.receivedUnreadToday.toString(),
                 sentToday: statistics.sentToday.toString()
             }) + '\n\n' +
-            categoryReport +
+            categoryStats +
             '---';
 
-        return reportMessage;
+        return statsMessage;
     }
 
 

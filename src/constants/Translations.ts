@@ -51,6 +51,15 @@ export const Translations = {
     DISCONNECT_SUCCESS: 'Disconnect_Success',
     DISCONNECT_FAILED: 'Disconnect_Failed',
 
+    // Login success notifications (webhook)
+    LOGIN_SUCCESS_NOTIFICATION: 'Login_Success_Notification',
+
+    // Welcome message content (onInstall)
+    WELCOME_TITLE: 'Welcome_Title',
+    WELCOME_DESCRIPTION: 'Welcome_Description',
+    WELCOME_TEXT: 'Welcome_Text',
+    WELCOME_MESSAGE: 'Welcome_Message',
+
     // Handler Messages
     ALREADY_LOGGED_IN: 'Already_Logged_In',
     OUTLOOK_COMING_SOON: 'Outlook_Coming_Soon',
@@ -236,15 +245,15 @@ export const Translations = {
     DEV_HTTPS_TO_HTTP_CONVERSION: 'Development mode: Converting HTTPS redirect URI to HTTP for localhost',
     DEV_OUTLOOK_TOKEN_EXCHANGE_FAILED: 'Outlook OAuth token exchange failed',
 
-    // Report Feature Messages
-    REPORT_COMMAND: 'Report_Command',
-    REPORT_PROVIDER_NOT_SUPPORTED: 'Report_Provider_Not_Supported',
-    REPORT_NOT_AUTHENTICATED: 'Report_Not_Authenticated',
-    REPORT_ERROR: 'Report_Error',
-    REPORT_HEADER: 'Report_Header',
-    REPORT_STATISTICS: 'Report_Statistics',
-    REPORT_TOKEN_EXPIRED: 'Report_Token_Expired',
-    REPORT_CATEGORIES_LABEL: 'Report_Categories_Label',
+    // Stats Feature Messages
+    STATS_COMMAND: 'Stats_Command',
+    STATS_PROVIDER_NOT_SUPPORTED: 'Stats_Provider_Not_Supported',
+    STATS_NOT_AUTHENTICATED: 'Stats_Not_Authenticated',
+    STATS_ERROR: 'Stats_Error',
+    STATS_HEADER: 'Stats_Header',
+    STATS_STATISTICS: 'Stats_Statistics',
+    STATS_TOKEN_EXPIRED: 'Stats_Token_Expired',
+    STATS_CATEGORIES_LABEL: 'Stats_Categories_Label',
 
     // Statistics Service Errors
     STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',
@@ -255,6 +264,11 @@ export const Translations = {
     // User Preference Modal
     NEW_CATEGORY_LABEL: 'New_Category_Label',
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
+    
+    // System Prompt Configuration
+    SYSTEM_PROMPT_LABEL: 'System_Prompt_Label',
+    SYSTEM_PROMPT_PLACEHOLDER: 'System_Prompt_Placeholder',
+    
     // Tool Calling Messages
     LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
     LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',
@@ -274,7 +288,7 @@ export const Translations = {
     TOOL_SEND_EMAIL: 'Tool_Send_Email',
     TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
     TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
-    TOOL_REPORT: 'Tool_Report',
+    TOOL_STATS: 'Tool_Stats',
 
     // Send Email Modal
     SEND_EMAIL_MODAL_TITLE: 'Send_Email_Modal_Title',

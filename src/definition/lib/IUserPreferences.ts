@@ -45,8 +45,9 @@ export interface IPreference {
     language: Language;
     emailProvider: EmailProviders;
     showProviderWarning?: boolean; // Optional flag to show provider change warning in modal
-    reportCategories?: string[];
+    statsCategories?: string[];
     llmConfiguration?: ILLMConfiguration;
+    systemPrompt?: string; // Custom system prompt for email tone customization
 }
 
 export interface IUserPreferenceStorage {

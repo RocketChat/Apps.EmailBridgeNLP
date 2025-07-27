@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
 
 export class GmailService {
     private oauthService: IOAuthService;
@@ -80,7 +80,7 @@ export class GmailService {
 
                     if (response.statusCode === 401 || unreadResponse.statusCode === 401) {
                         const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-                        throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+                        throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
                     }
 
                     const data = JSON.parse(response.content || '{}');
@@ -99,7 +99,7 @@ export class GmailService {
             receivedResponse.statusCode === 401 || sentResponse.statusCode === 401 ||
             receivedUnreadResponse.statusCode === 401) {
             const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
 
         const allEmailsData = JSON.parse(allEmailsResponse.content || '{}');

@@ -20,7 +20,7 @@ export const de = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth Redirect URI für Outlook - sollte enden mit /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "verbinden, status, trennen, hilfe, bericht",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Verbinden und verwalten Sie Ihre E-Mail-Konto-Integration mit KI-Unterstützung.",
 
     // OAuth Pages
@@ -35,7 +35,7 @@ export const de = {
     // Action Labels
     Connect_Email_Action_Label: "E-Mail-Konto verbinden",
     Check_Status_Action_Label: "Verbindungsstatus prüfen",
-    Disconnect_Email_Action_Label: "E-Mail trennen",
+    Disconnect_Email_Action_Label: "Abmelden von E-Mail-Konto",
     Send_Email_Action_Label: "E-Mail senden",
     View_Inbox_Action_Label: "Posteingang anzeigen",
 
@@ -47,8 +47,45 @@ export const de = {
     Authentication_Required: "Authentifizierung erforderlich. Bitte verbinden Sie Ihr E-Mail-Konto.",
     Connection_Status_Connected: "E-Mail-Konto ist verbunden und einsatzbereit.",
     Connection_Status_Disconnected: "Kein E-Mail-Konto verbunden.",
-    Disconnect_Success: "E-Mail-Konto erfolgreich getrennt.",
-    Disconnect_Failed: "Trennen Ihres E-Mail-Kontos fehlgeschlagen.",
+    Disconnect_Success: "E-Mail-Konto erfolgreich abgemeldet.",
+    Disconnect_Failed: "Fehler beim Abmelden von Ihrem E-Mail-Konto.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "\n**Anmeldung erfolgreich!**\n\nSie sind jetzt mit **__provider__** als **__email__** verbunden.\n\nSie können jetzt EmailBridge NLP-Funktionen verwenden!",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Installiert und Bereit, Ihre E-Mail mit KI zu Verbinden!**",
+    Welcome_Text: "Willkommen bei **Email Assistant** in RocketChat!",
+    Welcome_Message: `
+        🚀 **Starten Sie in 3 Einfachen Schritten:**
+        
+        1️⃣ **E-Mail Verbinden**: Verwenden Sie \`/email login\` um Gmail oder Outlook zu verbinden
+        2️⃣ **Einstellungen Konfigurieren**: Verwenden Sie \`/email config\` um Ihre Einstellungen festzulegen
+        3️⃣ **KI Verwenden**: Senden Sie natürlichsprachliche Befehle wie "E-Mails von gestern zusammenfassen"
+        
+        📧 **Was Sie Tun Können:**
+        • **Intelligentes E-Mail-Management**: "E-Mail an john@company.com über das Meeting senden"
+        • **Kanal-Zusammenfassungen**: "diese Unterhaltung zusammenfassen und an manager@company.com mailen"
+        • **Schnelle Statistiken**: Tägliche E-Mail-Statistiken und Einblicke erhalten. Verwenden Sie \`/email stats\`.
+        
+        📊 **E-Mail-Statistik-Funktion:**
+        Erhalten Sie personalisierte tägliche Berichte mit:
+        • Gesamte empfangene und gesendete E-Mails
+        • Top-Absender und -Empfänger
+        • E-Mail-Kategorien (Arbeit, Privat, Benachrichtigungen)
+        
+        ⚙️ **Unterstützte Anbieter:**
+        • **Gmail**
+        • **Outlook**
+        
+        🌍 **Mehrsprachige Unterstützung:**
+        Verfügbar in Englisch, Spanisch, Russisch, Deutsch, Polnisch und Portugiesisch
+        
+        Brauchen Sie Hilfe? Geben Sie jederzeit \`/email help\` ein!
+        
+        Danke für die Wahl von **Email Assistant** - Ihr KI E-Mail-Assistent! 🤖
+        `,
 
     // Handler messages
     Already_Logged_In: "Sie sind bereits mit **__provider__** als **__email__** angemeldet.\n\nWenn Sie sich abmelden möchten, verwenden Sie `/email logout`.",
@@ -76,7 +113,7 @@ export const de = {
     Login_Command: "verwenden Sie `/email login` - Bei Ihrem E-Mail-Konto anmelden",
     Logout_Command: "verwenden Sie `/email logout` - Von Ihrem E-Mail-Konto abmelden",
     Config_Command: "verwenden Sie `/email config` - Benutzereinstellungen und Konfiguration öffnen",
-    Report_Command: "verwenden Sie `/email report` - Tägliche E-Mail-Statistiken abrufen",
+    Stats_Command: "verwenden Sie `/email stats` - Tägliche E-Mail-Statistiken abrufen",
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
     Login_Action_Text: "Bei __provider__ anmelden",
@@ -136,6 +173,11 @@ export const de = {
     Error_OAuth_Callback_Failed: "OAuth-Callback fehlgeschlagen. Bitte versuchen Sie den Authentifizierungsprozess erneut.",
     Error_Settings_Not_Found: "E-Mail-Einstellungen nicht konfiguriert. Bitte kontaktieren Sie Ihren Administrator.",
     Error_Provider_Mismatch: "E-Mail-Anbieter-Konfigurationsfehler. Bitte kontaktieren Sie Ihren Administrator.",
+
+    // Admin Configuration Error Messages
+    Admin_Config_Missing_OAuth_Settings: "⚙️ **Administrator-Setup Erforderlich**\n\n**__provider__ Authentifizierung ist nicht konfiguriert.**\n\nDer Administrator muss OAuth-Einstellungen in den App-Einstellungen konfigurieren:\n\n**Erforderliche Einstellungen:**\n• Client ID\n• Client Secret\n• Redirect URI\n\nBitte kontaktieren Sie Ihren Systemadministrator, um die Einrichtung abzuschließen.",
+    Admin_Config_Missing_Gmail_Settings: "⚙️ **Gmail OAuth Nicht Konfiguriert**\n\nIhr Administrator muss Gmail-Authentifizierung in den App-Einstellungen einrichten.\n\n**Fehlende Konfiguration:**\n• Google OAuth Client ID\n• Google OAuth Client Secret\n• OAuth Redirect URI\n\nBitte kontaktieren Sie Ihren Administrator, um diese Einstellungen zu konfigurieren.",
+    Admin_Config_Missing_Outlook_Settings: "⚙️ **Outlook OAuth Nicht Konfiguriert**\n\nIhr Administrator muss Outlook-Authentifizierung in den App-Einstellungen einrichten.\n\n**Fehlende Konfiguration:**\n• Outlook OAuth Client ID\n• Outlook OAuth Client Secret\n• Outlook Redirect URI\n\nBitte kontaktieren Sie Ihren Administrator, um diese Einstellungen zu konfigurieren.",
 
     // Success Messages
     Success_Connection_Established: "E-Mail-Verbindung erfolgreich hergestellt ✅",
@@ -206,14 +248,14 @@ export const de = {
     Log_Btn_Fallback: "Fehler beim Erstellen der Benachrichtigung mit Login-Button, Rückgriff auf Textbenachrichtigung",
     Log_Fallback_Err: "Fehler beim Senden der Fallback-Textbenachrichtigung",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ wird für Berichte nicht unterstützt.**\n\nBitte wenden Sie sich für Hilfe an Ihren Administrator.",
-    Report_Not_Authenticated: "❌ **Sie sind nicht bei __provider__ authentifiziert.**\n\nVerwenden Sie `/email login`, um sich zuerst anzumelden, und versuchen Sie dann erneut, den Bericht zu erstellen.",
-    Report_Error: "❌ **Fehler beim Erstellen des E-Mail-Berichts:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
-    Report_Header: "\n📊 **E-Mail-Statistikbericht(letzte 24 Stunden)**",
-    Report_Statistics: "**Empfangen**: __receivedToday__ E-Mails\n**Gesendet**: __sentToday__ E-Mails\n**Ungelesen**: __totalUnread__ E-Mails",
-    Report_Token_Expired: "❌ **Ihre Authentifizierung ist abgelaufen.**\n\nVerwenden Sie `/email login`, um Ihr __provider__-Konto erneut zu verbinden und es erneut zu versuchen.",
-    Report_Categories_Label: "Report Categories",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ wird für Statistiken nicht unterstützt.**\n\nBitte wenden Sie sich für Hilfe an Ihren Administrator.",
+    Stats_Not_Authenticated: "❌ **Sie sind nicht bei __provider__ authentifiziert.**\n\nVerwenden Sie `/email login`, um sich zuerst anzumelden, und versuchen Sie dann erneut, die Statistiken zu erstellen.",
+    Stats_Error: "❌ **Fehler beim Erstellen der E-Mail-Statistiken:**\n__error__\n\nBitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
+    Stats_Header: "\n📊 **E-Mail-Statistikbericht(letzte 24 Stunden)**",
+    Stats_Statistics: "**Empfangen**: __receivedToday__ E-Mails\n**Gesendet**: __sentToday__ E-Mails\n**Ungelesen**: __totalUnread__ E-Mails",
+    Stats_Token_Expired: "❌ **Ihre Authentifizierung ist abgelaufen.**\n\nVerwenden Sie `/email login`, um Ihr __provider__-Konto erneut zu verbinden und es erneut zu versuchen.",
+    Stats_Categories_Label: "Statistik-Kategorien",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -224,6 +266,11 @@ export const de = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "System-Prompt",
+    System_Prompt_Placeholder: "Passen Sie Ihren E-Mail-Ton an (z.B. [Sie sind John, ein Softwareentwickler bei Rocket Chat. Sie sind sehr beschäftigt und so ist auch jeder, mit dem Sie korrespondieren, daher geben Sie Ihr Bestes, um Ihre E-Mails so kurz wie möglich und auf den Punkt zu halten. Geben Sie Ihr Bestes, um freundlich zu sein, und seien Sie nicht so unformell, dass es hörbar ist...]",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Verarbeitung: \"__query__\"...",
     LLM_User_Query_Display: "**Ihre Anfrage ist:** __query__",
@@ -243,7 +290,7 @@ export const de = {
     Tool_Send_Email: "E-Mail Senden",
     Tool_Extract_Attachment: "Anhänge Extrahieren",
     Tool_Summarize_And_Send: "Zusammenfassen & E-Mail Senden",
-    Tool_Report: "Bericht Erstellen",
+    Tool_Stats: "Statistiken Erstellen",
 
     // Send Email Modal
     Send_Email_Modal_Title: "E-Mail senden",

@@ -13,7 +13,7 @@ import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
-import { AvatarUtils } from '../constants/AuthConstants';
+import { AvatarUtils } from '../constants/constants';
 
 // Helper function to create avatar elements using usernames
 async function createAvatarElementsFromUsernames(

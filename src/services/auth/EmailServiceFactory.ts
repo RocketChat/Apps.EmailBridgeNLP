@@ -168,7 +168,7 @@ export class EmailServiceFactory {
             userInfo = await oauthService.getUserInfo(params.userId);
         } catch (error) {
             const providerName = getProviderDisplayName(provider);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
         
         switch (provider) {

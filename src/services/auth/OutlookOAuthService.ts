@@ -9,7 +9,7 @@ import {
     ProtocolConstants,
     ContentTypes,
     HttpHeaders
-} from '../../constants/AuthConstants';
+} from '../../constants/constants';
 import { Translations } from '../../constants/Translations';
 
 export class OutlookOAuthService implements IOAuthService {

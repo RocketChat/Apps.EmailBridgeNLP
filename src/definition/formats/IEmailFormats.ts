@@ -16,7 +16,7 @@ export interface IFormatSummaryDetailsParams {
     timeInfo?: ISummaryTimeInfo;
 }
 
-export interface IReportFormattingOptions {
+export interface IStatsFormattingOptions {
     includeCategoryStats?: boolean;
     includeFooter?: boolean;
     customFooter?: string;

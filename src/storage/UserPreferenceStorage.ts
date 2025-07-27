@@ -28,17 +28,18 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
         const currentPreference = await this.getUserPreference();
 
         // Store categories as selected by user (no forced defaults)
-        const userSelectedCategories = preference.reportCategories 
-            ? preference.reportCategories.map(c => c.toLowerCase())
-            : currentPreference.reportCategories;
+                const userSelectedCategories = preference.statsCategories
+            ? preference.statsCategories.map(c => c.toLowerCase())
+            : currentPreference.statsCategories;
 
         const updatedPreference: IPreference = {
             userId: this.userId,
             language: preference.language || currentPreference.language,
             emailProvider: preference.emailProvider || currentPreference.emailProvider,
-            reportCategories: userSelectedCategories,
+            statsCategories: userSelectedCategories,
             showProviderWarning: preference.showProviderWarning || currentPreference.showProviderWarning,
             llmConfiguration: preference.llmConfiguration || currentPreference.llmConfiguration,
+            systemPrompt: preference.systemPrompt !== undefined ? preference.systemPrompt : currentPreference.systemPrompt,
         };
 
         const association = new RocketChatAssociationRecord(
@@ -68,7 +69,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
                 userId: this.userId,
                 language: Language.en,
                 emailProvider: EmailProviders.GMAIL,
-                reportCategories: ['github', 'calendar', 'social'],
+                statsCategories: ['github', 'calendar', 'social'],
             };
             return preference;
         }

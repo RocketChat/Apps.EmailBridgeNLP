@@ -95,8 +95,8 @@ export class CommandUtility implements ICommandUtility {
             case CommandParam.CONFIG:
                 await handler.Config();
                 break;
-            case CommandParam.REPORT:
-                await handler.Report();
+            case CommandParam.STATS:
+                await handler.Stats();
                 break;
             default: {
                 const query = this.params.join(' ');

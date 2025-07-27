@@ -2,7 +2,7 @@ import { Language, t } from './Translation/translation';
 import { Translations } from '../constants/Translations';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { IRead } from '@rocket.chat/apps-engine/definition/accessors';
-import { AvatarUtils } from '../constants/AuthConstants';
+import { AvatarUtils } from '../constants/constants';
 
 export class MessageFormatter {
     

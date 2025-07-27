@@ -74,7 +74,7 @@ export class RoomInteractionStorage {
     public async clearInteractionRoomId(): Promise<void> {
         const association = new RocketChatAssociationRecord(
             RocketChatAssociationModel.USER,
-            this.userId,
+            `${this.userId}-room-interaction`,
         );
         
         await this.persistence.removeByAssociation(association);

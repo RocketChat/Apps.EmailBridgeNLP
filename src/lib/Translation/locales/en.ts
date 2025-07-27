@@ -20,7 +20,7 @@ export const en = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "connect, status, disconnect, help, report",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Connect and manage your email account integration with AI assistance.",
 
     // OAuth Pages
@@ -34,8 +34,8 @@ export const en = {
 
     // Action Labels
     Connect_Email_Action_Label: "Connect Email Account",
-    Check_Status_Action_Label: "Check Connection Status",
-    Disconnect_Email_Action_Label: "Disconnect Email",
+    Check_Status_Action_Label: "Check Logged In Status",
+    Disconnect_Email_Action_Label: "Logout from Email Account",
     Send_Email_Action_Label: "Send Email",
     View_Inbox_Action_Label: "View Inbox",
 
@@ -47,11 +47,49 @@ export const en = {
     Authentication_Required: "Authentication required. Please connect your email account.",
     Connection_Status_Connected: "Email account is connected and ready to use.",
     Connection_Status_Disconnected: "No email account is connected.",
-    Disconnect_Success: "Email account disconnected successfully.",
-    Disconnect_Failed: "Failed to disconnect your email account.",
+    Disconnect_Success: "Email account logged out successfully.",
+    Disconnect_Failed: "Failed to log out from your email account.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "\n**Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Installed and Ready to Connect to Your Email Directly from RocketChat!**",
+    Welcome_Text: "Welcome to **Email Assistant** in RocketChat!",
+    Welcome_Message: `
+
+        🚀 **Get Started in 3 Easy Steps:**
+        
+        1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
+        2️⃣ **Configure Settings**: Use \`/email config\` and \`/email llm-config\` to set your preferences
+        3️⃣ **Start Using AI**: Send natural language commands like \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **What You Can Do:**
+        • **Smart Email Management**: "send email to @John.doe about the meeting"
+        • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
+        • **Quick Stats**: Get email statistics. Use \`/email stats\`.
+        
+        📊 **Email Statistics Feature:**
+        Get personalized email statistics report showing:
+        • Total emails received and sent
+        • Top senders and recipients
+        • Email categories (general, calendar, github, etc.)
+        
+        ⚙️ **Supported Providers:**
+        • **Gmail** 
+        • **Outlook**
+
+        🌍 **Multi-Language Support:**
+        Available in English, Spanish, Russian, German, Polish, and Portuguese
+        
+        Need help? Type \`/email help\` anytime!
+        
+        Thanks for choosing **Email Assistant** - Your AI powered Email Assistant! 🤖
+        `,
 
     // Handler messages
-    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to disconnect, use `/email logout`.",
+    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to Logout, use `/email logout`.",
     Outlook_Coming_Soon: "**Outlook authentication will be available soon!**\n\nFor now, please use **Gmail** for email authentication.\n\n",
     Provider_Not_Implemented: "**__provider__ authentication is not yet implemented.**\n\nCurrently only **Gmail** is supported for authentication.\n\n",
     Connect_Account_Message: "**Connect your __provider__ account to Rocket Chat**",
@@ -71,7 +109,7 @@ export const en = {
     Login_Command: "use `/email login` - Login to your email account",
     Logout_Command: "use `/email logout` - Logout from your email account",
     Config_Command: "use `/email config` - Open user preferences and settings",
-    Report_Command: "use `/email report` - Get daily email statistics report",
+    Stats_Command: "use `/email stats` - Get daily email statistics report",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
     Login_Action_Text: "Login to __provider__",
@@ -201,14 +239,14 @@ export const en = {
     Log_Fallback_Err: "Failed to send fallback text notification",
 
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ is not supported for reports.**\n\nPlease contact your administrator for assistance.",
-    Report_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the report again.",
-    Report_Error: "❌ **Error generating email report:**\n__error__\n\nPlease try again or contact your administrator.",
-    Report_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
-    Report_Statistics: "**Received**: __receivedToday__ emails (__receivedUnreadToday__ unread)\n**Sent**: __sentToday__ emails",
-    Report_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
-    Report_Categories_Label: "Report Categories",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ is not supported for stats.**\n\nPlease contact your administrator for assistance.",
+    Stats_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the stats again.",
+    Stats_Error: "❌ **Error generating email stats:**\n__error__\n\nPlease try again or contact your administrator.",
+    Stats_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
+    Stats_Statistics: "**Received**: __receivedToday__ emails (__receivedUnreadToday__ unread)\n**Sent**: __sentToday__ emails",
+    Stats_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
+    Stats_Categories_Label: "Stats Categories",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -219,6 +257,11 @@ export const en = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "System Prompt",
+    System_Prompt_Placeholder: "Customize your email tone   e.g. [You're John, a Software Developer at Rocket Chat. You're very busy and so is everyone you correspond with, so you do your best to keep your emails to the point. Do your best to be kind, and don't be so informal that it comes across as rude....]",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Processing: \"__query__\"...",
     LLM_User_Query_Display: "**Your query is:** __query__",
@@ -238,7 +281,7 @@ export const en = {
     Tool_Send_Email: "Send Email",
     Tool_Extract_Attachment: "Extract Attachments",
     Tool_Summarize_And_Send: "Summarize & Send Email",
-    Tool_Report: "Generate Report",
+    Tool_Stats: "Generate Stats",
 
     // Send Email Modal
     Send_Email_Modal_Title: "Send Email",

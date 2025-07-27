@@ -20,7 +20,7 @@ export const es = {
     Outlook_OAuth_Redirect_URI_Description: "URI de redirección OAuth para Outlook - debe terminar con /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "conectar, estado, desconectar, ayuda",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Conectar y gestionar la integración de su cuenta de email con asistencia de IA.",
 
     // OAuth Pages
@@ -47,11 +47,48 @@ export const es = {
     Authentication_Required: "Autenticación requerida. Por favor conecte su cuenta de email.",
     Connection_Status_Connected: "La cuenta de email está conectada y lista para usar.",
     Connection_Status_Disconnected: "No hay cuenta de email conectada.",
-    Disconnect_Success: "Cuenta de email desconectada exitosamente.",
-    Disconnect_Failed: "No se pudo desconectar su cuenta de email.",
+    Disconnect_Success: "Cuenta de correo electrónico cerrada exitosamente.",
+    Disconnect_Failed: "Error al cerrar sesión de tu cuenta de correo electrónico.",
+
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Aplicación Email Assistant**",
+    Welcome_Description: "**¡Instalada y Lista para Conectar tu Email con IA!**",
+    Welcome_Text: "¡Bienvenido a **Email Assistant** en RocketChat!",
+    Welcome_Message: `
+        🚀 **Comienza en 3 Pasos Fáciles:**
+        
+        1️⃣ **Conecta tu Email**: Usa \`/email login\` para conectar Gmail o Outlook
+        2️⃣ **Configura Ajustes**: Usa \`/email config\` para establecer tus preferencias
+        3️⃣ **Usa la IA**: Envía comandos en lenguaje natural como \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **Lo que Puedes Hacer:**
+        • **Gestión Inteligente de Email**: "enviar email a john@company.com sobre la reunión"
+        • **Resúmenes de Canal**: "resumir esta conversación y enviarla por email a manager@company.com"
+        • **Estadísticas Rápidas**: Obtener estadísticas diarias de email e insights. Usa \`/email stats\`.
+        
+        📊 **Función de Estadísticas de Email:**
+        Obtén reportes diarios personalizados mostrando:
+        • Total de emails recibidos y enviados
+        • Principales remitentes y destinatarios
+        • Categorías de email (trabajo, personal, notificaciones)
+        
+        ⚙️ **Proveedores Soportados:**
+        • **Gmail**
+        • **Outlook**
+        
+        🌍 **Soporte Multi-idioma:**
+        Disponible en inglés, español, ruso, alemán, polaco y portugués
+        
+        ¿Necesitas ayuda? ¡Escribe \`/email help\` en cualquier momento!
+        
+        ¡Gracias por elegir **Email Assistant** - Tu Asistente de Email con IA! 🤖
+        `,
+        
+    Login_Success_Notification: "**¡Inicio de sesión exitoso!**\n\nAhora estás conectado a **__provider__** como **__email__**.✅ ",
 
     // Handler messages
-    Already_Logged_In: "Ya está conectado con **__provider__** como **__email__**.\n\nSi desea cerrar sesión, use `/email logout`.",
+    Already_Logged_In: "Ya has iniciado sesión con **__provider__** como **__email__**.\n\nSi quieres cerrar sesión, usa `/email logout`.",
     Outlook_Coming_Soon: "**¡La autenticación de Outlook estará disponible pronto!**\n\nPor ahora, por favor use **Gmail** para autenticación de email.\n\n",
     Provider_Not_Implemented: "**La autenticación de __provider__ aún no está implementada.**\n\nActualmente solo **Gmail** está soportado para autenticación.\n\n",
     Connect_Account_Message: "**Conectar su cuenta de __provider__ a Rocket Chat**",
@@ -203,15 +240,15 @@ export const es = {
     Log_Btn_Fallback: "Error al crear notificación con botón de inicio de sesión, recurriendo a notificación de texto",
     Log_Fallback_Err: "Error al enviar notificación de texto de respaldo",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ no es compatible para reportes.**\n\nPor favor, contacta a tu administrador para asistencia.",
-    Report_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar el reporte nuevamente.",
-    Report_Error: "❌ **Error al generar el reporte de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
-    Report_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
-    Report_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
-    Report_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
-    Report_Categories_Label: "Report Categories",
-    Report_Command: "usa `/email report` - Obtener informe diario de estadísticas de correo",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ no es compatible para estadísticas.**\n\nPor favor, contacta a tu administrador para asistencia.",
+    Stats_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar las estadísticas nuevamente.",
+    Stats_Error: "❌ **Error al generar las estadísticas de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Stats_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
+    Stats_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
+    Stats_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
+    Stats_Categories_Label: "Categorías de Estadísticas",
+    Stats_Command: "usa `/email stats` - Obtener informe diario de estadísticas de correo",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -222,6 +259,11 @@ export const es = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "Prompt del Sistema",
+    System_Prompt_Placeholder: "Personaliza el tono de tus emails (ej. [Eres John, un desarrollador de software en Rocket Chat. Eres muy ocupado y así lo son todos con quienes correspondes, por lo que haces tu mejor esfuerzo para mantener tus emails lo más cortos posible y concisos. Prefiere emails de una línea. Haz tu mejor esfuerzo para ser amable, y no seas tan informal que suene grosero....])",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Procesando: \"__query__\"...",
     LLM_User_Query_Display: "**Tu consulta es:** __query__",
@@ -241,7 +283,7 @@ export const es = {
     Tool_Send_Email: "Enviar Email",
     Tool_Extract_Attachment: "Extraer Adjuntos",
     Tool_Summarize_And_Send: "Resumir y Enviar Email",
-    Tool_Report: "Generar Reporte",
+    Tool_Stats: "Generar Estadísticas",
 
     // Send Email Modal
     Send_Email_Modal_Title: 'Enviar Correo',

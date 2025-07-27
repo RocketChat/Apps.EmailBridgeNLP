@@ -4,5 +4,5 @@ export enum CommandParam {
     LOGOUT = 'logout',
     CONFIG = 'config',
     LLM_CONFIG = 'llm-config',
-    REPORT = 'report',
+    STATS = 'stats',
 } 

@@ -2,7 +2,7 @@ import { IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { IMessage, ISummarizeParams } from '../definition/lib/IEmailUtils';
-import { MessageConfig } from '../constants/AuthConstants';
+import { MessageConfig } from '../constants/constants';
 
 export class MessageService {
     public async getMessages(
