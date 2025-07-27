@@ -1,3 +1,5 @@
+import { TemplatePlaceholders } from './constants';
+
 // Common reusable prompt components
 
 const EMAIL_ASSISTANT_INTRO = `
@@ -163,7 +165,7 @@ export const LlmPrompts = {
     
     USER_PREFERENCES_PROMPT,
     
-    SUMMARIZE_PROMPT: `You are an AI assistant specializing in giving clear and concise conversation summaries. Your task is to summarize the following Rocket.Chat conversation from the channel "__channelName__".
+    SUMMARIZE_PROMPT: `You are an AI assistant specializing in giving clear and concise conversation summaries. Your task is to summarize the following Rocket.Chat conversation from the channel "${TemplatePlaceholders.CHANNEL_NAME}".
 
     The summary should be easy for anyone to read, even if they were not part of the conversation. Structure your response as follows. You can tweak the structure according to the conversation(only if needed):
 
@@ -172,7 +174,7 @@ export const LlmPrompts = {
     3.  **ACTION ITEMS:** If any, list clear action items and who they are assigned to in a separate bulleted list.
 
     Here is the conversation:
-    __messages__
+    ${TemplatePlaceholders.MESSAGES}
 
     Generate the summary based on these instructions.`,
 

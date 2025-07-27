@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
 
 export class GmailService {
     private oauthService: IOAuthService;

@@ -149,3 +149,9 @@ export const AvatarUtils = {
     buildAvatarUrl: (username: string, format: string = AvatarConfig.DEFAULT_FORMAT, size: number = AvatarConfig.DEFAULT_SIZE) => 
         `${AvatarConfig.ENDPOINT_PATH}/${username}?format=${format}&size=${size}`,
 } as const;
+
+// Template Placeholders
+export const TemplatePlaceholders = {
+    CHANNEL_NAME: '__channelName__',
+    MESSAGES: '__messages__',
+} as const;

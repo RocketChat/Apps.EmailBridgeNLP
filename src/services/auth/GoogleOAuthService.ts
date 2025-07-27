@@ -8,7 +8,7 @@ import {
     OauthConfig,
     ContentTypes,
     HttpHeaders
-} from '../../constants/AuthConstants';
+} from '../../constants/constants';
 import { Translations } from '../../constants/Translations';
 
 export class GoogleOAuthService implements IOAuthService {

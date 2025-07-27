@@ -7,7 +7,7 @@ import { Language, t } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { LLMProviderEnum } from '../definition/lib/IUserPreferences';
 import { IPreference } from '../definition/lib/IUserPreferences';
-import { HttpHeaders, ContentTypes, LlmModels, LlmApiUrls } from '../constants/AuthConstants';
+import { HttpHeaders, ContentTypes, LlmModels, LlmApiUrls, TemplatePlaceholders } from '../constants/constants';
 import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 
 export class LLMService {
@@ -361,8 +361,8 @@ export class LLMService {
 
     public async generateSummary(messages: string, channelName: string): Promise<string> {
         const prompt = LlmPrompts.SUMMARIZE_PROMPT
-            .replace('__channelName__', channelName)
-            .replace('__messages__', messages);
+            .replace(TemplatePlaceholders.CHANNEL_NAME, channelName)
+            .replace(TemplatePlaceholders.MESSAGES, messages);
 
         try {
             let response;

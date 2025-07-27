@@ -14,7 +14,7 @@ import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { OutlookOAuthService } from '../services/auth/OutlookOAuthService';
 import { OAuthHtmlTemplates } from '../lib/templates/OAuthHtmlTemplates';
 import { getOutlookOAuthSettings } from '../config/SettingsManager';
-import { OauthEndpointPaths, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
+import { OauthEndpointPaths, ContentTypes, HttpHeaders } from '../constants/constants';
 import { Translations } from '../constants/Translations';
 import { t, Language } from '../lib/Translation/translation';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
