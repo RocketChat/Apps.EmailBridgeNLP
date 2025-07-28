@@ -297,10 +297,22 @@ export const es = {
     Send_Email_Content_Placeholder: 'Ingrese el contenido del correo',
     Send_Email_Send_Button: 'Enviar',
     Send_Email_Cancel_Button: 'Cancelar',
+    Send_Email_Test_Button: 'Enviar Correo de Prueba a Mí',
     Send_Email_Success: 'Correo enviado exitosamente ✅',
     Send_Email_Failed: 'Error al enviar correo: __error__',
-    Send_Email_Modal_Opened: 'Modal de composición de correo abierto',
+    Send_Email_Modal_Opened: 'Modal de envío de correo abierto',
     Send_Email_Error_No_From_Email: 'No se puede determinar la dirección de correo del remitente',
+
+    // Send Type dropdown
+    Send_Type_Label: 'Tipo de Envío',
+    Send_Type_Recipients: 'Enviar a destinatario(s)',
+    Send_Type_Test_Self: 'Enviar correo de prueba a mí mismo',
+    
+    // Test Email notifications
+    Test_Email_Success: 'Correo de prueba enviado a tu dirección ✅',
+    Test_Email_Success_With_Email: 'Correo de prueba enviado a: __userEmail__ ✅',
+    Test_Email_Failed: 'Error al enviar correo de prueba ❌',
+    Test_Email_No_User_Email: 'No se pudo obtener tu dirección de correo ❌',
 
     // Send Email Validation
     Send_Email_Validation_To_Required: "La dirección de correo del destinatario es obligatoria",

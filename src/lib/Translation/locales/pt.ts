@@ -293,10 +293,22 @@ export const pt = {
     Send_Email_Content_Placeholder: "Digite o conteúdo da sua mensagem",
     Send_Email_Send_Button: "Enviar e-mail",
     Send_Email_Cancel_Button: "Cancelar",
-    Send_Email_Modal_Opened: "Modal de composição de e-mail aberto com sucesso",
+    Send_Email_Test_Button: "Enviar E-mail de Teste para Mim",
+    Send_Email_Modal_Opened: "Modal de envio de e-mail aberto",
     Send_Email_Success: "E-mail enviado com sucesso ✅",
     Send_Email_Failed: "Falha ao enviar e-mail: __error__",
     Send_Email_Error_No_From_Email: "Não é possível determinar o endereço de e-mail do remetente",
+
+    // Send Type dropdown
+    Send_Type_Label: "Tipo de Envio",
+    Send_Type_Recipients: "Enviar para destinatário(s)",
+    Send_Type_Test_Self: "Enviar e-mail de teste para mim",
+    
+    // Test Email notifications
+    Test_Email_Success: "E-mail de teste enviado para seu endereço ✅",
+    Test_Email_Success_With_Email: "E-mail de teste enviado para: __userEmail__ ✅",
+    Test_Email_Failed: "Falha ao enviar e-mail de teste ❌",
+    Test_Email_No_User_Email: "Não foi possível obter seu endereço de e-mail ❌",
     Send_Email_Validation_To_Required: "Pelo menos um destinatário é obrigatório",
     Send_Email_Validation_Subject_Required: "Assunto é obrigatório",
     Send_Email_Validation_Content_Required: "Conteúdo da mensagem é obrigatório",

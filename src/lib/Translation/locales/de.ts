@@ -304,10 +304,11 @@ export const de = {
     Send_Email_Content_Placeholder: "Geben Sie Ihren Nachrichteninhalt ein",
     Send_Email_Send_Button: "E-Mail senden",
     Send_Email_Cancel_Button: "Abbrechen",
-    Send_Email_Modal_Opened: "E-Mail Kompositions-Modal erfolgreich geöffnet",
+    Send_Email_Test_Button: "Test-E-Mail an mich senden",
+    Send_Email_Modal_Opened: "E-Mail senden Modal geöffnet",
     Send_Email_Success: "E-Mail erfolgreich gesendet ✅",
     Send_Email_Failed: "Fehler beim Senden der E-Mail: __error__",
-    Send_Email_Error_No_From_Email: "Absender-E-Mail-Adresse kann nicht bestimmt werden",
+    Send_Email_Error_No_From_Email: "E-Mail-Adresse des Absenders kann nicht ermittelt werden",
     Send_Email_Validation_To_Required: "Empfänger-E-Mail-Adresse ist erforderlich",
     Send_Email_Validation_Subject_Required: "E-Mail-Betreff ist erforderlich",
     Send_Email_Validation_Content_Required: "E-Mail-Inhalt ist erforderlich",
@@ -396,4 +397,15 @@ export const de = {
     LLM_Config_Groq_Key_Required: "Groq API-Schlüssel ist für den ausgewählten Anbieter erforderlich",
     LLM_Config_Invalid_Provider: "Ungültiger LLM-Anbieter ausgewählt",
     LLM_API_Or_URL_Error: "Bitte überprüfen Sie Ihren LLM API-Schlüssel oder URL",
+
+    // Send Type dropdown
+    Send_Type_Label: "Sendetyp",
+    Send_Type_Recipients: "An Empfänger senden",
+    Send_Type_Test_Self: "Test-E-Mail an mich senden",
+    
+    // Test Email notifications
+    Test_Email_Success: "Test-E-Mail an Ihre Adresse gesendet ✅",
+    Test_Email_Success_With_Email: "Test-E-Mail gesendet an: __userEmail__ ✅",
+    Test_Email_Failed: "Test-E-Mail konnte nicht gesendet werden ❌",
+    Test_Email_No_User_Email: "E-Mail-Adresse konnte nicht abgerufen werden ❌",
 };

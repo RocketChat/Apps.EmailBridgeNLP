@@ -10,6 +10,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from '@rocket.chat/apps-engine/definition/metadata';
+
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
 import {
@@ -26,16 +27,11 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
-import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
-import { LLMService } from '../services/LLMService';
-import { ToolExecutorService } from '../services/ToolExecutorService';
+import { IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 import { handleError, handleErrorAndGetMessage } from '../helper/errorHandler';
 import { SendEmailModal } from '../modal/SendEmailModal';
-import { IToolCall } from '../definition/lib/ToolInterfaces';
-import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
-import { UsernameService } from '../services/UsernameService';
-import { MessageFormatter } from '../lib/MessageFormatter';
 import { NLQueryHandler } from './NLQuery';
 import { EmailFormats } from '../lib/formats/EmailFormats';
 

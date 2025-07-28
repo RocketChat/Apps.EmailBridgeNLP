@@ -293,10 +293,22 @@ export const ru = {
     Send_Email_Content_Placeholder: "Введите содержимое вашего сообщения",
     Send_Email_Send_Button: "Отправить письмо",
     Send_Email_Cancel_Button: "Отмена",
-    Send_Email_Modal_Opened: "Модальное окно создания письма успешно открыто",
+    Send_Email_Test_Button: "Отправить тестовое письмо себе",
+    Send_Email_Modal_Opened: "Окно отправки письма открыто",
     Send_Email_Success: "Письмо успешно отправлено ✅",
     Send_Email_Failed: "Ошибка при отправке письма: __error__",
     Send_Email_Error_No_From_Email: "Невозможно определить адрес электронной почты отправителя",
+
+    // Send Type dropdown
+    Send_Type_Label: "Тип отправки",
+    Send_Type_Recipients: "Отправить получателю(ям)",
+    Send_Type_Test_Self: "Отправить тестовое письмо себе",
+    
+    // Test Email notifications
+    Test_Email_Success: "Тестовое письмо отправлено на ваш адрес ✅",
+    Test_Email_Success_With_Email: "Тестовое письмо отправлено на: __userEmail__ ✅",
+    Test_Email_Failed: "Ошибка отправки тестового письма ❌",
+    Test_Email_No_User_Email: "Не удалось получить ваш адрес электронной почты ❌",
     Send_Email_Validation_To_Required: "Адрес электронной почты получателя обязателен",
     Send_Email_Validation_Subject_Required: "Тема письма обязательна",
     Send_Email_Validation_Content_Required: "Содержание письма обязательно",

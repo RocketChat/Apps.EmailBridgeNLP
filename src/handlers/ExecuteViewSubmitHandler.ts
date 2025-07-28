@@ -47,7 +47,7 @@ export class ExecuteViewSubmitHandler {
     }
 
     public async handleActions(): Promise<IUIKitResponse> {
-        const { user, view } = this.context.getInteractionData();
+        const { user, view, triggerId } = this.context.getInteractionData();
 
         if (view.id.startsWith(UserPreferenceModalEnum.VIEW_ID)) {
             return await this.handleUserPreferenceSubmit(user, view);
@@ -58,7 +58,15 @@ export class ExecuteViewSubmitHandler {
         }
 
         if (view.id.startsWith(SendEmailModalEnum.VIEW_ID)) {
-            return await this.handleSendEmailSubmit(user, view);
+            // Check send type from modal state
+            const state = view.state || {};
+            const sendType = this.getFormValue(state, SendEmailModalEnum.SEND_TYPE_ACTION_ID) || 'send';
+
+            if (sendType === 'test') {
+                return await this.handleSendTestEmailToSelf(user, view);
+            } else {
+                return await this.handleSendEmailSubmit(user, view);
+            }
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -353,6 +361,109 @@ export class ExecuteViewSubmitHandler {
         }
     }
 
+    private async handleSendTestEmailToSelf(user: any, view: any): Promise<IUIKitResponse> {
+        try {
+            // Get user's preferred language
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Extract form values
+            const state = view.state || {};
+            const subject = this.getFormValue(state, SendEmailModalEnum.SUBJECT_ACTION_ID);
+            const content = this.getFormValue(state, SendEmailModalEnum.CONTENT_ACTION_ID);
+            const ccValue = this.getFormValue(state, SendEmailModalEnum.CC_ACTION_ID);
+
+            // Validate required fields
+            if (!subject || !content) {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+
+            if (!userEmail) {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Parse CC emails if provided
+            const ccEmails = ccValue ? 
+                ccValue.split(',').map((email: string) => email.trim()).filter((email: string) => email) : 
+                undefined;
+
+            // Prepare email data
+            const emailData = {
+                to: [userEmail],
+                cc: ccEmails,
+                subject: subject,
+                content: content,
+            };
+
+            // Send email using ToolExecutorService
+            const toolExecutorService = new ToolExecutorService(
+                this.app,
+                this.read,
+                this.modify,
+                this.http,
+                this.persistence
+            );
+
+            const result = await toolExecutorService.sendEmail(emailData, user);
+
+            // Get room for notifications
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            const room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
+
+            // Show notifications using the same system as normal send
+            if (result.success) {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, { 
+                        message: t(Translations.TEST_EMAIL_SUCCESS_WITH_EMAIL, language, { userEmail }) 
+                    });
+                }
+                return this.context.getInteractionResponder().successResponse();
+            } else {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, { 
+                        message: t(Translations.SEND_EMAIL_FAILED, language, { error: result.message }) 
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+        } catch (error) {
+            // Get user language for error message
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Get room for error notification
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            const room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
+
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, { 
+                    message: t(Translations.TEST_EMAIL_FAILED, language) 
+                });
+            }
+            return this.context.getInteractionResponder().errorResponse();
+        }
+    }
+
     private getFormValue(viewState: any, actionId: string): any {
         for (const blockId in viewState) {
             if (viewState.hasOwnProperty(blockId) && viewState[blockId][actionId]) {
@@ -637,5 +748,31 @@ export class ExecuteViewSubmitHandler {
         }
 
         return null;
+    }
+
+    // Remove duplicate helper functions - use the ones from ExecuteBlockActionHandler or sendNotification helper
+    private async getUserEmailFromAuth(userId: string): Promise<string | null> {
+        try {
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                userId,
+            );
+            const preference = await userPreferenceStorage.getUserPreference();
+            const provider = preference?.emailProvider || EmailProviders.GMAIL;
+
+            const userInfo = await EmailServiceFactory.getUserInfo(
+                provider,
+                userId,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+            return userInfo?.email || null;
+        } catch (error) {
+            this.app.getLogger().error('Error getting user email from auth:', error);
+            return null;
+        }
     }
 }

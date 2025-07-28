@@ -295,10 +295,22 @@ export const en = {
     Send_Email_Content_Placeholder: "Enter email content",
     Send_Email_Send_Button: "Send",
     Send_Email_Cancel_Button: "Cancel",
-    Send_Email_Modal_Opened: "Email composition modal opened",
+    Send_Email_Test_Button: "Send Test Mail to Self",
+    Send_Email_Modal_Opened: "Send Email modal opened",
     Send_Email_Success: "Email sent successfully ✅",
     Send_Email_Failed: "Failed to send email: __error__",
     Send_Email_Error_No_From_Email: "Unable to determine sender email address",
+
+    // Send Type dropdown
+    Send_Type_Label: "Send Type",
+    Send_Type_Recipients: "Send to recipient(s)",
+    Send_Type_Test_Self: "Send a test mail to self",
+    
+    // Test Email notifications
+    Test_Email_Success: "Test email sent to your email address ✅",
+    Test_Email_Success_With_Email: "Test email sent to: __userEmail__ ✅",
+    Test_Email_Failed: "Failed to send test email ❌",
+    Test_Email_No_User_Email: "Could not get your email address ❌",
 
     // Send Email Validation
     Send_Email_Validation_To_Required: "Recipient email address is required",

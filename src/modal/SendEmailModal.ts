@@ -244,6 +244,39 @@ export async function SendEmailModal({
         }),
     );
 
+    blocks.push(blockBuilder.createDividerBlock());
+
+    // Send Type dropdown
+    const sendTypeOptions = [
+        {
+            text: t(Translations.SEND_TYPE_RECIPIENTS, language),
+            value: 'send',
+        },
+        {
+            text: t(Translations.SEND_TYPE_TEST_SELF, language),
+            value: 'test',
+        },
+    ];
+    const sendTypeDropdownOptions = elementBuilder.createDropDownOptions(sendTypeOptions);
+    const sendTypeElement = elementBuilder.addDropDown(
+        {
+            placeholder: t(Translations.SEND_TYPE_LABEL, language),
+            options: sendTypeDropdownOptions,
+            initialValue: 'send',
+        },
+        {
+            blockId: SendEmailModalEnum.SEND_TYPE_BLOCK_ID,
+            actionId: SendEmailModalEnum.SEND_TYPE_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            text: t(Translations.SEND_TYPE_LABEL, language),
+            element: sendTypeElement,
+            optional: false,
+        }),
+    );
+
     // Submit button (Send)
     const submitButton = elementBuilder.addButton(
         {

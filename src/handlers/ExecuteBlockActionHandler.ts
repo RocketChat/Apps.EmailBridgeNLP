@@ -32,6 +32,7 @@ import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { handleError } from '../helper/errorHandler';
 import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -592,5 +593,4 @@ export class ExecuteBlockActionHandler {
             return this.context.getInteractionResponder().successResponse();
         }
     }
-
 }

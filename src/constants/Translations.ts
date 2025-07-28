@@ -302,7 +302,19 @@ export const Translations = {
     SEND_EMAIL_CONTENT_PLACEHOLDER: 'Send_Email_Content_Placeholder',
     SEND_EMAIL_SEND_BUTTON: 'Send_Email_Send_Button',
     SEND_EMAIL_CANCEL_BUTTON: 'Send_Email_Cancel_Button',
+    SEND_EMAIL_TEST_BUTTON: 'Send_Email_Test_Button',
     SEND_EMAIL_MODAL_OPENED: 'Send_Email_Modal_Opened',
+    
+    // Send Type dropdown
+    SEND_TYPE_LABEL: 'Send_Type_Label',
+    SEND_TYPE_RECIPIENTS: 'Send_Type_Recipients',
+    SEND_TYPE_TEST_SELF: 'Send_Type_Test_Self',
+    
+    // Test Email notifications
+    TEST_EMAIL_SUCCESS: 'Test_Email_Success',
+    TEST_EMAIL_SUCCESS_WITH_EMAIL: 'Test_Email_Success_With_Email',
+    TEST_EMAIL_FAILED: 'Test_Email_Failed',
+    TEST_EMAIL_NO_USER_EMAIL: 'Test_Email_No_User_Email',
 
     // Send Email Button translations
     EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',

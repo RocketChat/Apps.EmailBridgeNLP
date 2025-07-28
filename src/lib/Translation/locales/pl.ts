@@ -293,10 +293,23 @@ export const pl = {
     Send_Email_Content_Placeholder: "Wprowadź treść wiadomości",
     Send_Email_Send_Button: "Wyślij e-mail",
     Send_Email_Cancel_Button: "Anuluj",
-    Send_Email_Modal_Opened: "Modal kompozycji e-maila pomyślnie otwarty",
+    Send_Email_Test_Button: "Wyślij testowy e-mail do siebie",
+    Send_Email_Modal_Opened: "Okno wysyłania e-maila otwarte",
     Send_Email_Success: "E-mail wysłany pomyślnie ✅",
     Send_Email_Failed: "Nie udało się wysłać e-maila: __error__",
     Send_Email_Error_No_From_Email: "Nie można określić adresu e-mail nadawcy",
+
+    // Send Type dropdown
+    Send_Type_Label: "Typ wysyłki",
+    Send_Type_Recipients: "Wyślij do odbiorcy(-ów)",
+    Send_Type_Test_Self: "Wyślij testowy e-mail do siebie",
+    
+    // Test Email notifications
+    Test_Email_Success: "Testowy e-mail wysłany na Twój adres ✅",
+    Test_Email_Success_With_Email: "Testowy e-mail wysłany na: __userEmail__ ✅",
+    Test_Email_Failed: "Nie udało się wysłać testowego e-maila ❌",
+    Test_Email_No_User_Email: "Nie można pobrać Twojego adresu e-mail ❌",
+
     Send_Email_Validation_To_Required: "Adres e-mail odbiorcy jest wymagany",
     Send_Email_Validation_Subject_Required: "Temat wiadomości e-mail jest wymagany",
     Send_Email_Validation_Content_Required: "Treść wiadomości e-mail jest wymagana",
