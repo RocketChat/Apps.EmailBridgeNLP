@@ -39,7 +39,7 @@ Fields:
 3. stats  
 → Generates a summary stats report of recent email statistics.  
 Fields:
-- "days": integer — Number of days to generate stats for
+- "days": integer — Number of days to generate stats for (1-15, default is 1- when time range is not specified)
 
 4. extract-attachments  
 → Extracts and downloads email attachments from specified emails.  

@@ -242,11 +242,15 @@ export const en = {
     // Stats feature messages
     Stats_Provider_Not_Supported: "❌ **__provider__ is not supported for stats.**\n\nPlease contact your administrator for assistance.",
     Stats_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the stats again.",
-    Stats_Error: "❌ **Error generating email stats:**\n__error__\n\nPlease try again or contact your administrator.",
-    Stats_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
+    Stats_Error: "Error generating email stats: __error__\n\nPlease try again or contact your administrator.",
+    Stats_Header: "\n📊 **Email Statistics Report(__timeRange__)**",
     Stats_Statistics: "**Received**: __receivedToday__ emails (__receivedUnreadToday__ unread)\n**Sent**: __sentToday__ emails",
     Stats_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
     Stats_Categories_Label: "Stats Categories",
+    Stats_Days_Invalid: "Invalid days parameter. Please provide a valid number of days (1-15).❌",
+    Stats_Days_Range_Error: "Days parameter out of range. Stats can only be generated for a maximum of 15 days.❌",
+    Stats_Time_Range_24_Hours: "last 24 hours",
+    Stats_Time_Range_Days: "last __days__ days",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",

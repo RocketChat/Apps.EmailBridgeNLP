@@ -445,7 +445,7 @@ export class Handler implements IHandler {
         }
     }
 
-    public async Stats(): Promise<void> {
+    public async Stats(days?: number): Promise<void> {
         const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
 
         const messageBuilder = this.modify
@@ -456,6 +456,20 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
+            // Validate days parameter (1-15 range, default to 1 day if not provided)
+            let validDays = 1; // Default to 1 day
+            if (days !== undefined) {
+                if (!Number.isInteger(days) || days < 1) {
+                    messageBuilder.setText(t(Translations.STATS_DAYS_INVALID, this.language));
+                    return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                }
+                if (days > 15) {
+                    messageBuilder.setText(t(Translations.STATS_DAYS_RANGE_ERROR, this.language));
+                    return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                }
+                validDays = days;
+            }
+
             // Get user's preferred email provider from their personal settings
             const userPreferenceStorage = new UserPreferenceStorage(
                 this.persis,
@@ -490,10 +504,13 @@ export class Handler implements IHandler {
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
-            // Get email statistics for last 24 hours
+            // Calculate hours based on days (24 hours per day)
+            const hoursBack = validDays * 24;
+            
+            // Get email statistics for the specified time period
             const statsParams: IEmailStatsParams = {
                 userId: this.sender.id,
-                hoursBack: 24,
+                hoursBack: hoursBack,
                 categories,
             };
 

@@ -15,6 +15,9 @@ import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
+import { IEmailStatsParams } from '../definition/lib/IEmailStatistics';
+import { EmailFormats } from '../lib/formats/EmailFormats';
+import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 
 export class ToolExecutorService {
     constructor(
@@ -43,6 +46,8 @@ export class ToolExecutorService {
                         success: false,
                         message: `Tool \`${toolName}\` should be handled with buttons, not through ToolExecutorService.`,
                     };
+                case LlmTools.STATS:
+                    return await this.handleStatsToolCall(toolCall, user);
                 case LlmTools.EXTRACT_ATTACHMENT:
                     return {
                         tool_name: toolName,
@@ -329,6 +334,114 @@ export class ToolExecutorService {
         } catch (error) {
             this.app.getLogger().error('Error sending email via Outlook:', error);
             throw error;
+        }
+    }
+
+    private async handleStatsToolCall(toolCall: IToolCall, user: IUser): Promise<IToolExecutionResult> {
+        try {
+            // Parse tool arguments
+            const args = JSON.parse(toolCall.function.arguments);
+            const daysRequested = args.days || 1;
+
+            // Get user's preferred language
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Validate days parameter (1-15 range)
+            if (!Number.isInteger(daysRequested) || daysRequested < 1) {
+                return {
+                    tool_name: LlmTools.STATS,
+                    success: false,
+                    message: t(Translations.STATS_DAYS_INVALID, language),
+                };
+            }
+
+            if (daysRequested > 15) {
+                return {
+                    tool_name: LlmTools.STATS,
+                    success: false,
+                    message: t(Translations.STATS_DAYS_RANGE_ERROR, language),
+                };
+            }
+
+            // Get user's preferred email provider
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+            const categories = userPreference.statsCategories;
+
+            // Check if provider is supported
+            if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
+                const providerName = getProviderDisplayName(emailProvider);
+                return {
+                    tool_name: LlmTools.STATS,
+                    success: false,
+                    message: t(Translations.STATS_PROVIDER_NOT_SUPPORTED, language, { provider: providerName }),
+                };
+            }
+
+            // Check if user is authenticated
+            const isAuthenticated = await EmailServiceFactory.isUserAuthenticated(
+                emailProvider,
+                user.id,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+
+            if (!isAuthenticated) {
+                return {
+                    tool_name: LlmTools.STATS,
+                    success: false,
+                    message: t(Translations.STATS_NOT_AUTHENTICATED, language, { provider: getProviderDisplayName(emailProvider) }),
+                };
+            }
+
+            // Calculate hours based on days (24 hours per day)
+            const hoursBack = daysRequested * 24;
+
+            // Get email statistics for the specified time period
+            const statsParams: IEmailStatsParams = {
+                userId: user.id,
+                hoursBack: hoursBack,
+                categories,
+            };
+
+            const statistics = await EmailServiceFactory.getEmailStatistics(
+                emailProvider,
+                statsParams,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger(),
+                language
+            );
+
+            // Use centralized stats formatting
+            const statsMessage = EmailFormats.formatEmailStats(statistics, language);
+
+            return {
+                tool_name: LlmTools.STATS,
+                success: true,
+                message: statsMessage,
+            };
+
+        } catch (error) {
+            const language = Language.en; // Fallback language
+            return {
+                tool_name: LlmTools.STATS,
+                success: false,
+                error: error.message,
+                message: t(Translations.STATS_ERROR, language, { error: error.message }),
+            };
         }
     }
 } 

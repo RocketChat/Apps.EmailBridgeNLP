@@ -241,10 +241,14 @@ export const pt = {
     Stats_Provider_Not_Supported: "❌ **__provider__ não é suportado para estatísticas.**\n\nPor favor, entre em contato com seu administrador para assistência.",
     Stats_Not_Authenticated: "❌ **Você não está autenticado com __provider__.**\n\nUse `/email login` para fazer login primeiro, depois tente gerar as estatísticas novamente.",
     Stats_Error: "❌ **Erro ao gerar estatísticas de e-mail:**\n__error__\n\nPor favor, tente novamente ou entre em contato com seu administrador.",
-    Stats_Header: "\n📊 **Relatório de Estatísticas de E-mail(últimas 24 horas)**",
+    Stats_Header: "\n📊 **Relatório de Estatísticas de E-mail(__timeRange__)**",
     Stats_Statistics: "**Recebidos**: __receivedToday__ emails\n**Enviados**: __sentToday__ emails\n**Não lidos**: __totalUnread__ emails",
     Stats_Token_Expired: "❌ **Sua autenticação expirou.**\n\nUse `/email login` para reconectar sua conta __provider__ e tente novamente.",
     Stats_Categories_Label: "Categorias de Estatísticas",
+    Stats_Days_Invalid: "❌ **Parâmetro de dias inválido.**\n\nPor favor, forneça um número válido de dias (1-15).",
+    Stats_Days_Range_Error: "❌ **Parâmetro de dias fora do intervalo.**\n\nEstatísticas só podem ser geradas para um máximo de 15 dias.",
+    Stats_Time_Range_24_Hours: "últimas 24 horas",
+    Stats_Time_Range_Days: "últimos __days__ dias",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",

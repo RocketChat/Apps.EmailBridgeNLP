@@ -115,6 +115,12 @@ export class GmailService {
         const sentToday = sentData.resultSizeEstimate || 0;
         const readEmails = Math.max(0, totalEmails - unreadEmails);
 
+        // Create user-friendly time range description
+        const days = Math.floor(params.hoursBack / 24);
+        const timeRangeDescription = days === 1 ? 
+            t(Translations.STATS_TIME_RANGE_24_HOURS, language) : 
+            t(Translations.STATS_TIME_RANGE_DAYS, language, { days: days.toString() });
+
         return {
             totalEmails,
             unreadEmails,
@@ -123,7 +129,7 @@ export class GmailService {
             receivedUnreadToday,
             sentToday,
             categoryStats,
-            timeRange: `Last ${params.hoursBack} hours`,
+            timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
             provider: 'Gmail'
         };

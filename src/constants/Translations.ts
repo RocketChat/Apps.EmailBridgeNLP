@@ -254,6 +254,10 @@ export const Translations = {
     STATS_STATISTICS: 'Stats_Statistics',
     STATS_TOKEN_EXPIRED: 'Stats_Token_Expired',
     STATS_CATEGORIES_LABEL: 'Stats_Categories_Label',
+    STATS_DAYS_INVALID: 'Stats_Days_Invalid',
+    STATS_DAYS_RANGE_ERROR: 'Stats_Days_Range_Error',
+    STATS_TIME_RANGE_24_HOURS: 'Stats_Time_Range_24_Hours',
+    STATS_TIME_RANGE_DAYS: 'Stats_Time_Range_Days',
 
     // Statistics Service Errors
     STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',

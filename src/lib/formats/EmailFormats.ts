@@ -52,7 +52,7 @@ export class EmailFormats {
         const categoryStats = this.formatCategoryStats(statistics.categoryStats);
 
         // Build complete stats message
-        const statsMessage = t(Translations.STATS_HEADER, language) + '\n\n' +
+        const statsMessage = t(Translations.STATS_HEADER, language, { timeRange: statistics.timeRange }) + '\n\n' +
             t(Translations.STATS_STATISTICS, language, {
                 receivedToday: statistics.receivedToday.toString(),
                 receivedUnreadToday: statistics.receivedUnreadToday.toString(),

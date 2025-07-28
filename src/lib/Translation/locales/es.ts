@@ -244,10 +244,14 @@ export const es = {
     Stats_Provider_Not_Supported: "❌ **__provider__ no es compatible para estadísticas.**\n\nPor favor, contacta a tu administrador para asistencia.",
     Stats_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar las estadísticas nuevamente.",
     Stats_Error: "❌ **Error al generar las estadísticas de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
-    Stats_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
+    Stats_Header: "\n📊 **Reporte de Estadísticas de Correo(__timeRange__)**",
     Stats_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
     Stats_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
     Stats_Categories_Label: "Categorías de Estadísticas",
+    Stats_Days_Invalid: "❌ **Parámetro de días inválido.**\n\nProporciona un número válido de días (1-15).",
+    Stats_Days_Range_Error: "❌ **Parámetro de días fuera de rango.**\n\nLas estadísticas solo se pueden generar para un máximo de 15 días.",
+    Stats_Time_Range_24_Hours: "últimas 24 horas",
+    Stats_Time_Range_Days: "últimos __days__ días",
     Stats_Command: "usa `/email stats` - Obtener informe diario de estadísticas de correo",
 
     // Statistics Service Errors
