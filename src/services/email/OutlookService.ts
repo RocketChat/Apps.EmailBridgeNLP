@@ -5,9 +5,9 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders, MessageConfig } from '../../constants/constants';
-import { LLMEmailAnalysisService } from './LLMEmailAnalysisService';
-import { IEmailData } from '../../definition/lib/IEmailUtils';
+import { ApiEndpoints, HeaderBuilders, MessageConfig, MicrosoftOauthUrls } from '../../constants/constants';
+import { LLMEmailAnalysisService } from '../LLMAnalysisService';
+import { IEmailData, ISendEmailData } from '../../definition/lib/IEmailUtils';
 import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 export class OutlookService {
@@ -139,15 +139,69 @@ export class OutlookService {
             categoryStats,
             timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
-            provider: 'Outlook',
+            provider: EmailProviders.OUTLOOK,
             enhancedAnalysis
         };
+    }
+
+    public async sendEmail(emailData: ISendEmailData, accessToken: string, fromEmail: string): Promise<boolean> {
+        try {
+            // Create the email payload for Outlook API
+            const emailPayload: any = {
+                message: {
+                    subject: emailData.subject,
+                    body: {
+                        contentType: 'Text',
+                        content: emailData.content
+                    },
+                    toRecipients: emailData.to.map(email => ({
+                        emailAddress: {
+                            address: email
+                        }
+                    }))
+                }
+            };
+
+            // Only add ccRecipients if there are CC recipients
+            if (emailData.cc && emailData.cc.length > 0) {
+                emailPayload.message.ccRecipients = emailData.cc.map(email => ({
+                    emailAddress: {
+                        address: email
+                    }
+                }));
+            }
+
+            // Send the email using Outlook API
+            const response = await this.http.post(MicrosoftOauthUrls.SEND_EMAIL, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
+                data: emailPayload
+            });
+
+            // Check response status
+            if (response.statusCode === 202) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.logger.error('Outlook API error:', errorMessage);
+                throw new Error(`Outlook API error: ${errorMessage}`);
+            }
+        } catch (error) {
+            this.logger.error('Error sending email via Outlook:', error);
+            throw error;
+        }
     }
 
     private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeFilter: string, language: Language): Promise<IEmailData[]> {
         try {
             // Get up to 450 recent emails with detailed info from inbox
-            const emailsResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$top=${MessageConfig.MAX_GMAIL_RESULTS}&$select=from,subject,bodyPreview,isRead,receivedDateTime`, {
+            const emailsResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$top=${MessageConfig.MAX_RESULTS}&$select=from,subject,bodyPreview,isRead,receivedDateTime`, {
                 headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
             });
 

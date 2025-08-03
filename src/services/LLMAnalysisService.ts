@@ -1,12 +1,15 @@
-import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
-import { IEnhancedEmailAnalysis, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
-import { IEmailData } from '../../definition/lib/IEmailUtils';
-import { t, Language } from '../../lib/Translation/translation';
-import { getEffectiveLLMSettings } from '../../config/SettingsManager';
-import { LLMService } from '../LLMService';
-import { UserPreferenceStorage } from '../../storage/UserPreferenceStorage';
-import { LlmPrompts } from '../../constants/prompts';
-import { TemplatePlaceholders } from '../../constants/constants';
+import { IHttp, IHttpRequest, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { IEnhancedEmailAnalysis, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
+import { IEmailData } from '../definition/lib/IEmailUtils';
+import { Language, t } from '../lib/Translation/translation';
+import { Translations } from '../constants/Translations';
+import { getEffectiveLLMSettings } from '../config/SettingsManager';
+import { LLMService } from './LLMService';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { LlmPrompts } from '../constants/prompts';
+import { HttpHeaders, ContentTypes, LlmModels, LlmApiUrls, TemplatePlaceholders } from '../constants/constants';
+import { LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 
 export class LLMEmailAnalysisService {
     constructor(
@@ -22,7 +25,7 @@ export class LLMEmailAnalysisService {
         language: string = 'en'
     ): Promise<IEnhancedEmailAnalysis> {
         try {
-            // Limit to max 450 emails for LLM processing
+            // Limit to max 150 emails for LLM processing
             const limitedEmails = emails.slice(0, 150);
             
             if (limitedEmails.length === 0) {
@@ -148,7 +151,7 @@ export class LLMEmailAnalysisService {
             const analysisResponse = await this.callLLMDirectly(llmService, prompt);
             
             if (!analysisResponse) {
-                throw new Error('No response from LLM');
+                throw new Error(t(Translations.LLM_NO_RESPONSE, Language.en));
             }
             
             // Try multiple JSON extraction patterns
@@ -194,17 +197,19 @@ export class LLMEmailAnalysisService {
         const http = (llmService as any).http;
 
         if (!llmSettings) {
-            throw new Error('LLM settings not available');
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, Language.en));
         }
 
         try {
             switch (llmSettings.provider) {
-                case 'groq':
+                case LLMProviderEnum.Groq:
                     return await this.callGroqDirectly(http, llmSettings, prompt);
-                case 'openai':
+                case LLMProviderEnum.OpenAI:
                     return await this.callOpenAIDirectly(http, llmSettings, prompt);
-                case 'gemini':
+                case LLMProviderEnum.Gemini:
                     return await this.callGeminiDirectly(http, llmSettings, prompt);
+                case LLMProviderEnum.SelfHosted:
+                    return await this.callSelfHostedDirectly(http, llmSettings, prompt);
                 default:
                     // Fallback to generateSummary method
                     return await llmService.generateSummary(prompt, 'Email Analysis');
@@ -217,7 +222,7 @@ export class LLMEmailAnalysisService {
 
     private async callGroqDirectly(http: any, llmSettings: any, prompt: string): Promise<string> {
         const payload = {
-            model: 'llama-3.3-70b-versatile',
+            model: LlmModels.GROQ,
             messages: [
                 {
                     role: 'user',
@@ -228,23 +233,25 @@ export class LLMEmailAnalysisService {
             max_tokens: 4000,
         };
 
-        const response = await http.post('https://api.groq.com/openai/v1/chat/completions', {
+        const request: IHttpRequest = {
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${llmSettings.groqApiKey}`,
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${llmSettings.groqApiKey}`,
             },
             data: payload,
-        });
+        };
+
+        const response = await http.post(LlmApiUrls.GROQ, request);
 
         if (response?.data?.choices?.length > 0) {
             return response.data.choices[0].message.content || '';
         }
-        throw new Error('No response from Groq');
+        throw new Error(t(Translations.LLM_NO_RESPONSE, Language.en));
     }
 
     private async callOpenAIDirectly(http: any, llmSettings: any, prompt: string): Promise<string> {
         const payload = {
-            model: 'gpt-4o-mini',
+            model: LlmModels.OPENAI,
             messages: [
                 {
                     role: 'user',
@@ -255,18 +262,20 @@ export class LLMEmailAnalysisService {
             max_tokens: 4000,
         };
 
-        const response = await http.post('https://api.openai.com/v1/chat/completions', {
+        const request: IHttpRequest = {
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${llmSettings.openaiApiKey}`,
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+                [HttpHeaders.AUTHORIZATION]: `Bearer ${llmSettings.openaiApiKey}`,
             },
             data: payload,
-        });
+        };
+
+        const response = await http.post(LlmApiUrls.OPENAI, request);
 
         if (response?.data?.choices?.length > 0) {
             return response.data.choices[0].message.content || '';
         }
-        throw new Error('No response from OpenAI');
+        throw new Error(t(Translations.LLM_NO_RESPONSE, Language.en));
     }
 
     private async callGeminiDirectly(http: any, llmSettings: any, prompt: string): Promise<string> {
@@ -286,20 +295,67 @@ export class LLMEmailAnalysisService {
             },
         };
 
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
         const response = await http.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${llmSettings.geminiApiKey}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                data: payload,
-            }
+            `${LlmApiUrls.GEMINI}?key=${llmSettings.geminiApiKey}`,
+            request
         );
 
         if (response?.data?.candidates?.length > 0) {
             return response.data.candidates[0].content.parts[0].text || '';
         }
-        throw new Error('No response from Gemini');
+        throw new Error(t(Translations.LLM_NO_RESPONSE, Language.en));
+    }
+
+    private async callSelfHostedDirectly(http: any, llmSettings: any, prompt: string): Promise<string> {
+        if (!llmSettings.selfHostedUrl) {
+            throw new Error(t(Translations.ERROR_MISSING_CONFIGURATION, Language.en));
+        }
+
+        // Ensure proper endpoint format for self-hosted LLMs
+        let apiUrl = llmSettings.selfHostedUrl.trim();
+        
+        // Remove trailing slash if present
+        if (apiUrl.endsWith('/')) {
+            apiUrl = apiUrl.slice(0, -1);
+        }
+                
+        // Add /v1/chat/completions if not already present (common for OpenAI-compatible APIs)
+        if (!apiUrl.includes('/chat/completions') && !apiUrl.includes('/generate') && !apiUrl.includes('/api/chat')) {
+            apiUrl += '/v1/chat/completions';
+        }
+
+        const payload = {
+            model: 'llama3',
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+            temperature: 0.3,
+            max_tokens: 4000,
+        };
+
+        const request: IHttpRequest = {
+            headers: {
+                [HttpHeaders.CONTENT_TYPE]: ContentTypes.APPLICATION_JSON,
+            },
+            data: payload,
+        };
+
+        const response = await http.post(apiUrl, request);
+
+        if (response?.data?.choices?.length > 0) {
+            return response.data.choices[0].message.content || '';
+        }
+        throw new Error(t(Translations.LLM_NO_RESPONSE, Language.en));
     }
 
     private parseUnstructuredResponse(response: string, userCategories: string[] = []): any {

@@ -5,9 +5,9 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders, MessageConfig } from '../../constants/constants';
-import { LLMEmailAnalysisService } from './LLMEmailAnalysisService';
-import { IEmailData } from '../../definition/lib/IEmailUtils';
+import { ApiEndpoints, HeaderBuilders, MessageConfig, GoogleOauthUrls } from '../../constants/constants';
+import { LLMEmailAnalysisService } from '../LLMAnalysisService';
+import { IEmailData, ISendEmailData } from '../../definition/lib/IEmailUtils';
 import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 export class GmailService {
@@ -163,15 +163,66 @@ export class GmailService {
             categoryStats,
             timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
-            provider: 'Gmail',
+            provider: EmailProviders.GMAIL,
             enhancedAnalysis
         };
+    }
+
+    public async sendEmail(emailData: ISendEmailData, accessToken: string, fromEmail: string): Promise<boolean> {
+        try {
+            // Create the email content
+            const toList = emailData.to.join(', ');
+            const ccList = emailData.cc ? emailData.cc.join(', ') : '';
+
+            let emailContent = `From: ${fromEmail}\r\n`;
+            emailContent += `To: ${toList}\r\n`;
+            if (ccList) {
+                emailContent += `Cc: ${ccList}\r\n`;
+            }
+            emailContent += `Subject: ${emailData.subject}\r\n`;
+            emailContent += `Content-Type: text/plain; charset=utf-8\r\n\r\n`;
+            emailContent += emailData.content;
+
+            // Encode the email in base64url format (Gmail specific)
+            const encodedEmail = Buffer.from(emailContent)
+                .toString('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            // Send the email using Gmail API
+            const response = await this.http.post(GoogleOauthUrls.SEND_EMAIL, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
+                data: {
+                    raw: encodedEmail
+                }
+            });
+
+            // Check response status
+            if (response.statusCode === 200) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.logger.error('Gmail API error:', errorMessage);
+                throw new Error(`Gmail API error: ${errorMessage}`);
+            }
+        } catch (error) {
+            this.logger.error('Error sending email via Gmail:', error);
+            throw error;
+        }
     }
 
     private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeQuery: string, language: Language): Promise<IEmailData[]> {
         try {
             // Get up to 450 recent emails with basic info
-            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=${MessageConfig.MAX_GMAIL_RESULTS}`, {
+            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=${MessageConfig.MAX_RESULTS}`, {
                 headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
             });
 
@@ -231,8 +282,4 @@ export class GmailService {
         }
     }
 
-    // Future methods will be added here:
-    // public async sendEmail(params: ISendEmailParams): Promise<boolean> { ... }
-    // public async searchEmails(params: ISearchParams): Promise<IEmailSearchResult[]> { ... }
-    // public async getEmailContent(messageId: string): Promise<IEmailContent> { ... }
 }

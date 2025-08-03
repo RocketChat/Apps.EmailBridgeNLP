@@ -10,6 +10,8 @@ import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { EmailProviders } from '../enums/EmailProviders';
 import { GoogleOauthUrls, MicrosoftOauthUrls, HeaderBuilders, ContentTypes, HttpHeaders } from '../constants/constants';
+import { GmailService } from './email/GmailService';
+import { OutlookService } from './email/OutlookService';
 import { IToolExecutionResult } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
@@ -172,9 +174,22 @@ export class ToolExecutorService {
                 };
             }
 
-            // Send the email
+            // Send the email using provider service directly
             try {
-                const success = await this.sendEmailWithProvider(emailData, accessToken, fromEmail, emailProvider);
+                let success: boolean;
+                
+                switch (emailProvider) {
+                    case EmailProviders.GMAIL:
+                        const gmailService = new GmailService(oauthService, this.http, this.app.getLogger(), this.persistence, this.read);
+                        success = await gmailService.sendEmail(emailData, accessToken, fromEmail);
+                        break;
+                    case EmailProviders.OUTLOOK:
+                        const outlookService = new OutlookService(oauthService, this.http, this.app.getLogger(), this.persistence, this.read);
+                        success = await outlookService.sendEmail(emailData, accessToken, fromEmail);
+                        break;
+                    default:
+                        throw new Error(`Unsupported provider: ${emailProvider}`);
+                }
                 
                 if (success) {
                     return {
@@ -188,6 +203,7 @@ export class ToolExecutorService {
                     };
                 }
             } catch (sendError) {
+                this.app.getLogger().error('Error sending email:', sendError);
                 return {
                     success: false,
                     message: t(Translations.SEND_EMAIL_FAILED, language, { error: sendError.message }),
@@ -200,140 +216,6 @@ export class ToolExecutorService {
                 success: false,
                 message: t(Translations.SEND_EMAIL_FAILED, Language.en, { error: error.message }),
             };
-        }
-    }
-
-    private async sendEmailWithProvider(
-        emailData: ISendEmailData,
-        accessToken: string,
-        fromEmail: string,
-        provider: EmailProviders
-    ): Promise<boolean> {
-        try {
-            switch (provider) {
-                case EmailProviders.GMAIL:
-                    return await this.sendEmailViaGmail(emailData, accessToken, fromEmail);
-                case EmailProviders.OUTLOOK:
-                    return await this.sendEmailViaOutlook(emailData, accessToken, fromEmail);
-                default:
-                    throw new Error(`Unsupported provider: ${provider}`);
-            }
-        } catch (error) {
-            this.app.getLogger().error('Error sending email with provider:', error);
-            throw error;
-        }
-    }
-
-    private async sendEmailViaGmail(
-        emailData: ISendEmailData,
-        accessToken: string,
-        fromEmail: string
-    ): Promise<boolean> {
-        try {
-            // Create the email content
-            const toList = emailData.to.join(', ');
-            const ccList = emailData.cc ? emailData.cc.join(', ') : '';
-
-            let emailContent = `From: ${fromEmail}\r\n`;
-            emailContent += `To: ${toList}\r\n`;
-            if (ccList) {
-                emailContent += `Cc: ${ccList}\r\n`;
-            }
-            emailContent += `Subject: ${emailData.subject}\r\n`;
-            emailContent += `Content-Type: text/plain; charset=utf-8\r\n\r\n`;
-            emailContent += emailData.content;
-
-            // Encode the email in base64url format (Gmail specific)
-            const encodedEmail = Buffer.from(emailContent)
-                .toString('base64')
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=+$/, '');
-
-            // Send the email using Gmail API
-            const response = await this.http.post(GoogleOauthUrls.SEND_EMAIL, {
-                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
-                data: {
-                    raw: encodedEmail
-                }
-            });
-
-            // Check response status
-            if (response.statusCode === 200) {
-                return true;
-            } else {
-                // Log detailed error information
-                let errorMessage = `HTTP ${response.statusCode}`;
-                try {
-                    const errorData = JSON.parse(response.content || '{}');
-                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
-                } catch {
-                    errorMessage += ` - ${response.content || 'No error details'}`;
-                }
-                this.app.getLogger().error('Gmail API error:', errorMessage);
-                throw new Error(`Gmail API error: ${errorMessage}`);
-            }
-        } catch (error) {
-            this.app.getLogger().error('Error sending email via Gmail:', error);
-            throw error;
-        }
-    }
-
-    private async sendEmailViaOutlook(
-        emailData: ISendEmailData,
-        accessToken: string,
-        fromEmail: string
-    ): Promise<boolean> {
-        try {
-            // Create the email payload for Outlook API
-            const emailPayload: any = {
-                message: {
-                    subject: emailData.subject,
-                    body: {
-                        contentType: 'Text',
-                        content: emailData.content
-                    },
-                    toRecipients: emailData.to.map(email => ({
-                        emailAddress: {
-                            address: email
-                        }
-                    }))
-                }
-            };
-
-            // Only add ccRecipients if there are CC recipients
-            if (emailData.cc && emailData.cc.length > 0) {
-                emailPayload.message.ccRecipients = emailData.cc.map(email => ({
-                    emailAddress: {
-                        address: email
-                    }
-                }));
-            }
-
-            // Send the email using Outlook API
-            const response = await this.http.post(MicrosoftOauthUrls.SEND_EMAIL, {
-                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
-                data: emailPayload
-            });
-
-            // Check response status
-            if (response.statusCode === 202) {
-                return true;
-            } else {
-                // Log detailed error information
-                let errorMessage = `HTTP ${response.statusCode}`;
-                try {
-                    const errorData = JSON.parse(response.content || '{}');
-                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
-                } catch {
-                    errorMessage += ` - ${response.content || 'No error details'}`;
-                }
-                this.app.getLogger().error('Outlook API error:', errorMessage);
-                throw new Error(`Outlook API error: ${errorMessage}`);
-            }
-        } catch (error) {
-            this.app.getLogger().error('Error sending email via Outlook:', error);
-            throw error;
         }
     }
 
