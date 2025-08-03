@@ -300,7 +300,7 @@ export class NLQueryHandler {
             const formattedMessages = messageService.formatMessagesForSummary(messages);
 
             // Generate summary using LLM
-            const channelName = this.room.displayName || 'Channel';
+            const channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
             const summaryContent = await llmService.generateSummary(formattedMessages, channelName);
 
             if (!summaryContent || summaryContent === "Failed to generate summary due to an error.") {
@@ -371,7 +371,7 @@ export class NLQueryHandler {
 
         // Use MessageFormatter for consistent formatting
         const channelName = toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL
-            ? this.room.displayName || 'Channel'
+            ? this.room.displayName || this.room.slugifiedName || 'Channel'
             : undefined;
 
         const formattedMessage = await MessageFormatter.formatEmailReadyMessage(
