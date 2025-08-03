@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
+import { ApiEndpoints, HeaderBuilders, MessageConfig } from '../../constants/constants';
 import { LLMEmailAnalysisService } from './LLMEmailAnalysisService';
 import { IEmailData } from '../../definition/lib/IEmailUtils';
 import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
@@ -171,7 +171,7 @@ export class GmailService {
     private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeQuery: string, language: Language): Promise<IEmailData[]> {
         try {
             // Get up to 450 recent emails with basic info
-            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=450`, {
+            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=${MessageConfig.MAX_GMAIL_RESULTS}`, {
                 headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
             });
 

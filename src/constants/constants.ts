@@ -134,7 +134,8 @@ export const LlmConfig = {
 
 // Message Retrieval Configuration
 export const MessageConfig = {
-    MAX_MESSAGES_RETRIEVAL: 100, 
+    MAX_MESSAGES_RETRIEVAL: 100,
+    MAX_GMAIL_RESULTS: 450,
 } as const; 
 
 // Avatar Configuration

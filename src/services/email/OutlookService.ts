@@ -5,7 +5,7 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
+import { ApiEndpoints, HeaderBuilders, MessageConfig } from '../../constants/constants';
 import { LLMEmailAnalysisService } from './LLMEmailAnalysisService';
 import { IEmailData } from '../../definition/lib/IEmailUtils';
 import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
@@ -147,7 +147,7 @@ export class OutlookService {
     private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeFilter: string, language: Language): Promise<IEmailData[]> {
         try {
             // Get up to 450 recent emails with detailed info from inbox
-            const emailsResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$top=450&$select=from,subject,bodyPreview,isRead,receivedDateTime`, {
+            const emailsResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$top=${MessageConfig.MAX_GMAIL_RESULTS}&$select=from,subject,bodyPreview,isRead,receivedDateTime`, {
                 headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
             });
 
