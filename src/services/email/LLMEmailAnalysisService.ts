@@ -1,9 +1,7 @@
 import { IHttp, ILogger, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IEnhancedEmailAnalysis, IEmailStatsParams } from '../../definition/lib/IEmailStatistics';
-import { ICategoryStats } from '../../definition/formats/IEmailFormats';
 import { IEmailData } from '../../definition/lib/IEmailUtils';
 import { t, Language } from '../../lib/Translation/translation';
-import { Translations } from '../../constants/Translations';
 import { getEffectiveLLMSettings } from '../../config/SettingsManager';
 import { LLMService } from '../LLMService';
 import { UserPreferenceStorage } from '../../storage/UserPreferenceStorage';
@@ -25,15 +23,10 @@ export class LLMEmailAnalysisService {
     ): Promise<IEnhancedEmailAnalysis> {
         try {
             // Limit to max 450 emails for LLM processing
-            const limitedEmails = emails.slice(0, 450);
-            this.logger.info(`Processing ${limitedEmails.length} emails for LLM analysis`);
+            const limitedEmails = emails.slice(0, 150);
             
             if (limitedEmails.length === 0) {
-                this.logger.warn('No emails provided for LLM analysis');
                 return {
-                    trends: [], // Removed as requested
-                    insights: [], // Removed as requested
-                    topSenders: [],
                     userCategories: {},
                     additionalCategories: {},
                     totalEmailsAnalyzed: 0,
@@ -78,11 +71,8 @@ export class LLMEmailAnalysisService {
             });
             
             return {
-                topSenders: [], // Removed topSenders as requested
                 userCategories: userCategories,
                 additionalCategories: analysisResult.additionalCategories || {},
-                trends: [], // Removed trends as requested
-                insights: [], // Removed insights as requested
                 totalEmailsAnalyzed: limitedEmails.length,
                 isLLMGenerated: true
             };
@@ -98,9 +88,6 @@ export class LLMEmailAnalysisService {
             });
             
             return {
-                trends: [], // Removed trends as requested
-                insights: [], // Removed insights as requested
-                topSenders: [],
                 userCategories: userCategories,
                 additionalCategories: {},
                 totalEmailsAnalyzed: 0,
@@ -146,22 +133,11 @@ export class LLMEmailAnalysisService {
         // If user has no categories, provide a default set but make it clear these are fallback defaults
         const categoriesList = userCategories.length > 0 ? 
             userCategories.join(', ') : 
-            'work, personal, notifications, updates';
+            'work, personal, socials';
         
         const prompt = LlmPrompts.EMAIL_ANALYSIS_PROMPT
             .replace(TemplatePlaceholders.USER_CATEGORIES, categoriesList)
             .replace(TemplatePlaceholders.EMAIL_DATA, emailData);
-
-        // Log comprehensive details about what's being sent to LLM
-        this.logger.info('=== LLM EMAIL ANALYSIS REQUEST START ===');
-        this.logger.info('User Categories:', categoriesList);
-        this.logger.info('Email Data Length:', emailData.length);
-        this.logger.info('Language:', language);
-        this.logger.info('=== EMAIL DATA BEING ANALYZED ===');
-        this.logger.info(emailData);
-        this.logger.info('=== COMPLETE PROMPT BEING SENT TO LLM ===');
-        this.logger.info(prompt);
-        this.logger.info('=== LLM EMAIL ANALYSIS REQUEST END ===');
         
         return prompt;
     }
@@ -174,9 +150,6 @@ export class LLMEmailAnalysisService {
             if (!analysisResponse) {
                 throw new Error('No response from LLM');
             }
-            
-            // Log the full response for debugging
-            this.logger.info('LLM Analysis Response:', analysisResponse);
             
             // Try multiple JSON extraction patterns
             const jsonPatterns = [
@@ -192,7 +165,6 @@ export class LLMEmailAnalysisService {
                     try {
                         const jsonText = match[1] || match[0];
                         const cleaned = jsonText.trim();
-                        this.logger.info('Attempting to parse JSON:', cleaned);
                         const parsed = JSON.parse(cleaned);
                         
                         // Validate the structure
@@ -331,7 +303,6 @@ export class LLMEmailAnalysisService {
     }
 
     private parseUnstructuredResponse(response: string, userCategories: string[] = []): any {
-        this.logger.info('Parsing unstructured response, LLM failed to return proper JSON');
         
         // Initialize user categories with 0 counts even when JSON parsing fails
         const userCategoriesObj: { [key: string]: { total: number, unread: number } } = {};
@@ -340,9 +311,6 @@ export class LLMEmailAnalysisService {
         });
 
         return {
-            trends: [], // Removed as requested
-            insights: [], // Removed as requested
-            topSenders: [], // Removed topSenders as requested
             userCategories: userCategoriesObj,
             additionalCategories: {},
             totalEmailsAnalyzed: 0
