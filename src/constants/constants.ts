@@ -122,7 +122,7 @@ export const LlmApiUrls = {
 export const LlmModels = {
     OPENAI: 'gpt-4o-mini',
     GEMINI: 'gemini-2.0-flash-exp', 
-    GROQ: 'llama3-70b-8192',
+    GROQ: 'llama-3.3-70b-versatile',
 } as const;
 
 // LLM Configuration
@@ -154,4 +154,6 @@ export const AvatarUtils = {
 export const TemplatePlaceholders = {
     CHANNEL_NAME: '__channelName__',
     MESSAGES: '__messages__',
+    USER_CATEGORIES: '__userCategories__',
+    EMAIL_DATA: '__emailData__',
 } as const;

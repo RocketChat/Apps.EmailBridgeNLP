@@ -177,5 +177,40 @@ export const LlmPrompts = {
     ${TemplatePlaceholders.MESSAGES}
 
     Generate the summary based on these instructions.`,
+    
+    EMAIL_ANALYSIS_PROMPT: `You are an email analytics expert. Analyze the provided emails and categorize them based on content, sender, and subject.
+
+User's requested categories: __userCategories__
+
+Email Data:
+__emailData__
+
+CRITICAL INSTRUCTIONS:
+1. You MUST include ALL user's requested categories in userCategories section, even if count is 0
+2. Categorize emails into user categories first, then create some additional useful categories who have more than 5 emails
+3. Count emails in each category (total and unread counts)
+
+Return ONLY this JSON structure:
+
+{
+    "userCategories": {
+        "category_name": {"total": real_count, "unread": real_unread_count}
+    },
+    "additionalCategories": {
+        "suggested_category_name": {"total": real_count, "unread": real_unread_count}
+    }
+}
+
+CATEGORIZATION RULES:
+- MANDATORY: Include EVERY user category from the list above in userCategories, set count to 0 if no emails match
+- Categorize emails based on content, sender domain, and subject keywords
+- For user categories: Try to fit emails into the requested categories, use count 0 if none match
+- For additional categories: Suggest ONLY useful categories you identify from the email patterns, who have more than 5 emails & total additional categories should not be more than 5
+- Count actual emails only - no fictional data
+- Return valid JSON only, no explanations
+
+STRICT VALIDATION:
+- userCategories MUST contain all categories from user's list: __userCategories__
+- All counts must be real numbers from actual email data`,
 
 };

@@ -6,21 +6,25 @@ import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
 import { ApiEndpoints, HeaderBuilders } from '../../constants/constants';
+import { LLMEmailAnalysisService } from './LLMEmailAnalysisService';
+import { IEmailData } from '../../definition/lib/IEmailUtils';
+import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 export class GmailService {
     private oauthService: IOAuthService;
     private http: IHttp;
     private logger: ILogger;
+    private persistence?: IPersistence;
+    private read?: IRead;
 
-    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger) {
+    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger, persistence?: IPersistence, read?: IRead) {
         this.oauthService = oauthService;
         this.http = http;
         this.logger = logger;
+        this.persistence = persistence;
+        this.read = read;
     }
 
-    /**
-     * Get Gmail email statistics for the specified time period
-     */
     public async getEmailStatistics(params: IEmailStatsParams, userInfo: any, language: Language = Language.en): Promise<IEmailStatistics> {
         const accessToken = await this.oauthService.getValidAccessToken(params.userId);
         
@@ -54,8 +58,10 @@ export class GmailService {
             headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
-        const categoryStats: { [category: string]: { total: number, unread: number } } = {};
-        if (params.categories && params.categories.length > 0) {
+        let categoryStats: { [category: string]: { total: number, unread: number } } = {};
+        
+        // Only do email provider categorization if LLM categorization is NOT selected
+        if (!params.useLLMCategorization && params.categories && params.categories.length > 0) {
             for (const category of params.categories) {
                 let categoryQuery = '';
                 if (category === 'github') {
@@ -121,6 +127,32 @@ export class GmailService {
             t(Translations.STATS_TIME_RANGE_24_HOURS, language) : 
             t(Translations.STATS_TIME_RANGE_DAYS, language, { days: days.toString() });
 
+        // Enhanced LLM analysis if requested
+        let enhancedAnalysis;
+        if (params.useLLMCategorization && this.persistence && this.read) {
+            try {
+                // Fetch detailed email data for LLM analysis (limit 450 emails)
+                const detailedEmails = await this.fetchDetailedEmailsForLLMAnalysis(accessToken, timeQuery, language);
+                
+                if (detailedEmails.length > 0) {
+                    const llmAnalysisService = new LLMEmailAnalysisService(this.http, this.persistence, this.read, this.logger);
+                    enhancedAnalysis = await llmAnalysisService.analyzeEmails(detailedEmails, params, language);
+                    
+                    // Replace provider categories with LLM categories
+                    categoryStats = {};
+                    if (enhancedAnalysis.userCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.userCategories);
+                    }
+                    if (enhancedAnalysis.additionalCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.additionalCategories);
+                    }
+                }
+            } catch (error) {
+                this.logger.error('LLM email analysis failed for Gmail:', error);
+                // Continue with regular stats if LLM analysis fails
+            }
+        }
+
         return {
             totalEmails,
             unreadEmails,
@@ -131,8 +163,72 @@ export class GmailService {
             categoryStats,
             timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
-            provider: 'Gmail'
+            provider: 'Gmail',
+            enhancedAnalysis
         };
+    }
+
+    private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeQuery: string, language: Language): Promise<IEmailData[]> {
+        try {
+            // Get up to 450 recent emails with basic info
+            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=450`, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
+            });
+
+            if (emailsResponse.statusCode !== 200) {
+                throw new Error('Failed to fetch emails list');
+            }
+
+            const emailsData = JSON.parse(emailsResponse.content || '{}');
+            const messages = emailsData.messages || [];
+
+            // Fetch detailed info for each email (in batches to avoid rate limits)
+            const detailedEmails: IEmailData[] = [];
+            const batchSize = 50; // Process in smaller batches
+
+            for (let i = 0; i < Math.min(messages.length, 450); i += batchSize) {
+                const batch = messages.slice(i, i + batchSize);
+                const batchPromises = batch.map(async (message: any) => {
+                    try {
+                        const detailResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages/${message.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject`, {
+                            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
+                        });
+
+                        if (detailResponse.statusCode === 200) {
+                            const detailData = JSON.parse(detailResponse.content || '{}');
+                            const headers = detailData.payload?.headers || [];
+                            
+                            const fromHeader = headers.find((h: any) => h.name === 'From');
+                            const subjectHeader = headers.find((h: any) => h.name === 'Subject');
+                            
+                            return {
+                                sender: fromHeader?.value || 'Unknown',
+                                subject: subjectHeader?.value || 'No Subject',
+                                bodyPreview: detailData.snippet || '',
+                                isRead: !(detailData.labelIds || []).includes('UNREAD'),
+                                receivedDateTime: new Date(parseInt(detailData.internalDate)).toISOString()
+                            };
+                        }
+                    } catch (error) {
+                        this.logger.error('Failed to fetch email detail:', error);
+                    }
+                    return null;
+                });
+
+                const batchResults = await Promise.all(batchPromises);
+                detailedEmails.push(...batchResults.filter(email => email !== null) as IEmailData[]);
+                
+                // Add a small delay between batches to respect rate limits
+                if (i + batchSize < messages.length) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+
+            return detailedEmails;
+        } catch (error) {
+            this.logger.error('Failed to fetch detailed emails for LLM analysis:', error);
+            return [];
+        }
     }
 
     // Future methods will be added here:

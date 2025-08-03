@@ -20,7 +20,7 @@ import { getLanguageDisplayTextFromCode } from '../helper/userPreference';
 import { IPreference } from '../definition/lib/IUserPreferences';
 import { EmailProviders } from '../enums/EmailProviders';
 import { Translations } from '../constants/Translations';
-import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+import { EmailCategorizationEnum } from '../definition/lib/IUserPreferences';
 
 
 
@@ -58,6 +58,9 @@ export async function UserPreferenceModal({
             optional: true,
         })
     );
+
+    // Divider
+    blocks.push(blockBuilder.createDividerBlock());
 
     // Stats Categories Selection - show default categories in dropdown but don't force selection
     const userCategories = existingPreference.statsCategories || [];
@@ -106,8 +109,44 @@ export async function UserPreferenceModal({
         })
     );
 
+    // Email Categorization Method Selection
+    const categorizationOptions = [
+        {
+            text: t(Translations.EMAIL_CATEGORIZATION_EMAIL_PROVIDER, language),
+            value: EmailCategorizationEnum.EmailProvider,
+        },
+        {
+            text: t(Translations.EMAIL_CATEGORIZATION_LLM, language),
+            value: EmailCategorizationEnum.LLM,
+        },
+    ];
+    const categorizationDropDownOption = elementBuilder.createDropDownOptions(categorizationOptions);
+    const categorizationDropDown = elementBuilder.addDropDown(
+        {
+            placeholder: t(Translations.EMAIL_CATEGORIZATION_DESCRIPTION, language),
+            options: categorizationDropDownOption,
+            initialOption: categorizationDropDownOption.find(
+                (option) => option.value === (existingPreference.emailCategorization || EmailCategorizationEnum.EmailProvider),
+            ),
+            dispatchActionConfig: [Modals.DISPATCH_ACTION_CONFIG_ON_SELECT],
+        },
+        {
+            blockId: UserPreferenceModalEnum.EMAIL_CATEGORIZATION_DROPDOWN_BLOCK_ID,
+            actionId: UserPreferenceModalEnum.EMAIL_CATEGORIZATION_DROPDOWN_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            blockId: UserPreferenceModalEnum.EMAIL_CATEGORIZATION_DROPDOWN_BLOCK_ID,
+            text: t(Translations.EMAIL_CATEGORIZATION_LABEL, language),
+            element: categorizationDropDown,
+            optional: false,
+        }),
+    );
+
     // Divider
     blocks.push(blockBuilder.createDividerBlock());
+
     // Language Selection
     const languageOptions = supportedLanguageList.map((lang) => ({
         text: getLanguageDisplayTextFromCode(lang, existingPreference.language),

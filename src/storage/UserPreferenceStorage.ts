@@ -7,7 +7,7 @@ import {
     IPersistenceRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { IUserPreferenceStorage } from '../definition/lib/IUserPreferences';
-import { IPreference } from '../definition/lib/IUserPreferences';
+import { IPreference, EmailCategorizationEnum } from '../definition/lib/IUserPreferences';
 import { Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 
@@ -40,6 +40,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
             showProviderWarning: preference.showProviderWarning || currentPreference.showProviderWarning,
             llmConfiguration: preference.llmConfiguration || currentPreference.llmConfiguration,
             systemPrompt: preference.systemPrompt !== undefined ? preference.systemPrompt : currentPreference.systemPrompt,
+            emailCategorization: preference.emailCategorization !== undefined ? preference.emailCategorization : currentPreference.emailCategorization,
         };
 
         const association = new RocketChatAssociationRecord(
@@ -70,6 +71,7 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
                 language: Language.en,
                 emailProvider: EmailProviders.GMAIL,
                 statsCategories: ['github', 'calendar', 'social'],
+                emailCategorization: EmailCategorizationEnum.EmailProvider, // Default to Email Provider
             };
             return preference;
         }

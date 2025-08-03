@@ -23,6 +23,15 @@ export enum LLMProviderEnum {
     Groq = 'groq',
 }
 
+export type EmailCategorizationPreference = 
+    | EmailCategorizationEnum.EmailProvider
+    | EmailCategorizationEnum.LLM;
+
+export enum EmailCategorizationEnum {
+    EmailProvider = 'email-provider',
+    LLM = 'llm',
+}
+
 export interface ILLMConfiguration {
     llmUsagePreference: LLMUsagePreference;
     llmProvider?: LLMProviderType;
@@ -48,6 +57,7 @@ export interface IPreference {
     statsCategories?: string[];
     llmConfiguration?: ILLMConfiguration;
     systemPrompt?: string; // Custom system prompt for email tone customization
+    emailCategorization?: EmailCategorizationPreference; // Preference for email categorization method
 }
 
 export interface IUserPreferenceStorage {

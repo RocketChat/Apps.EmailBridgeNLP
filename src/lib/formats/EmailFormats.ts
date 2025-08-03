@@ -1,6 +1,6 @@
 import { Language, t } from '../Translation/translation';
 import { Translations } from '../../constants/Translations';
-import { IEmailStatistics } from '../../definition/lib/IEmailStatistics';
+import { IEmailStatistics, IEnhancedEmailAnalysis } from '../../definition/lib/IEmailStatistics';
 import { ISummarizeParams } from '../../definition/lib/IEmailUtils';
 import { 
     ISummaryEmailResult, 
@@ -51,6 +51,9 @@ export class EmailFormats {
         // Build category stats section
         const categoryStats = this.formatCategoryStats(statistics.categoryStats);
 
+        // Build enhanced analysis section if available
+        const enhancedAnalysis = statistics.enhancedAnalysis ? this.formatEnhancedAnalysis(statistics.enhancedAnalysis) : '';
+
         // Build complete stats message
         const statsMessage = t(Translations.STATS_HEADER, language, { timeRange: statistics.timeRange }) + '\n\n' +
             t(Translations.STATS_STATISTICS, language, {
@@ -59,6 +62,7 @@ export class EmailFormats {
                 sentToday: statistics.sentToday.toString()
             }) + '\n\n' +
             categoryStats +
+            enhancedAnalysis +
             '---';
 
         return statsMessage;
@@ -104,5 +108,18 @@ export class EmailFormats {
             }
         }
         return categoryReport;
+    }
+
+    public static formatEnhancedAnalysis(enhancedAnalysis: IEnhancedEmailAnalysis): string {
+        let enhancedText = '';
+
+        // Show total emails analyzed if LLM generated
+        if (enhancedAnalysis.isLLMGenerated && enhancedAnalysis.totalEmailsAnalyzed) {
+            enhancedText += `\n*Total - ${enhancedAnalysis.totalEmailsAnalyzed} emails analyzed*\n`;
+        }
+
+        // Removed topSenders section as requested
+
+        return enhancedText;
     }
 } 

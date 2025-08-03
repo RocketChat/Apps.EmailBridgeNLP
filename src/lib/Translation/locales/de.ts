@@ -261,6 +261,12 @@ export const de = {
     Stats_Time_Range_24_Hours: "letzte 24 Stunden",
     Stats_Time_Range_Days: "letzte __days__ Tage",
 
+    // Email Categorization Preferences
+    Email_Categorization_Label: "E-Mail-Kategorisierungsmethode",
+    Email_Categorization_Description: "Wählen Sie, wie E-Mails für Statistiken kategorisiert werden sollen",
+    Email_Categorization_Email_Provider: "E-Mail-Anbieter-API",
+    Email_Categorization_LLM: "LLM-Analyse",
+
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
     Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",

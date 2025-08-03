@@ -258,6 +258,13 @@ export const Translations = {
     STATS_DAYS_RANGE_ERROR: 'Stats_Days_Range_Error',
     STATS_TIME_RANGE_24_HOURS: 'Stats_Time_Range_24_Hours',
     STATS_TIME_RANGE_DAYS: 'Stats_Time_Range_Days',
+    
+    // Email Categorization Preferences
+    EMAIL_CATEGORIZATION_LABEL: 'Email_Categorization_Label',
+    EMAIL_CATEGORIZATION_DESCRIPTION: 'Email_Categorization_Description',
+    EMAIL_CATEGORIZATION_EMAIL_PROVIDER: 'Email_Categorization_Email_Provider',
+    EMAIL_CATEGORIZATION_LLM: 'Email_Categorization_LLM',
+    LLM_ANALYSIS_FAILED: 'LLM_Analysis_Failed',
 
     // Statistics Service Errors
     STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',

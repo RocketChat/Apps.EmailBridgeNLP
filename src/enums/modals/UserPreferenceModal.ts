@@ -21,6 +21,10 @@ export enum UserPreferenceModalEnum {
     SYSTEM_PROMPT_INPUT_BLOCK_ID = 'system-prompt-block',
     SYSTEM_PROMPT_INPUT_ACTION_ID = 'system-prompt-action',
     
+    // Email Categorization dropdown
+    EMAIL_CATEGORIZATION_DROPDOWN_BLOCK_ID = 'email-categorization-block',
+    EMAIL_CATEGORIZATION_DROPDOWN_ACTION_ID = 'email-categorization-action',
+    
     // LLM Configuration
     LLM_USAGE_PREFERENCE_DROPDOWN_BLOCK_ID = 'llm-usage-preference-block',
     LLM_USAGE_PREFERENCE_DROPDOWN_ACTION_ID = 'llm-usage-preference-action',

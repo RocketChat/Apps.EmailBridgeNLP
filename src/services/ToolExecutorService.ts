@@ -376,6 +376,7 @@ export class ToolExecutorService {
             const userPreference = await userPreferenceStorage.getUserPreference();
             const emailProvider = userPreference.emailProvider;
             const categories = userPreference.statsCategories;
+            const useLLMCategorization = userPreference.emailCategorization === 'llm';
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
@@ -413,6 +414,8 @@ export class ToolExecutorService {
                 userId: user.id,
                 hoursBack: hoursBack,
                 categories,
+                useLLMCategorization,
+                language,
             };
 
             const statistics = await EmailServiceFactory.getEmailStatistics(

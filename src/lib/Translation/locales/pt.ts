@@ -250,6 +250,12 @@ export const pt = {
     Stats_Time_Range_24_Hours: "últimas 24 horas",
     Stats_Time_Range_Days: "últimos __days__ dias",
 
+    // Email Categorization Preferences
+    Email_Categorization_Label: "Método de Categorização de E-mails",
+    Email_Categorization_Description: "Escolha como os e-mails devem ser categorizados para estatísticas",
+    Email_Categorization_Email_Provider: "API do Provedor de E-mail",
+    Email_Categorization_LLM: "Análise LLM",
+
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
     Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",

@@ -252,6 +252,13 @@ export const es = {
     Stats_Days_Range_Error: "❌ **Parámetro de días fuera de rango.**\n\nLas estadísticas solo se pueden generar para un máximo de 15 días.",
     Stats_Time_Range_24_Hours: "últimas 24 horas",
     Stats_Time_Range_Days: "últimos __days__ días",
+
+    // Email Categorization Preferences
+    Email_Categorization_Label: "Método de Categorización de Correos",
+    Email_Categorization_Description: "Elige cómo deben categorizarse los correos para las estadísticas",
+    Email_Categorization_Email_Provider: "API del Proveedor de Correo",
+    Email_Categorization_LLM: "Análisis LLM",
+
     Stats_Command: "usa `/email stats` - Obtener informe diario de estadísticas de correo",
 
     // Statistics Service Errors

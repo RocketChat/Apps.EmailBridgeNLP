@@ -17,7 +17,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
-import { IPreference } from '../definition/lib/IUserPreferences';
+import { IPreference, EmailCategorizationEnum, EmailCategorizationPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
 import { handleErrorAndGetMessage, handleError, handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
@@ -91,6 +91,7 @@ export class ExecuteViewSubmitHandler {
             const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.STATS_CATEGORIES_INPUT_ACTION_ID) || [];
             const newCategoriesRaw = this.getFormValue(view.state, UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID) || "";
             const systemPromptValue = this.getFormValue(view.state, UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_ACTION_ID) || "";
+            const emailCategorizationValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_CATEGORIZATION_DROPDOWN_ACTION_ID) || EmailCategorizationEnum.EmailProvider;
 
             // Process and combine categories - store what user actually selected
             const newCategories = newCategoriesRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
@@ -128,6 +129,7 @@ export class ExecuteViewSubmitHandler {
                 emailProvider: emailProviderValue as EmailProviders,
                 statsCategories: [...new Set(combinedCategories as string[])],
                 systemPrompt: systemPromptValue.trim() || undefined,
+                emailCategorization: emailCategorizationValue as EmailCategorizationPreference,
             };
 
             // Update user preference
@@ -176,7 +178,9 @@ export class ExecuteViewSubmitHandler {
             const hasChanges = (
                 currentPreference.language !== languageValue ||
                 currentPreference.emailProvider !== emailProviderValue ||
-                JSON.stringify(currentPreference.statsCategories?.sort()) !== JSON.stringify(combinedCategories.sort())
+                JSON.stringify(currentPreference.statsCategories?.sort()) !== JSON.stringify(combinedCategories.sort()) ||
+                currentPreference.emailCategorization !== emailCategorizationValue ||
+                currentPreference.systemPrompt !== (systemPromptValue.trim() || undefined)
             );
 
             // Notify user about successful update with provider-specific handling

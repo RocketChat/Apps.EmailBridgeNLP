@@ -11,10 +11,23 @@ export interface IEmailStatistics {
     timeRange: string;
     emailAddress: string;
     provider: string;
+    enhancedAnalysis?: IEnhancedEmailAnalysis;
+}
+
+export interface IEnhancedEmailAnalysis {
+    topSenders?: Array<{ email: string; count: number; name?: string }>;
+    userCategories?: ICategoryStats;
+    additionalCategories?: ICategoryStats;
+    trends?: string[];
+    insights?: string[];
+    totalEmailsAnalyzed?: number;
+    isLLMGenerated: boolean;
 }
 
 export interface IEmailStatsParams {
     userId: string;
     hoursBack: number;
     categories?: string[];
+    useLLMCategorization?: boolean;
+    language?: string;
 } 

@@ -252,6 +252,13 @@ export const en = {
     Stats_Time_Range_24_Hours: "last 24 hours",
     Stats_Time_Range_Days: "last __days__ days",
 
+    // Email Categorization Preferences
+    Email_Categorization_Label: "Email Categorization Method",
+    Email_Categorization_Description: "Choose how emails should be categorized for statistics report",
+    Email_Categorization_Email_Provider: "Email Provider API",
+    Email_Categorization_LLM: "LLM Analysis",
+    LLM_Analysis_Failed: "LLM analysis encountered an error",
+
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
     Statistics_Not_Implemented: "Statistics are not implemented for provider: __provider__",
