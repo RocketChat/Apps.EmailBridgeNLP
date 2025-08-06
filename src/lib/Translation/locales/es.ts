@@ -259,7 +259,8 @@ export const es = {
     Email_Categorization_Email_Provider: "API del Proveedor de Correo",
     Email_Categorization_LLM: "Análisis LLM",
 
-    Stats_Command: "usa `/email stats` - Obtener informe diario de estadísticas de correo",
+    Stats_Command: "usa `/email stats <no. de días>` - Obtener informe de estadísticas de correo (máximo 15 días)",
+    Natural_Language_Examples: "usa `/email <tu consulta>` - Comandos en lenguaje natural con asistencia IA\nEjemplos:\n• \`/email enviar correo a @john.doe sobre la reunión de mañana\`\n• \`/email resumir este hilo y enviar a manager@company.com\`\n• \`/email generar estadísticas de los últimos 5 días\`\n• \`/email enviar correo a @all OR #canal-nombre OR #equipo-nombre\`",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",

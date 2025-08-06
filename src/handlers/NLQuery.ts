@@ -79,12 +79,15 @@ export class NLQueryHandler {
         // Store the original query for username extraction
         this.originalQuery = query;
 
+        // Replace @all with current channel name for bulk emailing
+        const processedQuery = this.replaceAtAllWithChannelName(query);
+
         try {
             // Send initial query message with AI thinking indicator
-            await this.sendQueryMessage(query, appUser);
+            await this.sendQueryMessage(processedQuery, appUser);
 
             // Process the query with LLM
-            const { toolCalls, error } = await this.processWithLLM(query);
+            const { toolCalls, error } = await this.processWithLLM(processedQuery);
 
             if (error) {
                 await this.sendUserFriendlyError(error, appUser);
@@ -538,5 +541,20 @@ export class NLQueryHandler {
                 'tool_execution_error'
             );
         }
+    }
+
+    private replaceAtAllWithChannelName(query: string): string {
+        // Replace @all with #current-channel-name for bulk emailing
+        const channelName = this.room.displayName || this.room.slugifiedName || 'general';
+        
+        // Use regex to replace @all (case insensitive) with the channel name
+        const processedQuery = query.replace(/@all\b/gi, `#${channelName}`);
+        
+        // Log the replacement for debugging
+        if (processedQuery !== query) {
+            this.app.getLogger().debug(`Replaced @all with #${channelName} in query: ${query} -> ${processedQuery}`);
+        }
+        
+        return processedQuery;
     }
 }

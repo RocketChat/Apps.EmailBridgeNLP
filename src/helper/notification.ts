@@ -23,6 +23,8 @@ ${t(Translations.LOGIN_COMMAND, language)}
 ${t(Translations.LOGOUT_COMMAND, language)}
 ${t(Translations.CONFIG_COMMAND, language)}
 ${t(Translations.STATS_COMMAND, language)}
+
+${t(Translations.NATURAL_LANGUAGE_EXAMPLES, language)}
     `;
 
     const helperMessage = modify

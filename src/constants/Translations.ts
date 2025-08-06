@@ -247,6 +247,7 @@ export const Translations = {
 
     // Stats Feature Messages
     STATS_COMMAND: 'Stats_Command',
+    NATURAL_LANGUAGE_EXAMPLES: 'Natural_Language_Examples',
     STATS_PROVIDER_NOT_SUPPORTED: 'Stats_Provider_Not_Supported',
     STATS_NOT_AUTHENTICATED: 'Stats_Not_Authenticated',
     STATS_ERROR: 'Stats_Error',
