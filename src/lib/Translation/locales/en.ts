@@ -375,6 +375,7 @@ export const en = {
     LLM_Email_Subject_Label: "**Subject:**",
     LLM_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
     LLM_Summary_Email_Ready_Formatted: "Hey __name__, your email with summary from channel: **__channelName__** is ready to send",
+    LLM_Channel_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
 
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "The URL/API key is not filled. Please contact your admin.",
@@ -430,6 +431,10 @@ export const en = {
     Channel_Not_Found: "Channel or team '**__channelName__**' not found. Please check the name and try again.",
     Channel_Permission_Error: "Permission Error: __error__",
     Channel_No_Emails_Found: "No email addresses found for members in '**__channelName__**'. __error__",
+    Channel_Name_Required: "Channel name is required",
+    Channel_Name_Required_For_Team_Email: "Channel name is required for sending email to channel or team",
+    Failed_To_Retrieve_Channel_Members: "Failed to retrieve channel members",
+    Failed_To_Get_Members: "Failed to get members for __channelName__",
     Permission_View_C_Room: "Ask workspace admin to grant **view-c-room** permission to access public channels.",
     Permission_View_Joined_Room: "Ask workspace admin to grant **view-joined-room** permission to access private groups.",
     Permission_View_Full_User_Info: "Ask workspace admin to grant **view-full-other-user-info** permission to retrieve member email addresses.",

@@ -61,6 +61,17 @@ export function handleLLMErrorAndGetMessage(
         return error.message; // Return the original error message
     }
 
+    // Check if this is a summary-related error (should be shown directly to user)
+    if (errorMessage.includes('summarize') || errorMessage.includes('summary') || errorMessage.includes('messages found') || 
+        errorMessage.includes('no messages') || errorMessage.includes('failed to generate summary')) {
+        return error.message; // Return the original error message
+    }
+
+    // Check if this is a timeout or network error that shouldn't be attributed to API key
+    if (errorMessage.includes('timeout') || errorMessage.includes('econnreset') || errorMessage.includes('enotfound')) {
+        return 'Network connection issue. Please try again.';
+    }
+
     // Get status code from HTTP response
     const statusCode = error.statusCode || error.response?.status || error.status;
     

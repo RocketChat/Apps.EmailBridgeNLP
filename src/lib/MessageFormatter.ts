@@ -15,17 +15,30 @@ export class MessageFormatter {
         emailData: ISendEmailData, 
         language: Language,
         read?: IRead,
-        channelName?: string
+        channelName?: string,
+        isChannelEmail?: boolean,
+        isSummaryEmail?: boolean
     ): Promise<string> {
-        // Determine if this is a summary email or regular email
-        const responseText = channelName 
-            ? t(Translations.LLM_SUMMARY_EMAIL_READY_FORMATTED, language, { 
+        // Determine the message type and use appropriate template
+        let responseText: string;
+        
+        if (isSummaryEmail && channelName) {
+            // This is a summary email
+            responseText = t(Translations.LLM_SUMMARY_EMAIL_READY_FORMATTED, language, { 
                 name: senderName,
                 channelName: channelName
-              })
-            : t(Translations.LLM_EMAIL_READY_FORMATTED, language, { 
+            });
+        } else if (isChannelEmail) {
+            // This is a regular channel email (not summary)
+            responseText = t(Translations.LLM_CHANNEL_EMAIL_READY_FORMATTED, language, { 
                 name: senderName
-              });
+            });
+        } else {
+            // This is a regular email
+            responseText = t(Translations.LLM_EMAIL_READY_FORMATTED, language, { 
+                name: senderName
+            });
+        }
         
         let formattedMessage = `${responseText}\n\n`;
         
@@ -34,7 +47,9 @@ export class MessageFormatter {
             const recipientDisplay = await this.formatMixedRecipients(
                 emailData.to, 
                 emailData.toUsernames || [], 
-                read
+                read,
+                channelName,
+                isChannelEmail
             );
             formattedMessage += `${t(Translations.LLM_EMAIL_TO_LABEL, language)} ${recipientDisplay}\n`;
         }
@@ -44,7 +59,9 @@ export class MessageFormatter {
             const ccDisplay = await this.formatMixedRecipients(
                 emailData.cc, 
                 emailData.ccUsernames || [], 
-                read
+                read,
+                channelName,
+                isChannelEmail
             );
             formattedMessage += `${t(Translations.LLM_EMAIL_CC_LABEL, language)} ${ccDisplay}\n`;
         }
@@ -70,7 +87,7 @@ export class MessageFormatter {
         return formattedUsers.join(', ');
     }
 
-    private static async formatMixedRecipients(emails: string[], usernames: string[], read?: IRead): Promise<string> {
+    private static async formatMixedRecipients(emails: string[], usernames: string[], read?: IRead, channelName?: string, isChannelEmail?: boolean): Promise<string> {
         const recipients: string[] = [];
         
         // Remove duplicates from input arrays
@@ -99,6 +116,12 @@ export class MessageFormatter {
         
         // Remove any remaining duplicates from final result
         const uniqueRecipients = [...new Set(recipients)];
+        
+        // If this is a channel email, add the channel name indicator
+        if (isChannelEmail && channelName) {
+            return `${uniqueRecipients.join(', ')} (#${channelName})`;
+        }
+        
         return uniqueRecipients.join(', ');
     }
 

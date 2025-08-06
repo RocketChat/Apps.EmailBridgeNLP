@@ -337,6 +337,10 @@ export const Translations = {
     CHANNEL_NOT_FOUND: 'Channel_Not_Found',
     CHANNEL_PERMISSION_ERROR: 'Channel_Permission_Error',
     CHANNEL_NO_EMAILS_FOUND: 'Channel_No_Emails_Found',
+    CHANNEL_NAME_REQUIRED: 'Channel_Name_Required',
+    CHANNEL_NAME_REQUIRED_FOR_TEAM_EMAIL: 'Channel_Name_Required_For_Team_Email',
+    FAILED_TO_RETRIEVE_CHANNEL_MEMBERS: 'Failed_To_Retrieve_Channel_Members',
+    FAILED_TO_GET_MEMBERS: 'Failed_To_Get_Members',
     PERMISSION_VIEW_C_ROOM: 'Permission_View_C_Room',
     PERMISSION_VIEW_JOINED_ROOM: 'Permission_View_Joined_Room',
     PERMISSION_VIEW_FULL_USER_INFO: 'Permission_View_Full_User_Info',
@@ -394,6 +398,7 @@ export const Translations = {
     LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',
     LLM_EMAIL_READY_FORMATTED: 'LLM_Email_Ready_Formatted',
     LLM_SUMMARY_EMAIL_READY_FORMATTED: 'LLM_Summary_Email_Ready_Formatted',
+    LLM_CHANNEL_EMAIL_READY_FORMATTED: 'LLM_Channel_Email_Ready_Formatted',
 
     // Error message details for MessageFormatter
     ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',

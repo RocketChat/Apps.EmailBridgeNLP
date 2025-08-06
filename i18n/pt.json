@@ -117,5 +117,7 @@
 	"Gemini_API_Key_Label": "Chave API do Google Gemini",
 	"Gemini_API_Key_Description": "Sua chave API do Google AI Studio para acessar modelos Gemini (necessário apenas ao usar o provedor Gemini)",
 	"Groq_API_Key_Label": "Chave API do Groq",
-	"Groq_API_Key_Description": "Sua chave API do Groq para acessar modelos Llama (necessário apenas ao usar o provedor Groq)"
+	"Groq_API_Key_Description": "Sua chave API do Groq para acessar modelos Llama (necessário apenas ao usar o provedor Groq)",
+	"Max_Recipients_Per_Email_Label": "Máximo de Destinatários por E-mail",
+	"Max_Recipients_Per_Email_Description": "Número máximo de destinatários permitidos por e-mail para todos os usuários (padrão: 100)"
 } 

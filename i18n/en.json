@@ -117,5 +117,7 @@
 	"Gemini_API_Key_Label": "Google Gemini API Key",
 	"Gemini_API_Key_Description": "Your Google AI Studio API key for accessing Gemini models (required only when using Gemini provider)",
 	"Groq_API_Key_Label": "Groq API Key",
-	"Groq_API_Key_Description": "Your Groq API key for accessing Llama models (required only when using Groq provider)"
+	"Groq_API_Key_Description": "Your Groq API key for accessing Llama models (required only when using Groq provider)",
+	"Max_Recipients_Per_Email_Label": "Maximum Recipients per Email",
+	"Max_Recipients_Per_Email_Description": "Maximum number of recipients allowed per email for all users (default: 100)"
 } 

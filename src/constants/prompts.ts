@@ -14,7 +14,7 @@ RESPONSE FORMAT:
 }
 
 If the request does not match any known tool, return:
-{"error": "I can't understand that request. Could you please rephrase it with more details?"}`;
+{"error": "I can't understand that request. Could you please rephrase it with more exact details?"}`;
 
 const AVAILABLE_TOOLS = `
 AVAILABLE TOOLS:
@@ -36,20 +36,33 @@ Fields:
 - "include_in": string — Optional "to" or "cc" field where to put the emails (default: "to")
 
 3. summarize-and-send-email  
-→ Summarizes a conversation in thread/channel and sends it to a recipient(s).  
+→ Summarizes messages/conversation in the current thread/channel and sends the summary to specific recipients by email.
+Use when: User wants to send summary TO specific people/emails (not to a channel)
 Fields:
-- "to": [string] — Optional recipient list  
+- "to": [string] — Required recipient email list  
 - "cc": [string] — Optional CC list
-- "start_date": string (YYYY-MM-DD) — Optional
-- "end_date": string (YYYY-MM-DD) — Optional
+- "start_date": string (YYYY-MM-DD) — Optional date range start
+- "end_date": string (YYYY-MM-DD) — Optional date range end
 - "people": [string] — Optional list of usernames starting with @, to consider for extracting messages in conversation
+- "subject": string — Optional email subject
 
-4. stats  
+4. summarize-and-send-email-to-channel-or-team
+→ Summarizes messages/conversation in the current thread/channel and sends the summary to ALL MEMBERS of a specified channel or team.
+Use when: User wants to send summary TO ALL members of a channel/team (like #general, #development)
+Fields:
+- "channel_name": string — Required channel or team name (without # prefix)
+- "start_date": string (YYYY-MM-DD) — Optional date range start
+- "end_date": string (YYYY-MM-DD) — Optional date range end
+- "people": [string] — Optional list of usernames starting with @, to consider for extracting messages in conversation
+- "include_in": string — Optional "to" or "cc" field where to put the emails (default: "to")
+- "subject": string — Optional email subject
+
+5. stats  
 → Generates a summary stats report of recent email statistics.  
 Fields:
 - "days": integer — Number of days to generate stats for (1-15, default is 1- when time range is not specified)
 
-5. extract-attachments  
+6. extract-attachments  
 → Extracts and downloads email attachments from specified emails.  
 Fields:
 - "email_ids": [string] — Required list of email IDs to extract attachments from
@@ -65,20 +78,23 @@ FORMAT RULES:
 5. If only one email is given, still use array.
 6. "days" must be an integer number (no quotes).
 7. Populate subject and content fields if possible, according to the user's query.
-8. For "people" field in summarize-and-send-email:
+8. For SUMMARIZE tools - when to use which:
+   - "summarize and send to @user" or "summarize and send to email@example.com" → use "summarize-and-send-email"
+   - "summarize and send to #channel" or "summarize and send to all members of #team" → use "summarize-and-send-email-to-channel-or-team"
+9. For "people" field in summarize tools:
    - If usernames have @ prefix (e.g., "@alice", "bob") → include them: ["@alice"]
    - If usernames have NO @ prefix (e.g., "alice", "bob") → use empty array: []
-9. EMAIL ADDRESS EXTRACTION: When you see @username [email@example.com] in the query, extract ONLY the email from brackets:
+10. EMAIL ADDRESS EXTRACTION: When you see @username [email@example.com] in the query, extract ONLY the email from brackets:
     - "@john.doe [john@company.com]" → use "john@company.com" in "to" field
     - "@alice [alice@example.com] and @bob [bob@example.com]" → use ["alice@example.com", "bob@example.com"]
     - "@username [ ]" or "@username" → skip this user (no valid email)
     - "send to john@gmail.com and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
-10. MIXED RECIPIENTS: When query has both usernames with emails and direct emails:
+11. MIXED RECIPIENTS: When query has both usernames with emails and direct emails:
     - Extract emails from @username [email] format
     - Include direct email addresses as-is
     - Combine all valid emails into the "to" array
     - "send to @john.gk [john@gmail.com] and alice@company.com" → use ["john@gmail.com", "alice@company.com"]
-11. If if user query is like "send an email" which dont provide any details for email content, then just generate a "Welcome to Rocket.Chat" email with longer email body.
+12. If user query is like "send an email" which doesn't provide any details for email content, then just generate a "Welcome to Rocket.Chat" email with longer email body.
     `;
 
 const PROMPT_EXAMPLES = `
@@ -163,7 +179,45 @@ Assistant:
 }
 }
 
-User: /email foo bar  
+User: /email summarize this channel and send it to @Himanshu.hb [priyan@gmail.com]
+Assistant:
+{
+"function_call": {
+    "name": "summarize-and-send-email",
+    "arguments": {
+        "to": ["priyan@gmail.com"],
+        "subject": "Channel Summary"
+    }
+}
+}
+
+User: /email summarise this thread and send it to #general
+Assistant:
+{
+"function_call": {
+    "name": "summarize-and-send-email-to-channel-or-team",
+    "arguments": {
+        "channel_name": "general",
+        "subject": "Thread Summary"
+    }
+}
+}
+
+User: /email summarize last 3 days conversation and send to all members of #general-team
+Assistant:
+{
+"function_call": {
+    "name": "summarize-and-send-email-to-channel-or-team",
+    "arguments": {
+        "channel_name": "general-team",
+        "start_date": "{CURRENT_DATE_MINUS_3}",
+        "end_date": "{CURRENT_DATE}",
+        "include_in": "to"
+    }
+}
+}
+
+User: /email foo bar ojdo
 Assistant:
 {"error":"I can't understand your request. Please rewrite your query with more details."}`;
 

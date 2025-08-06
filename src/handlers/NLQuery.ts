@@ -28,6 +28,7 @@ import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
 import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { getEffectiveLLMSettings } from '../config/SettingsManager';
+import { MessageService } from '../services/MessageService';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -210,7 +211,8 @@ export class NLQueryHandler {
         // Handle email tools with UI buttons
         if (toolCall.function.name === LlmTools.SEND_EMAIL || 
             toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM ||
-            toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL) {
+            toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL ||
+            toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
             await this.handleEmailTools(toolCall, args, appUser);
         } else {
             // Use ToolExecutorService for other tools
@@ -241,6 +243,9 @@ export class NLQueryHandler {
             } else if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
                 // Handle channel/team email tool
                 emailData = await this.prepareChannelEmailData(args);
+            } else if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+                // Handle summarize and send to channel/team tool
+                emailData = await this.prepareSummarizeChannelEmailData(args);
             } else {
                 // Handle summarize-and-send-email tool
                 emailData = await this.prepareSummarizeEmailData(args);
@@ -267,7 +272,7 @@ export class NLQueryHandler {
         try {
             const channelName = args.channel_name;
             if (!channelName) {
-                throw new Error('Channel name is required');
+                throw new Error(t(Translations.CHANNEL_NAME_REQUIRED, this.language));
             }
 
             // Create channel member service
@@ -284,9 +289,9 @@ export class NLQueryHandler {
 
             if (!result.success) {
                 if (result.permissionError) {
-                    throw new Error(`Permission Error: ${result.permissionError}`);
+                    throw new Error(t(Translations.CHANNEL_PERMISSION_ERROR, this.language, { error: result.permissionError }));
                 }
-                throw new Error(result.error || 'Failed to retrieve channel members');
+                throw new Error(result.error || t(Translations.FAILED_TO_RETRIEVE_CHANNEL_MEMBERS, this.language));
             }
 
             // Get user preferences for limit validation
@@ -365,7 +370,6 @@ export class NLQueryHandler {
             }
 
             // Create services for summarization
-            const { MessageService } = await import('../services/MessageService');
             const messageService = new MessageService();
 
             // Get user preference for LLM settings
@@ -435,6 +439,125 @@ export class NLQueryHandler {
         }
     }
 
+    private async prepareSummarizeChannelEmailData(args: any): Promise<ISendEmailData> {
+        try {
+            // First, prepare the summary data (similar to prepareSummarizeEmailData)
+            const summarizeParams: ISummarizeParams = {
+                start_date: args.start_date,
+                end_date: args.end_date,
+                people: args.people,
+                format: args.format,
+            };
+
+            // Calculate days if date range is provided
+            if (args.start_date && args.end_date) {
+                const startDate = new Date(args.start_date);
+                const endDate = new Date(args.end_date);
+                const timeDiff = endDate.getTime() - startDate.getTime();
+                summarizeParams.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            }
+
+            // Create services for summarization
+            const messageService = new MessageService();
+
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
+
+            // Retrieve messages from the current room or thread
+            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
+
+            if (messages.length === 0) {
+                throw new Error(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
+            }
+
+            // Format messages for summarization
+            const formattedMessages = messageService.formatMessagesForSummary(messages);
+
+            // Generate summary using LLM
+            const channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
+            const summaryContent = await llmService.generateSummary(formattedMessages, channelName);
+
+            if (!summaryContent || summaryContent === "Failed to generate summary due to an error.") {
+                throw new Error(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
+            }
+
+            // Format email using EmailFormats utility
+            const emailResult = EmailFormats.formatSummaryEmail(
+                channelName,
+                summaryContent,
+                messages.length,
+                args,
+                summarizeParams
+            );
+
+            // Now get channel members (similar to prepareChannelEmailData)
+            const channelMemberService = new ChannelMemberService(
+                this.read,
+                this.http,
+                this.app,
+                this.sender,
+                this.persis
+            );
+
+            const targetChannelName = args.channel_name;
+            if (!targetChannelName) {
+                throw new Error(t(Translations.CHANNEL_NAME_REQUIRED_FOR_TEAM_EMAIL, this.language));
+            }
+
+            const result = await channelMemberService.getChannelMembers(targetChannelName);
+
+            if (!result.success) {
+                throw new Error(result.error || t(Translations.FAILED_TO_GET_MEMBERS, this.language, { channelName: targetChannelName }));
+            }
+
+            // Extract emails from members
+            const memberEmails = result.members
+                .filter(member => member.email)
+                .map(member => member.email as string);
+
+            if (memberEmails.length === 0) {
+                throw new Error(`No email addresses found for members in ${result.channelName}. ${result.error || ''}`);
+            }
+
+            // Show channel name in response
+            const isChannel = targetChannelName.includes('channel') || !targetChannelName.includes('team');
+            const roomType = isChannel ? 'channel' : 'team';
+            
+            // Add informative message about channel/team to the summary content
+            const enhancedContent = `${emailResult.content}\n\n[This summary email was sent to all members of the ${roomType} #${result.channelName}]`;
+
+            // Determine where to put emails (to or cc)
+            const includeIn = args.include_in?.toLowerCase() || 'to';
+            
+            const emailData: ISendEmailData = {
+                to: includeIn === 'to' ? memberEmails : [],
+                cc: includeIn === 'cc' ? memberEmails : undefined,
+                subject: emailResult.subject,
+                content: enhancedContent,
+                toUsernames: includeIn === 'to' ? result.members.map(m => m.username) : [],
+                ccUsernames: includeIn === 'cc' ? result.members.map(m => m.username) : [],
+            };
+
+            return emailData;
+
+        } catch (error) {
+            this.app.getLogger().error('Error preparing summarize channel email data:', error);
+            throw error;
+        }
+    }
+
     private async storeEmailDataForButtons(emailData: ISendEmailData): Promise<void> {
         const roomInteractionStorage = new RoomInteractionStorage(
             this.persis,
@@ -465,16 +588,32 @@ export class NLQueryHandler {
 
         // Use MessageFormatter for consistent formatting
         let channelName: string | undefined;
+        let isChannelEmail = false;
+        let isSummaryEmail = false;
+        
         if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL) {
             channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
-        } else if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
-            // Extract channel name from tool arguments
+            isSummaryEmail = true;
+        } else if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+            // Extract channel name from tool arguments for summary + channel email
             try {
                 const args = JSON.parse(toolCall.function.arguments);
                 channelName = args.channel_name || 'Unknown Channel';
             } catch (error) {
                 channelName = 'Unknown Channel';
             }
+            isChannelEmail = true;
+            isSummaryEmail = true;
+        } else if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+            // Extract channel name from tool arguments for regular channel email
+            try {
+                const args = JSON.parse(toolCall.function.arguments);
+                channelName = args.channel_name || 'Unknown Channel';
+            } catch (error) {
+                channelName = 'Unknown Channel';
+            }
+            isChannelEmail = true;
+            isSummaryEmail = false;
         }
 
         const formattedMessage = await MessageFormatter.formatEmailReadyMessage(
@@ -482,7 +621,9 @@ export class NLQueryHandler {
             emailData,
             this.language,
             this.read,
-            channelName
+            channelName,
+            isChannelEmail,
+            isSummaryEmail
         );
 
         block.addSectionBlock({

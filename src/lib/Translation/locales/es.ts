@@ -371,6 +371,7 @@ export const es = {
     LLM_Email_Subject_Label: "**Asunto:**",
     LLM_Email_Ready_Formatted: "Hola __name__, tu correo está listo para enviar",
     LLM_Summary_Email_Ready_Formatted: "Hola __name__, tu correo con resumen del canal: **__channelName__** está listo para enviar",
+    LLM_Channel_Email_Ready_Formatted: "Hola __name__, tu correo está listo para enviar",
 
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "Los datos del correo ya no están disponibles. Por favor, intenta tu solicitud nuevamente.",
@@ -431,4 +432,10 @@ export const es = {
     Validation_Max_Recipients_Invalid: "El máximo de destinatarios debe ser un número válido mayor que 0.",
     Validation_Max_Recipients_Exceeds_Limit: "El máximo de destinatarios no puede exceder el límite del workspace de __limit__.",
     Recipient_Limit_Exceeded: "**Límite de destinatarios excedido**: Esta solicitud tendría __emailCount__ destinatarios, pero su límite es __effectiveLimit__. Pida al administrador que aumente el límite o reduzca el número de destinatarios.",
+
+    // Channel/Team Email translations
+    Channel_Name_Required: "El nombre del canal es requerido",
+    Channel_Name_Required_For_Team_Email: "El nombre del canal es requerido para enviar correo al canal o equipo",
+    Failed_To_Retrieve_Channel_Members: "Error al obtener miembros del canal",
+    Failed_To_Get_Members: "Error al obtener miembros para __channelName__",
 };

@@ -364,6 +364,7 @@ export const ru = {
     LLM_Email_Subject_Label: "**Тема:**",
     LLM_Email_Ready_Formatted: "Привет __name__, ваше письмо готово к отправке",
     LLM_Summary_Email_Ready_Formatted: "Привет __name__, ваше письмо с резюме из канала: **__channelName__** готово к отправке",
+    LLM_Channel_Email_Ready_Formatted: "Привет __name__, ваше письмо готово к отправке",
 
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "Данные электронной почты больше недоступны. Пожалуйста, попробуйте снова.",
@@ -424,4 +425,10 @@ export const ru = {
     Validation_Max_Recipients_Invalid: "Максимальное количество получателей должно быть действительным числом больше 0.",
     Validation_Max_Recipients_Exceeds_Limit: "Максимальное количество получателей не может превышать лимит рабочего пространства __limit__.",
     Recipient_Limit_Exceeded: "**Превышен лимит получателей**: Этот запрос имел бы __emailCount__ получателей, но ваш лимит составляет __effectiveLimit__. Попросите администратора увеличить лимит или уменьшите количество получателей.",
+
+    // Channel/Team Email translations
+    Channel_Name_Required: "Требуется имя канала",
+    Channel_Name_Required_For_Team_Email: "Требуется имя канала для отправки электронной почты в канал или команду",
+    Failed_To_Retrieve_Channel_Members: "Ошибка при получении участников канала",
+    Failed_To_Get_Members: "Ошибка при получении участников для __channelName__",
 };
