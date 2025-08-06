@@ -420,4 +420,14 @@ export const es = {
     LLM_Config_Groq_Key_Required: "La clave de API de Groq es requerida para el proveedor seleccionado",
     LLM_Config_Invalid_Provider: "Proveedor LLM inválido seleccionado",
     LLM_API_Or_URL_Error: "Por favor verifique su LLM API o URL",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Máximo de Destinatarios por Correo",
+    Max_Recipients_Per_Email_Description: "Número máximo de destinatarios permitidos por correo para todos los usuarios (predeterminado: 100)",
+    Too_Many_Recipients_Error: "Demasiados destinatarios para este correo",
+    User_Max_Recipients_Label: "Mi Máximo de Destinatarios por Correo",
+    User_Max_Recipients_Description: "Su límite personal para destinatarios por correo (debe ser menor o igual al límite del workspace)",
+    Validation_Max_Recipients_Invalid: "El máximo de destinatarios debe ser un número válido mayor que 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "El máximo de destinatarios no puede exceder el límite del workspace de __limit__.",
+    Recipient_Limit_Exceeded: "**Límite de destinatarios excedido**: Esta solicitud tendría __emailCount__ destinatarios, pero su límite es __effectiveLimit__. Pida al administrador que aumente el límite o reduzca el número de destinatarios.",
 };

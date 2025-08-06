@@ -41,6 +41,7 @@ export class ToolExecutorService {
         try {
             switch (toolName) {
                 case LlmTools.SEND_EMAIL:
+                case LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM:
                 case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
                     // This tool is now handled directly in Handler.ts with buttons
                     return {

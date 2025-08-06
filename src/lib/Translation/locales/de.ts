@@ -418,4 +418,14 @@ export const de = {
     Test_Email_Success_With_Email: "Test-E-Mail gesendet an: __userEmail__ ✅",
     Test_Email_Failed: "Test-E-Mail konnte nicht gesendet werden ❌",
     Test_Email_No_User_Email: "E-Mail-Adresse konnte nicht abgerufen werden ❌",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Maximale Empfänger pro E-Mail",
+    Max_Recipients_Per_Email_Description: "Maximale Anzahl der Empfänger pro E-Mail für alle Benutzer (Standard: 100)",
+    Too_Many_Recipients_Error: "Zu viele Empfänger für diese E-Mail",
+    User_Max_Recipients_Label: "Meine maximalen Empfänger pro E-Mail",
+    User_Max_Recipients_Description: "Ihr persönliches Limit für Empfänger pro E-Mail (muss kleiner oder gleich dem Arbeitsbereich-Limit sein)",
+    Validation_Max_Recipients_Invalid: "Maximale Empfänger muss eine gültige Zahl größer als 0 sein.",
+    Validation_Max_Recipients_Exceeds_Limit: "Maximale Empfänger kann das Arbeitsbereich-Limit von __limit__ nicht überschreiten.",
+    Recipient_Limit_Exceeded: "**Empfängerlimit überschritten**: Diese Anfrage würde __emailCount__ Empfänger haben, aber Ihr Limit ist __effectiveLimit__. Bitten Sie Ihren Administrator, das Limit zu erhöhen, oder reduzieren Sie die Anzahl der Empfänger.",
 };

@@ -68,13 +68,13 @@ export const en = {
         📧 **What You Can Do:**
         • **Smart Email Management**: "send email to @John.doe about the meeting"
         • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
-        • **Quick Stats**: Get email statistics. Use \`/email stats\`.
+        • **Quick Stats**: Get email statistics with \`/email stats <no. of days> \` - choose between fast provider API or deep AI analysis
         
         📊 **Email Statistics Feature:**
         Get personalized email statistics report showing:
         • Total emails received and sent
-        • Top senders and recipients
         • Email categories (general, calendar, github, etc.)
+        • Get additional categories from LLM analysis
         
         ⚙️ **Supported Providers:**
         • **Gmail** 
@@ -290,6 +290,7 @@ export const en = {
 
     // Tool Names (for user display)
     Tool_Send_Email: "Send Email",
+    Tool_Send_Email_To_Channel: "Send Email to Channel/Team",
     Tool_Extract_Attachment: "Extract Attachments",
     Tool_Summarize_And_Send: "Summarize & Send Email",
     Tool_Stats: "Generate Stats",
@@ -423,4 +424,28 @@ export const en = {
     LLM_Config_Groq_Key_Required: "Please fill your Groq API key in the modal",
     LLM_Config_Invalid_Provider: "Invalid LLM provider selected",
     LLM_API_Or_URL_Error: "Please check your LLM API key or URL",
+
+    // Channel/Team Email translations
+    Channel_Not_Found: "Channel or team '**__channelName__**' not found. Please check the name and try again.",
+    Channel_Permission_Error: "Permission Error: __error__",
+    Channel_No_Emails_Found: "No email addresses found for members in '**__channelName__**'. __error__",
+    Permission_View_C_Room: "Ask workspace admin to grant **view-c-room** permission to access public channels.",
+    Permission_View_Joined_Room: "Ask workspace admin to grant **view-joined-room** permission to access private groups.",
+    Permission_View_Full_User_Info: "Ask workspace admin to grant **view-full-other-user-info** permission to retrieve member email addresses.",
+    Channel_Fetch_Error: "An error occurred while fetching channel members: __error__",
+    Channel_Members_Fetch_Failed: "Failed to fetch members: __error__",
+    Channel_Room_Type_Not_Supported: "Room type '__roomType__' is not supported for email sending. Only channels and private groups are supported.",
+    Channel_Members_Rest_API_Failed: "Failed to fetch members via REST API: __error__",
+    Channel_Could_Not_Retrieve_Emails: "Could not retrieve email addresses for some members: __members__",
+    Recipient_Limit_Exceeded: "Found __emailCount__ recipients, but the workspace limit is __effectiveLimit__. Ask workspace admin to increase the maximum recipients per email limit.",
+    Recipient_Limit_Validation_Failed: "Failed to validate recipient limit. Please try again.",
+    
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Maximum Recipients Per Email",
+    Max_Recipients_Per_Email_Description: "Maximum number of recipients allowed per email for all users (default: 50)",
+    Too_Many_Recipients_Error: "Too many recipients for this email",
+    User_Max_Recipients_Label: "My Max Recipients Per Email",
+    User_Max_Recipients_Description: "Your personal limit for recipients per email (must be less than or equal to workspace limit)",
+    Validation_Max_Recipients_Invalid: "Max recipients must be a valid number greater than 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "Max recipients cannot exceed the workspace limit of __limit__.",
 };

@@ -297,6 +297,7 @@ export const Translations = {
 
     // Tool Names (for user display)
     TOOL_SEND_EMAIL: 'Tool_Send_Email',
+    TOOL_SEND_EMAIL_TO_CHANNEL: 'Tool_Send_Email_To_Channel',
     TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
     TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
     TOOL_STATS: 'Tool_Stats',
@@ -330,7 +331,31 @@ export const Translations = {
     // Send Email Button translations
     EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',
     EMAIL_SEND_BUTTON: 'Email_Send_Button',
+
+    // Channel/Team Email translations
+    CHANNEL_NOT_FOUND: 'Channel_Not_Found',
+    CHANNEL_PERMISSION_ERROR: 'Channel_Permission_Error',
+    CHANNEL_NO_EMAILS_FOUND: 'Channel_No_Emails_Found',
+    PERMISSION_VIEW_C_ROOM: 'Permission_View_C_Room',
+    PERMISSION_VIEW_JOINED_ROOM: 'Permission_View_Joined_Room',
+    PERMISSION_VIEW_FULL_USER_INFO: 'Permission_View_Full_User_Info',
     EMAIL_EDIT_AND_SEND_BUTTON: 'Email_Edit_And_Send_Button',
+    CHANNEL_FETCH_ERROR: 'Channel_Fetch_Error',
+    CHANNEL_MEMBERS_FETCH_FAILED: 'Channel_Members_Fetch_Failed',
+    CHANNEL_ROOM_TYPE_NOT_SUPPORTED: 'Channel_Room_Type_Not_Supported',
+    CHANNEL_MEMBERS_REST_API_FAILED: 'Channel_Members_Rest_API_Failed',
+    CHANNEL_COULD_NOT_RETRIEVE_EMAILS: 'Channel_Could_Not_Retrieve_Emails',
+    RECIPIENT_LIMIT_EXCEEDED: 'Recipient_Limit_Exceeded',
+    RECIPIENT_LIMIT_VALIDATION_FAILED: 'Recipient_Limit_Validation_Failed',
+    
+    // Email Limits translations
+    MAX_RECIPIENTS_PER_EMAIL_LABEL: 'Max_Recipients_Per_Email_Label',
+    MAX_RECIPIENTS_PER_EMAIL_DESCRIPTION: 'Max_Recipients_Per_Email_Description',
+    TOO_MANY_RECIPIENTS_ERROR: 'Too_Many_Recipients_Error',
+    USER_MAX_RECIPIENTS_LABEL: 'User_Max_Recipients_Label',
+    USER_MAX_RECIPIENTS_DESCRIPTION: 'User_Max_Recipients_Description',
+    VALIDATION_MAX_RECIPIENTS_INVALID: 'Validation_Max_Recipients_Invalid',
+    VALIDATION_MAX_RECIPIENTS_EXCEEDS_LIMIT: 'Validation_Max_Recipients_Exceeds_Limit',
 
     // Send Email Status translations
     SEND_EMAIL_SUCCESS: 'Send_Email_Success',

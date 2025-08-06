@@ -413,4 +413,14 @@ export const ru = {
     LLM_Config_Groq_Key_Required: "API-ключ Groq требуется для выбранного провайдера",
     LLM_Config_Invalid_Provider: "Выбран недействительный провайдер LLM",
     LLM_API_Or_URL_Error: "Пожалуйста, проверьте ваш API LLM или URL",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Максимальное количество получателей на письмо",
+    Max_Recipients_Per_Email_Description: "Максимальное количество получателей на письмо для всех пользователей (по умолчанию: 100)",
+    Too_Many_Recipients_Error: "Слишком много получателей для этого письма",
+    User_Max_Recipients_Label: "Мой максимум получателей на письмо",
+    User_Max_Recipients_Description: "Ваш личный лимит получателей на письмо (должен быть меньше или равен лимиту рабочего пространства)",
+    Validation_Max_Recipients_Invalid: "Максимальное количество получателей должно быть действительным числом больше 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "Максимальное количество получателей не может превышать лимит рабочего пространства __limit__.",
+    Recipient_Limit_Exceeded: "**Превышен лимит получателей**: Этот запрос имел бы __emailCount__ получателей, но ваш лимит составляет __effectiveLimit__. Попросите администратора увеличить лимит или уменьшите количество получателей.",
 };

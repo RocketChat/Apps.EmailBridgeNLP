@@ -85,4 +85,17 @@ export async function getEffectiveLLMSettings(
     }
     
     return adminSettings;
+}
+
+export async function getMaxRecipientsPerEmail(settingsReader: ISettingRead): Promise<number> {
+    const maxRecipients = await settingsReader.getValueById(SettingsIds.MaxRecipientsPerEmail);
+    return maxRecipients ? Number(maxRecipients) : 50; // Default to 50 if not set
+}
+
+export async function getEffectiveMaxRecipients(
+    settingsReader: ISettingRead,
+    userPreference?: IPreference
+): Promise<number> {
+    // Always use admin limit since user preferences no longer control this
+    return await getMaxRecipientsPerEmail(settingsReader);
 } 

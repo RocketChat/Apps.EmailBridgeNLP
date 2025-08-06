@@ -25,9 +25,17 @@ Fields:
 - "to": [string] — Optional recipient list  
 - "subject": string — Email subject  
 - "content": string — Email body content. 
-- "cc": [string] — Optional CC list
+- "cc": [string] — Optional CC listCurrently app parses user names, make similar functionality to parse Channel names or team names, which starts with #  , like #channel-name or #team-name. 
 
-2. summarize-and-send-email  
+2. send-email-to-channel-or-team
+→ Sends an email to all members of a specified channel or team.
+Fields:
+- "channel_name": string — Required channel or team name (without # prefix)
+- "subject": string — Email subject
+- "content": string — Email body content
+- "include_in": string — Optional "to" or "cc" field where to put the emails (default: "to")
+
+3. summarize-and-send-email  
 → Summarizes a conversation in thread/channel and sends it to a recipient(s).  
 Fields:
 - "to": [string] — Optional recipient list  
@@ -36,12 +44,12 @@ Fields:
 - "end_date": string (YYYY-MM-DD) — Optional
 - "people": [string] — Optional list of usernames starting with @, to consider for extracting messages in conversation
 
-3. stats  
+4. stats  
 → Generates a summary stats report of recent email statistics.  
 Fields:
 - "days": integer — Number of days to generate stats for (1-15, default is 1- when time range is not specified)
 
-4. extract-attachments  
+5. extract-attachments  
 → Extracts and downloads email attachments from specified emails.  
 Fields:
 - "email_ids": [string] — Required list of email IDs to extract attachments from
@@ -127,6 +135,33 @@ Assistant:
 }
 }
 
+User: /email send an email to #general-team about the meeting
+Assistant:
+{
+"function_call": {
+    "name": "send-email-to-channel-or-team",
+    "arguments": {
+        "channel_name": "general-team",
+        "subject": "Team Meeting Notification",
+        "content": "Hello Team,\\n\\nWe have an important team meeting scheduled. Please check your calendars and confirm your attendance.\\n\\nBest regards,\\nTeam Lead"
+        "include_in": "to"
+    }
+}
+}
+
+User: /email send an email to channel #development and put everyone in CC
+Assistant:
+{
+"function_call": {
+    "name": "send-email-to-channel-or-team",
+    "arguments": {
+        "channel_name": "development",
+        "subject": "Development Team Update",
+        "content": "Dear Development Team,\\n\\nI hope this email finds you well. I wanted to provide you with an update on our current projects and initiatives.\\n\\nBest regards,\\nProject Manager",
+        "include_in": "cc"
+    }
+}
+}
 
 User: /email foo bar  
 Assistant:

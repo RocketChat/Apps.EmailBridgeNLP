@@ -408,4 +408,14 @@ export const pl = {
     LLM_Config_Groq_Key_Required: "Klucz API Groq jest wymagany dla wybranego dostawcy",
     LLM_Config_Invalid_Provider: "Wybrano nieprawidłowego dostawcę LLM",
     LLM_API_Or_URL_Error: "Proszę sprawdzić swój LLM API lub URL",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Maksymalna liczba odbiorców na e-mail",
+    Max_Recipients_Per_Email_Description: "Maksymalna liczba odbiorców dozwolona na e-mail dla wszystkich użytkowników (domyślnie: 100)",
+    Too_Many_Recipients_Error: "Za dużo odbiorców dla tego e-maila",
+    User_Max_Recipients_Label: "Mój maksymalny limit odbiorców na e-mail",
+    User_Max_Recipients_Description: "Twój osobisty limit odbiorców na e-mail (musi być mniejszy lub równy limitowi obszaru roboczego)",
+    Validation_Max_Recipients_Invalid: "Maksymalna liczba odbiorców musi być prawidłową liczbą większą niż 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "Maksymalna liczba odbiorców nie może przekroczyć limitu obszaru roboczego wynoszącego __limit__.",
+    Recipient_Limit_Exceeded: "**Przekroczono limit odbiorców**: To żądanie miałoby __emailCount__ odbiorców, ale Twój limit to __effectiveLimit__. Poproś administratora o zwiększenie limitu lub zmniejsz liczbę odbiorców.",
 };

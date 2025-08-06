@@ -14,6 +14,8 @@ export enum SettingsIds {
     OpenAIApiKey = 'openai_api_key',
     GeminiApiKey = 'gemini_api_key',
     GroqApiKey = 'groq_api_key',
+    // Email Limits
+    MaxRecipientsPerEmail = 'max_recipients_per_email',
 }
 
 export const settings: Array<ISetting> = [
@@ -165,5 +167,16 @@ export const settings: Array<ISetting> = [
         section: 'LLM Configuration',
         i18nLabel: 'SelfHosted_LLM_URL_Label',
         i18nDescription: 'SelfHosted_LLM_URL_Description',
+    },
+    // Email Limits Section
+    {
+        id: SettingsIds.MaxRecipientsPerEmail,
+        type: SettingType.NUMBER,
+        packageValue: 50,
+        required: false,
+        public: false,
+        section: 'Email Limits',
+        i18nLabel: 'Max_Recipients_Per_Email_Label',
+        i18nDescription: 'Max_Recipients_Per_Email_Description',
     },
 ];
