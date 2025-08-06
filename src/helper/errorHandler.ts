@@ -50,6 +50,17 @@ export function handleLLMErrorAndGetMessage(
 ): string {
     app.getLogger().error(`${context} error:`, error);
 
+    // Check if this is a recipient limit error (should be shown directly to user)
+    const errorMessage = error.message?.toLowerCase() || '';
+    if (errorMessage.includes('recipients') && (errorMessage.includes('limit') || errorMessage.includes('maximum'))) {
+        return error.message; // Return the original limit error message
+    }
+
+    // Check if this is a channel/permission error (should be shown directly to user)
+    if (errorMessage.includes('permission') || errorMessage.includes('channel') || errorMessage.includes('team')) {
+        return error.message; // Return the original error message
+    }
+
     // Get status code from HTTP response
     const statusCode = error.statusCode || error.response?.status || error.status;
     
