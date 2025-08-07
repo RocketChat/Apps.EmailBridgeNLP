@@ -67,6 +67,7 @@ export const pl = {
         📧 **Co Możesz Robić:**
         • **Inteligentne Zarządzanie Email**: "wyślij email do john@company.com o spotkaniu"
         • **Podsumowania Kanału**: "podsumuj tę rozmowę i wyślij emailem do manager@company.com"
+        • **Email Masowy**: "wyślij email do #nazwa-kanału lub #nazwa-zespołu" *(wymaga uprawnień admin lub specjalnych)*
         • **Szybkie Statystyki**: Otrzymuj codzienne statystyki email i insights. Użyj \`/email stats\`.
         
         📊 **Funkcja Statystyk Email:**
@@ -81,6 +82,9 @@ export const pl = {
         
         🌍 **Wsparcie Wielojęzyczne:**
         Dostępne w języku angielskim, hiszpańskim, rosyjskim, niemieckim, polskim i portugalskim
+        
+        🔒 **Bezpieczeństwo Email Masowy:**
+        Tylko administratorzy workspace i specjalnie autoryzowani użytkownicy mogą wysyłać masowe emaile do kanałów/zespołów. To zapobiega spamowi i zapewnia odpowiedzialne używanie email.
         
         Potrzebujesz pomocy? Wpisz \`/email help\` w dowolnym momencie!
         
@@ -109,7 +113,7 @@ export const pl = {
     Logout_Command: "użyj `/email logout` - Wyloguj się z konta e-mail",
     Config_Command: "użyj `/email config` - Otwórz preferencje użytkownika i ustawienia",
     Stats_Command: "użyj `/email stats <liczba dni>` - Pobierz raport statystyk e-mail (maksymalnie 15 dni)",
-    Natural_Language_Examples: "użyj `/email <twoje zapytanie>` - Komendy w języku naturalnym dla wsparcia AI\nPrzykłady:\n• \`/email wyślij e-mail do @john.doe o spotkaniu jutro\`\n• \`/email podsumuj ten wątek i wyślij do manager@company.com\`\n• \`/email wygeneruj statystyki z ostatnich 5 dni\`\n• \`/email wyślij e-mail do @all OR #nazwa-kanału OR #nazwa-zespółu\`",
+    Natural_Language_Examples: "użyj `/email <twoje zapytanie>` - Komendy w języku naturalnym dla wsparcia AI\nPrzykłady:\n• \`/email wyślij e-mail do @john.doe o spotkaniu jutro\`\n• \`/email podsumuj ten wątek i wyślij do manager@company.com\`\n• \`/email wygeneruj statystyki z ostatnich 5 dni\`\n• \`/email wyślij e-mail do @all OR #nazwa-kanału OR #nazwa-zespółu\` *(wymaga uprawnień admin)*\n\n🔒 **Email Masowy**: E-maile do kanałów/zespołów wymagają uprawnień administratora workspace lub specjalnych uprawnień aby zapobiec spamowi.",
     Default_Greeting: "Cześć __name__! Jestem Email Bot 👋. Mogę pomóc Ci ze wszystkimi potrzebami e-mail.",
     Use_Help_Command: "Użyj `/email help` aby dowiedzieć się o wszystkich dostępnych funkcjach i poleceniach.",
     Login_Action_Text: "Zaloguj się do __provider__",

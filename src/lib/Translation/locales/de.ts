@@ -67,6 +67,7 @@ export const de = {
         📧 **Was Sie Tun Können:**
         • **Intelligentes E-Mail-Management**: "E-Mail an john@company.com über das Meeting senden"
         • **Kanal-Zusammenfassungen**: "diese Unterhaltung zusammenfassen und an manager@company.com mailen"
+        • **Massen-E-Mail**: "E-Mail an #kanal-name oder #team-name senden" *(erfordert Admin oder spezielle Berechtigungen)*
         • **Schnelle Statistiken**: Tägliche E-Mail-Statistiken und Einblicke erhalten. Verwenden Sie \`/email stats\`.
         
         📊 **E-Mail-Statistik-Funktion:**
@@ -81,6 +82,9 @@ export const de = {
         
         🌍 **Mehrsprachige Unterstützung:**
         Verfügbar in Englisch, Spanisch, Russisch, Deutsch, Polnisch und Portugiesisch
+        
+        🔒 **Massen-E-Mail-Sicherheit:**
+        Nur Workspace-Administratoren und speziell autorisierte Benutzer können Massen-E-Mails an Kanäle/Teams senden. Dies verhindert Spam und stellt verantwortlichen E-Mail-Gebrauch sicher.
         
         Brauchen Sie Hilfe? Geben Sie jederzeit \`/email help\` ein!
         
@@ -114,7 +118,7 @@ export const de = {
     Logout_Command: "verwenden Sie `/email logout` - Von Ihrem E-Mail-Konto abmelden",
     Config_Command: "verwenden Sie `/email config` - Benutzereinstellungen und Konfiguration öffnen",
     Stats_Command: "verwenden Sie `/email stats <Anzahl Tage>` - E-Mail-Statistikbericht abrufen (max. 15 Tage)",
-    Natural_Language_Examples: "verwenden Sie `/email <Ihre Anfrage>` - Natürlichsprachliche Befehle für KI-Unterstützung\nBeispiele:\n• \`/email E-Mail an @john.doe über das Meeting morgen senden\`\n• \`/email diesen Thread zusammenfassen und an manager@company.com senden\`\n• \`/email Statistiken für die letzten 5 Tage generieren\`\n• \`/email E-Mail an @all OR #kanal-name OR #team-name senden\`",
+    Natural_Language_Examples: "verwenden Sie `/email <Ihre Anfrage>` - Natürlichsprachliche Befehle für KI-Unterstützung\nBeispiele:\n• \`/email E-Mail an @john.doe über das Meeting morgen senden\`\n• \`/email diesen Thread zusammenfassen und an manager@company.com senden\`\n• \`/email Statistiken für die letzten 5 Tage generieren\`\n• \`/email E-Mail an @all OR #kanal-name OR #team-name senden\` *(erfordert Admin-Berechtigungen)*\n\n🔒 **Massen-E-Mail**: Kanal-/Team-E-Mails erfordern Workspace-Admin oder spezielle Berechtigungen zur Spam-Prävention.",
     Default_Greeting: "Hallo __name__! Ich bin Email Bot 👋. Ich kann Ihnen bei allen Ihren E-Mail-Bedürfnissen helfen.",
     Use_Help_Command: "Verwenden Sie `/email help`, um mehr über alle verfügbaren Funktionen und Befehle zu erfahren.",
     Login_Action_Text: "Bei __provider__ anmelden",

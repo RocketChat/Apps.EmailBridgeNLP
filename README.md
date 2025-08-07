@@ -82,9 +82,10 @@ Say goodbye to context switching between your email client and team chat! With *
 - **`/email config`**: Open user preferences and settings  
 - **`/email stats`**: Get comprehensive email statistics report with AI-powered analysis
 
-Natural Language command exmples:
+Natural Language command examples:
 
 - **`/email summarize this thread/channel and send it as email to boss@rc.com who refuses to use chat`**: summarize thread/channel and send as email to specified recipient(s) 
+- **`/email send email to @all OR #channel-name OR #team-name regarding meeting on tommorow morning 10PM`**: Send bulk emails to all users in a channel or team *(requires admin or special permissions)*
 - **`/email post in the channel for everyone the budget for 2025 email pdf received between 5/1/2025 and 6/24/2025`**: searchs the emails, extracts the attachment and upload it in channel. 
 - **`/email please give me stats for yesterday`**: Get detailed email analytics with insights
 
@@ -95,6 +96,17 @@ User can go to User Preferences by entering `/email config` or by clicking "User
 - **Stats Categories**: Customize categories for email analytics (github, calendar, social, etc.)
 - **Email Categorization Method**: Choose between email "Provider API" or "LLM-based categorization"(LLM also generates additioonal categories other than user provided)
 - **System Prompt**: Customize AI behavior for email tone and style
+
+### 🔒 Bulk Email Permissions:
+**Security Feature**: Bulk email functionality (sending to channels/teams) is restricted to prevent spam:
+- **✅ Workspace Administrators**: Full access to all email features including bulk email
+- **✅ Authorized Users**: Users specifically granted permission by administrators
+- **❌ Regular Users**: Cannot use bulk email features without explicit permission
+
+**For Administrators:**
+- Configure allowed users in App Settings → "Bulk Email Permissions" → "Allowed Users for Bulk Email"
+- Add comma-separated usernames (e.g., `user1, user2, user3`) to grant bulk email access
+- Users will receive clear notifications if they lack permissions
 
 
 <h2>Development & Debugging 🐛</h2>

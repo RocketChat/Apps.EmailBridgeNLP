@@ -68,6 +68,7 @@ export const en = {
         📧 **What You Can Do:**
         • **Smart Email Management**: "send email to @John.doe about the meeting"
         • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
+        • **Bulk Email**: "send email to #channel-name or #team-name regarding meeting on tommorow morning 10PM" *(only admin or users with special permissions can send bulk emails)*
         • **Quick Stats**: Get email statistics with \`/email stats <no. of days> \` - choose between fast provider API or deep AI analysis
         
         📊 **Email Statistics Feature:**
@@ -82,6 +83,9 @@ export const en = {
 
         🌍 **Multi-Language Support:**
         Available in English, Spanish, Russian, German, Polish, and Portuguese
+        
+        🔒 **Bulk Email Security:**
+        Only workspace administrators and specially authorized users can send bulk emails to channels/teams. Ask your admin to add you to the allowed users list.
         
         Need help? Type \`/email help\` anytime!
         
@@ -110,7 +114,7 @@ export const en = {
     Logout_Command: "use `/email logout` - Logout from your email account",
     Config_Command: "use `/email config` - Open user preferences and settings",
     Stats_Command: "use `/email stats <no. of days>` - Get email statistics for specified days (max limit: 15 days)",
-    Natural_Language_Examples: "use `/email <your query>` - Natural language commands with AI assistance\nExamples:\n• \`/email send an email to @john.doe about the meeting tomorrow\`\n• \`/email summarize this thread and send to manager@company.com\`\n• \`/email generate stats for last 5 days\`\n• \`/email send email to @all OR #channel-name OR #team-name\`",
+    Natural_Language_Examples: "use `/email <your query>` - Natural language commands with AI assistance\nExamples:\n• \`/email send an email to @john.doe about the meeting tomorrow\`\n• \`/email summarize this thread and send to manager@company.com\`\n• \`/email generate stats for last 5 days\`\n• \`/email send email to @all OR #channel-name OR #team-name\` *(requires permissions)",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
     Login_Action_Text: "Login to __provider__",

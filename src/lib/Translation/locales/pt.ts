@@ -67,6 +67,7 @@ export const pt = {
         📧 **O que Você Pode Fazer:**
         • **Gerenciamento Inteligente de Email**: "enviar email para john@company.com sobre a reunião"
         • **Resumos de Canal**: "resumir esta conversa e enviar por email para manager@company.com"
+        • **Email em Massa**: "enviar email para #nome-canal ou #nome-equipe" *(requer permissões de admin ou especiais)*
         • **Estatísticas Rápidas**: Obter estatísticas diárias de email e insights. Use \`/email stats\`.
         
         📊 **Recurso de Estatísticas de Email:**
@@ -81,6 +82,9 @@ export const pt = {
         
         🌍 **Suporte Multi-idioma:**
         Disponível em inglês, espanhol, russo, alemão, polonês e português
+        
+        🔒 **Segurança de Email em Massa:**
+        Apenas administradores do workspace e usuários especialmente autorizados podem enviar emails em massa para canais/equipes. Isso previne spam e garante uso responsável de email.
         
         Precisa de ajuda? Digite \`/email help\` a qualquer momento!
         
@@ -109,7 +113,7 @@ export const pt = {
     Logout_Command: "use `/email logout` - Fazer logout da conta de email",
     Config_Command: "use `/email config` - Abrir preferências do usuário e configurações",
     Stats_Command: "use `/email stats <no. de dias>` - Obter relatório de estatísticas de email (máximo 15 dias)",
-    Natural_Language_Examples: "use `/email <sua consulta>` - Comandos em linguagem natural para assistência IA\nExemplos:\n• \`/email enviar email para @john.doe sobre a reunião amanhã\`\n• \`/email resumir esta conversa e enviar para manager@company.com\`\n• \`/email gerar estatísticas dos últimos 5 dias\`\n• \`/email enviar email para @all OR #nome-canal OR #nome-equipa\`",
+    Natural_Language_Examples: "use `/email <sua consulta>` - Comandos em linguagem natural para assistência IA\nExemplos:\n• \`/email enviar email para @john.doe sobre a reunião amanhã\`\n• \`/email resumir esta conversa e enviar para manager@company.com\`\n• \`/email gerar estatísticas dos últimos 5 dias\`\n• \`/email enviar email para @all OR #nome-canal OR #nome-equipa\` *(requer permissões de admin)*\n\n🔒 **Email em Massa**: Emails para canais/equipas requerem permissões de administrador do workspace ou especiais para prevenir spam.",
     Default_Greeting: "Olá __name__! Eu sou o Email Bot 👋. Posso ajudá-lo com todas as suas necessidades de email.",
     Use_Help_Command: "Use `/email help` para aprender sobre todos os recursos e comandos disponíveis.",
     Login_Action_Text: "Fazer login no __provider__",

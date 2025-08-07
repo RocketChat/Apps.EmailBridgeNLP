@@ -65,6 +65,7 @@ export const es = {
         📧 **Lo que Puedes Hacer:**
         • **Gestión Inteligente de Email**: "enviar email a john@company.com sobre la reunión"
         • **Resúmenes de Canal**: "resumir esta conversación y enviarla por email a manager@company.com"
+        • **Email Masivo**: "enviar email a #nombre-canal o #nombre-equipo" *(requiere permisos de admin o especiales)*
         • **Estadísticas Rápidas**: Obtener estadísticas diarias de email e insights. Usa \`/email stats\`.
         
         📊 **Función de Estadísticas de Email:**
@@ -79,6 +80,9 @@ export const es = {
         
         🌍 **Soporte Multi-idioma:**
         Disponible en inglés, español, ruso, alemán, polaco y portugués
+        
+        🔒 **Seguridad de Email Masivo:**
+        Solo los administradores del workspace y usuarios especialmente autorizados pueden enviar emails masivos a canales/equipos. Esto previene spam y asegura un uso responsable del email.
         
         ¿Necesitas ayuda? ¡Escribe \`/email help\` en cualquier momento!
         
@@ -260,7 +264,7 @@ export const es = {
     Email_Categorization_LLM: "Análisis LLM",
 
     Stats_Command: "usa `/email stats <no. de días>` - Obtener informe de estadísticas de correo (máximo 15 días)",
-    Natural_Language_Examples: "usa `/email <tu consulta>` - Comandos en lenguaje natural con asistencia IA\nEjemplos:\n• \`/email enviar correo a @john.doe sobre la reunión de mañana\`\n• \`/email resumir este hilo y enviar a manager@company.com\`\n• \`/email generar estadísticas de los últimos 5 días\`\n• \`/email enviar correo a @all OR #canal-nombre OR #equipo-nombre\`",
+    Natural_Language_Examples: "usa `/email <tu consulta>` - Comandos en lenguaje natural con asistencia IA\nEjemplos:\n• \`/email enviar correo a @john.doe sobre la reunión de mañana\`\n• \`/email resumir este hilo y enviar a manager@company.com\`\n• \`/email generar estadísticas de los últimos 5 días\`\n• \`/email enviar correo a @all OR #canal-nombre OR #equipo-nombre\` *(requiere permisos de admin)*\n\n🔒 **Email Masivo**: Correos a canales/equipos requieren permisos de administrador del workspace o especiales para prevenir spam.",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
