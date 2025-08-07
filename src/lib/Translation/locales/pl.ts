@@ -426,4 +426,12 @@ export const pl = {
     Channel_Name_Required_For_Team_Email: "Nazwa kanału jest wymagana do wysyłania e-maili do kanału lub zespołu",
     Failed_To_Retrieve_Channel_Members: "Błąd podczas pobierania członków kanału",
     Failed_To_Get_Members: "Błąd podczas pobierania członków dla __channelName__",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "🚫 **Odmowa dostępu: Funkcja masowych e-maili**\n\nTylko administratorzy obszaru roboczego i specjalnie autoryzowani użytkownicy mogą wysyłać masowe e-maile.\n\n**Autoryzowani Użytkownicy:**\n• **Administratorzy obszaru roboczego** - Pełny dostęp do wszystkich funkcji\n• **Zatwierdzone użytkownicy** - Użytkownicy, którym administratorzy specjalnie przyznali uprawnienia\n\n**Co możesz zrobić?**\n• Skontaktuj się z administratorem obszaru roboczego, aby poprosić o uprawnienia do masowych e-maili\n• Poproś administratora o dodanie Twojej nazwy użytkownika do listy dozwolonych użytkowników\n\nPotrzebujesz pomocy? Skontaktuj się z administratorem obszaru roboczego.",
+    Bulk_Email_Permission_Check_Error: "❌ **Błąd sprawdzania uprawnień**\n\nWystąpił błąd podczas sprawdzania Twoich uprawnień do funkcji masowych e-maili. Spróbuj ponownie lub skontaktuj się z administratorem, jeśli problem będzie się utrzymywać.",
+    
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Dozwoleni użytkownicy dla masowych e-maili",
+    Bulk_Email_Allowed_Users_Description: "Lista nazw użytkowników oddzielonych przecinkami, którzy mogą używać funkcji masowych e-maili (oprócz administratorów obszaru roboczego). Przykład: użytkownik1, użytkownik2, użytkownik3",
 };

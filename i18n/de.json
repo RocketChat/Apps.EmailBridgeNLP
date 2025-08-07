@@ -119,5 +119,7 @@
 	"Groq_API_Key_Label": "Groq API-Schlüssel",
 	"Groq_API_Key_Description": "Ihr Groq API-Schlüssel für den Zugriff auf Llama-Modelle (nur bei Verwendung des Groq-Anbieters erforderlich)",
 	"Max_Recipients_Per_Email_Label": "Maximale Empfänger pro E-Mail",
-	"Max_Recipients_Per_Email_Description": "Maximale Anzahl der Empfänger pro E-Mail für alle Benutzer (Standard: 100)"
+	"Max_Recipients_Per_Email_Description": "Maximale Anzahl der Empfänger pro E-Mail für alle Benutzer (Standard: 100)",
+	"Bulk_Email_Allowed_Users_Label": "Erlaubte Benutzer für Massen-E-Mail",
+	"Bulk_Email_Allowed_Users_Description": "Kommagetrennte Liste von Benutzernamen, die Massen-E-Mail-Funktionen verwenden dürfen (zusätzlich zu Arbeitsbereich-Administratoren). Beispiel: benutzer1, benutzer2, benutzer3"
 } 

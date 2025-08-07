@@ -20,6 +20,8 @@ import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils'
 import { LlmTools } from '../enums/LlmTools';
 import { UsernameService } from '../services/UsernameService';
 import { ChannelMemberService } from '../services/ChannelMemberService';
+import { UserPermissionService } from '../services/UserPermissionService';
+import { sendNotification } from '../helper/notification';
 import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
@@ -222,6 +224,27 @@ export class NLQueryHandler {
 
     private async handleEmailTools(toolCall: IToolCall, args: any, appUser: IUser): Promise<void> {
         try {
+            // Check permissions for bulk email tools
+            if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM || 
+                toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+                
+                // Create permission service to check user roles
+                const permissionService = new UserPermissionService(
+                    this.read,
+                    this.app,
+                    this.sender,
+                    this.room
+                );
+
+                const permissionCheck = await permissionService.canUseBulkEmailTools();
+                
+                if (!permissionCheck.canUse) {
+                    // Send permission denied notification
+                    await this.sendPermissionDeniedNotification();
+                    return;
+                }
+            }
+
             let emailData: ISendEmailData;
 
             if (toolCall.function.name === LlmTools.SEND_EMAIL) {
@@ -265,6 +288,36 @@ export class NLQueryHandler {
                 appUser,
                 'data_processing_error'
             );
+        }
+    }
+
+    private async sendPermissionDeniedNotification(): Promise<void> {
+        try {
+            const message = t(Translations.BULK_EMAIL_PERMISSION_DENIED, this.language);
+            
+            await sendNotification(
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                { message }
+            );
+        } catch (error) {
+            this.app.getLogger().error('Error sending permission denied notification:', error);
+            // Fallback to simple notification
+            try {
+                const fallbackMessage = t(Translations.BULK_EMAIL_PERMISSION_DENIED, this.language);
+                
+                await sendNotification(
+                    this.read,
+                    this.modify,
+                    this.sender,
+                    this.room,
+                    { message: fallbackMessage }
+                );
+            } catch (fallbackError) {
+                this.app.getLogger().error('Error sending fallback permission notification:', fallbackError);
+            }
         }
     }
 

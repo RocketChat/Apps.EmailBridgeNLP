@@ -445,6 +445,14 @@ export const en = {
     Channel_Could_Not_Retrieve_Emails: "Could not retrieve email addresses for some members: __members__",
     Recipient_Limit_Exceeded: "Found __emailCount__ recipients, but the workspace limit is __effectiveLimit__. Ask workspace admin to increase the maximum recipients per email limit.",
     Recipient_Limit_Validation_Failed: "Failed to validate recipient limit. Please try again.",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "\n🚫 **Access Denied: Bulk Email Feature**\nOnly workspace administrators and specifically authorized users can send bulk emails.\n\nWhat can you do: Contact your workspace administrator to request bulk email permissions.",
+    Bulk_Email_Permission_Check_Error: "❌ **Error checking permissions**\n\nThere was an error verifying your permissions for bulk email features. Please try again or contact your administrator if the issue persists.",
+    
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Allowed Users for Bulk Email",
+    Bulk_Email_Allowed_Users_Description: "Comma-separated list of usernames that are allowed to use bulk email features (in addition to workspace administrators). Example: user1, user2, user3",
     
     // Email Limits translations
     Max_Recipients_Per_Email_Label: "Maximum Recipients Per Email",

@@ -431,4 +431,12 @@ export const pt = {
     Channel_Name_Required_For_Team_Email: "Nome do canal é obrigatório para enviar e-mail ao canal ou equipe",
     Failed_To_Retrieve_Channel_Members: "Erro ao obter membros do canal",
     Failed_To_Get_Members: "Erro ao obter membros para __channelName__",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "🚫 **Acesso Negado: Recurso de Email em Massa**\n\nApenas administradores do espaço de trabalho e usuários especificamente autorizados podem enviar emails em massa.\n\n**Usuários Autorizados:**\n• **Administradores do Espaço de Trabalho** - Acesso completo a todos os recursos\n• **Usuários Aprovados** - Usuários que receberam permissão específica dos administradores\n\n**O que você pode fazer?**\n• Entre em contato com o administrador do espaço de trabalho para solicitar permissões de email em massa\n• Peça a um administrador para adicionar seu nome de usuário à lista de usuários permitidos\n\nPrecisa de ajuda? Entre em contato com o administrador do espaço de trabalho para assistência.",
+    Bulk_Email_Permission_Check_Error: "❌ **Erro verificando permissões**\n\nHouve um erro ao verificar suas permissões para recursos de email em massa. Tente novamente ou entre em contato com seu administrador se o problema persistir.",
+    
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Usuários Permitidos para Email em Massa",
+    Bulk_Email_Allowed_Users_Description: "Lista de nomes de usuário separados por vírgula que podem usar recursos de email em massa (além dos administradores do espaço de trabalho). Exemplo: usuario1, usuario2, usuario3",
 };

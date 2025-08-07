@@ -352,6 +352,14 @@ export const Translations = {
     CHANNEL_COULD_NOT_RETRIEVE_EMAILS: 'Channel_Could_Not_Retrieve_Emails',
     RECIPIENT_LIMIT_EXCEEDED: 'Recipient_Limit_Exceeded',
     RECIPIENT_LIMIT_VALIDATION_FAILED: 'Recipient_Limit_Validation_Failed',
+
+    // Bulk email permissions
+    BULK_EMAIL_PERMISSION_DENIED: 'Bulk_Email_Permission_Denied',
+    BULK_EMAIL_PERMISSION_CHECK_ERROR: 'Bulk_Email_Permission_Check_Error',
+    
+    // App settings for bulk email
+    BULK_EMAIL_ALLOWED_USERS_LABEL: 'Bulk_Email_Allowed_Users_Label',
+    BULK_EMAIL_ALLOWED_USERS_DESCRIPTION: 'Bulk_Email_Allowed_Users_Description',
     
     // Email Limits translations
     MAX_RECIPIENTS_PER_EMAIL_LABEL: 'Max_Recipients_Per_Email_Label',

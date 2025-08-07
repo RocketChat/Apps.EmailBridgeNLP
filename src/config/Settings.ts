@@ -16,6 +16,8 @@ export enum SettingsIds {
     GroqApiKey = 'groq_api_key',
     // Email Limits
     MaxRecipientsPerEmail = 'max_recipients_per_email',
+    // Bulk Email Permissions
+    BulkEmailAllowedUsers = 'bulk_email_allowed_users',
 }
 
 export const settings: Array<ISetting> = [
@@ -168,15 +170,26 @@ export const settings: Array<ISetting> = [
         i18nLabel: 'SelfHosted_LLM_URL_Label',
         i18nDescription: 'SelfHosted_LLM_URL_Description',
     },
-    // Email Limits Section
+   // Bulk Email Permissions Section
     {
         id: SettingsIds.MaxRecipientsPerEmail,
         type: SettingType.NUMBER,
         packageValue: 50,
         required: false,
         public: false,
-        section: 'Email Limits',
+        section: 'Bulk Email Permissions',
         i18nLabel: 'Max_Recipients_Per_Email_Label',
         i18nDescription: 'Max_Recipients_Per_Email_Description',
+    },
+    
+    {
+        id: SettingsIds.BulkEmailAllowedUsers,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: false,
+        public: false,
+        section: 'Bulk Email Permissions',
+        i18nLabel: 'Bulk_Email_Allowed_Users_Label',
+        i18nDescription: 'Bulk_Email_Allowed_Users_Description',
     },
 ];

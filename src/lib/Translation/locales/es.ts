@@ -438,4 +438,12 @@ export const es = {
     Channel_Name_Required_For_Team_Email: "El nombre del canal es requerido para enviar correo al canal o equipo",
     Failed_To_Retrieve_Channel_Members: "Error al obtener miembros del canal",
     Failed_To_Get_Members: "Error al obtener miembros para __channelName__",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "🚫 **Acceso Denegado: Función de Email Masivo**\n\nSolo los administradores del espacio de trabajo y usuarios específicamente autorizados pueden enviar emails masivos.\n\n**Usuarios Autorizados:**\n• **Administradores del Espacio de Trabajo** - Acceso completo a todas las funciones\n• **Usuarios Aprobados** - Usuarios a los que específicamente los administradores han otorgado permisos\n\n**¿Qué puedes hacer?**\n• Contacta a tu administrador del espacio de trabajo para solicitar permisos de email masivo\n• Pide a un administrador que agregue tu nombre de usuario a la lista de usuarios permitidos\n\n¿Necesitas ayuda? Contacta a tu administrador del espacio de trabajo para obtener asistencia.",
+    Bulk_Email_Permission_Check_Error: "❌ **Error verificando permisos**\n\nHubo un error al verificar tus permisos para las funciones de email masivo. Por favor, inténtalo de nuevo o contacta a tu administrador si el problema persiste.",
+    
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Usuarios Permitidos para Email Masivo",
+    Bulk_Email_Allowed_Users_Description: "Lista de nombres de usuario separados por comas que tienen permitido usar las funciones de email masivo (además de los administradores del espacio de trabajo). Ejemplo: usuario1, usuario2, usuario3",
 };
