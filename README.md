@@ -84,10 +84,11 @@ Say goodbye to context switching between your email client and team chat! With *
 
 Natural Language command examples:
 
-- **`/email summarize this thread/channel and send it as email to boss@rc.com who refuses to use chat`**: summarize thread/channel and send as email to specified recipient(s) 
-- **`/email send email to @all OR #channel-name OR #team-name regarding meeting on tommorow morning 10PM`**: Send bulk emails to all users in a channel or team *(requires admin or special permissions)*
-- **`/email post in the channel for everyone the budget for 2025 email pdf received between 5/1/2025 and 6/24/2025`**: searchs the emails, extracts the attachment and upload it in channel. 
-- **`/email please give me stats for yesterday`**: Get detailed email analytics with insights
+- **`/email send an email to @john.doe about the meeting tomorrow`**: Sends email to registered email of @john.doe with proper content
+- **`/email summarize this thread/channel and send it as email to boss@rc.com and @boss.rc who refuses to use chat`**: summarizes thread/channel and send as email to specified recipient(s) 
+- **`/email send email to @all OR #channel-name OR #team-name regarding meeting on tommorow morning 10PM`**: Send bulk emails to all users in a channel or team *(requires admin or special permissions)* 
+- **`/email summarize this thread/channel and send it as email to @all OR #channel-name OR #team-name`**: summarizes thread/channel and send as email to all the members in the specified #channel-name OR #team-name
+- **`/email please give me stats for last 3 days`**: Get email statistics for last 3 days
 
 ### User Preferences Modal:
 User can go to User Preferences by entering `/email config` or by clicking "User Preferences" button in helper message. Configure:
