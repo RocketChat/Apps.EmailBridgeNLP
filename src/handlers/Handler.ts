@@ -10,6 +10,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from '@rocket.chat/apps-engine/definition/metadata';
+
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { IHandlerParams, IHandler } from '../definition/handlers/IHandler';
 import {
@@ -26,18 +27,14 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ActionIds } from '../enums/ActionIds';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { Translations } from '../constants/Translations';
-import { IEmailStatistics, IEmailStatsParams } from '../definition/lib/IEmailStatistics';
-import { LLMService } from '../services/LLMService';
-import { ToolExecutorService } from '../services/ToolExecutorService';
+import { IEmailStatsParams } from '../definition/lib/IEmailStatistics';
 import { handleError, handleErrorAndGetMessage } from '../helper/errorHandler';
 import { SendEmailModal } from '../modal/SendEmailModal';
-import { IToolCall } from '../definition/lib/ToolInterfaces';
-import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
+import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
-import { UsernameService } from '../services/UsernameService';
-import { MessageFormatter } from '../lib/MessageFormatter';
 import { NLQueryHandler } from './NLQuery';
 import { EmailFormats } from '../lib/formats/EmailFormats';
+import { CacheService } from '../services/CacheService';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -131,6 +128,14 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
+            // Store room ID for webhook notification after successful login
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id,
+            );
+            await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+
             // Get user's preferred email provider from their personal settings
             const userPreferenceStorage = new UserPreferenceStorage(
                 this.persis,
@@ -441,7 +446,7 @@ export class Handler implements IHandler {
         }
     }
 
-    public async Report(): Promise<void> {
+    public async Stats(days?: number): Promise<void> {
         const appUser = (await this.read.getUserReader().getAppUser()) as IUser;
 
         const messageBuilder = this.modify
@@ -452,6 +457,20 @@ export class Handler implements IHandler {
             .setGroupable(false);
 
         try {
+            // Validate days parameter (1-15 range, default to 1 day if not provided)
+            let validDays = 1; // Default to 1 day
+            if (days !== undefined) {
+                if (!Number.isInteger(days) || days < 1) {
+                    messageBuilder.setText(t(Translations.STATS_DAYS_INVALID, this.language));
+                    return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                }
+                if (days > 15) {
+                    messageBuilder.setText(t(Translations.STATS_DAYS_RANGE_ERROR, this.language));
+                    return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
+                }
+                validDays = days;
+            }
+
             // Get user's preferred email provider from their personal settings
             const userPreferenceStorage = new UserPreferenceStorage(
                 this.persis,
@@ -460,12 +479,13 @@ export class Handler implements IHandler {
             );
             const userPreference = await userPreferenceStorage.getUserPreference();
             const emailProvider = userPreference.emailProvider;
-            const categories = userPreference.reportCategories;
+            const categories = userPreference.statsCategories;
+            const useLLMCategorization = userPreference.emailCategorization === 'llm';
 
             // Check if provider is supported
             if (!EmailServiceFactory.isProviderSupported(emailProvider)) {
                 const providerName = getProviderDisplayName(emailProvider);
-                const message = t(Translations.REPORT_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
+                const message = t(Translations.STATS_PROVIDER_NOT_SUPPORTED, this.language, { provider: providerName });
 
                 messageBuilder.setText(message);
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
@@ -482,15 +502,20 @@ export class Handler implements IHandler {
             );
 
             if (!isAuthenticated) {
-                messageBuilder.setText(t(Translations.REPORT_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
+                messageBuilder.setText(t(Translations.STATS_NOT_AUTHENTICATED, this.language, { provider: getProviderDisplayName(emailProvider) }));
                 return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
             }
 
-            // Get email statistics for last 24 hours
+            // Calculate hours based on days (24 hours per day)
+            const hoursBack = validDays * 24;
+            
+            // Get email statistics for the specified time period
             const statsParams: IEmailStatsParams = {
                 userId: this.sender.id,
-                hoursBack: 24,
+                hoursBack: hoursBack,
                 categories,
+                useLLMCategorization,
+                language: this.language,
             };
 
             const statistics = await EmailServiceFactory.getEmailStatistics(
@@ -503,9 +528,9 @@ export class Handler implements IHandler {
                 this.language
             );
 
-            // Use centralized report formatting
-            const reportMessage = EmailFormats.formatEmailReport(statistics, this.language);
-            messageBuilder.setText(reportMessage);
+            // Use centralized stats formatting
+            const statsMessage = EmailFormats.formatEmailStats(statistics, this.language);
+            messageBuilder.setText(statsMessage);
 
             return this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
 
@@ -513,7 +538,7 @@ export class Handler implements IHandler {
             const userMessage = handleErrorAndGetMessage(
                 this.app,
                 this.language,
-                'Report generation',
+                'Stats generation',
                 error
             );
 
@@ -533,6 +558,15 @@ export class Handler implements IHandler {
 
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
 
+            // Check if placeholder processing should be enabled for this email
+            const cacheService = new CacheService(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.room.id
+            );
+            const emailContext = await cacheService.getEmailContext();
+            const isPlaceholderEnabled = emailContext?.isPlaceholderEnabled || false;
+
             const modal = await SendEmailModal({
                 app: this.app,
                 modify: this.modify,
@@ -540,6 +574,7 @@ export class Handler implements IHandler {
                 language: this.language,
                 emailData,
                 context: 'llm',
+                isPlaceholderEnabled,
             });
 
             if (!modal) {
@@ -595,8 +630,8 @@ export class Handler implements IHandler {
                 return t(Translations.TOOL_EXTRACT_ATTACHMENT, this.language);
             case LlmTools.SUMMARIZE_AND_SEND_EMAIL:
                 return t(Translations.TOOL_SUMMARIZE_AND_SEND, this.language);
-            case LlmTools.REPORT:
-                return t(Translations.TOOL_REPORT, this.language);
+            case LlmTools.STATS:
+                return t(Translations.TOOL_STATS, this.language);
             default:
                 return toolName;
         }

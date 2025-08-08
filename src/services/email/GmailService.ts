@@ -5,22 +5,26 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders, MessageConfig, GoogleOauthUrls } from '../../constants/constants';
+import { LLMEmailAnalysisService } from '../LLMAnalysisService';
+import { IEmailData, ISendEmailData } from '../../definition/lib/IEmailUtils';
+import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 export class GmailService {
     private oauthService: IOAuthService;
     private http: IHttp;
     private logger: ILogger;
+    private persistence?: IPersistence;
+    private read?: IRead;
 
-    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger) {
+    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger, persistence?: IPersistence, read?: IRead) {
         this.oauthService = oauthService;
         this.http = http;
         this.logger = logger;
+        this.persistence = persistence;
+        this.read = read;
     }
 
-    /**
-     * Get Gmail email statistics for the specified time period
-     */
     public async getEmailStatistics(params: IEmailStatsParams, userInfo: any, language: Language = Language.en): Promise<IEmailStatistics> {
         const accessToken = await this.oauthService.getValidAccessToken(params.userId);
         
@@ -54,8 +58,10 @@ export class GmailService {
             headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
         });
 
-        const categoryStats: { [category: string]: { total: number, unread: number } } = {};
-        if (params.categories && params.categories.length > 0) {
+        let categoryStats: { [category: string]: { total: number, unread: number } } = {};
+        
+        // Only do email provider categorization if LLM categorization is NOT selected
+        if (!params.useLLMCategorization && params.categories && params.categories.length > 0) {
             for (const category of params.categories) {
                 let categoryQuery = '';
                 if (category === 'github') {
@@ -80,7 +86,7 @@ export class GmailService {
 
                     if (response.statusCode === 401 || unreadResponse.statusCode === 401) {
                         const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-                        throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+                        throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
                     }
 
                     const data = JSON.parse(response.content || '{}');
@@ -99,7 +105,7 @@ export class GmailService {
             receivedResponse.statusCode === 401 || sentResponse.statusCode === 401 ||
             receivedUnreadResponse.statusCode === 401) {
             const providerName = getProviderDisplayName(EmailProviders.GMAIL);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
 
         const allEmailsData = JSON.parse(allEmailsResponse.content || '{}');
@@ -115,6 +121,38 @@ export class GmailService {
         const sentToday = sentData.resultSizeEstimate || 0;
         const readEmails = Math.max(0, totalEmails - unreadEmails);
 
+        // Create user-friendly time range description
+        const days = Math.floor(params.hoursBack / 24);
+        const timeRangeDescription = days === 1 ? 
+            t(Translations.STATS_TIME_RANGE_24_HOURS, language) : 
+            t(Translations.STATS_TIME_RANGE_DAYS, language, { days: days.toString() });
+
+        // Enhanced LLM analysis if requested
+        let enhancedAnalysis;
+        if (params.useLLMCategorization && this.persistence && this.read) {
+            try {
+                // Fetch detailed email data for LLM analysis (limit 450 emails)
+                const detailedEmails = await this.fetchDetailedEmailsForLLMAnalysis(accessToken, timeQuery, language);
+                
+                if (detailedEmails.length > 0) {
+                    const llmAnalysisService = new LLMEmailAnalysisService(this.http, this.persistence, this.read, this.logger);
+                    enhancedAnalysis = await llmAnalysisService.analyzeEmails(detailedEmails, params, language);
+                    
+                    // Replace provider categories with LLM categories
+                    categoryStats = {};
+                    if (enhancedAnalysis.userCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.userCategories);
+                    }
+                    if (enhancedAnalysis.additionalCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.additionalCategories);
+                    }
+                }
+            } catch (error) {
+                this.logger.error('LLM email analysis failed for Gmail:', error);
+                // Continue with regular stats if LLM analysis fails
+            }
+        }
+
         return {
             totalEmails,
             unreadEmails,
@@ -123,14 +161,125 @@ export class GmailService {
             receivedUnreadToday,
             sentToday,
             categoryStats,
-            timeRange: `Last ${params.hoursBack} hours`,
+            timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
-            provider: 'Gmail'
+            provider: EmailProviders.GMAIL,
+            enhancedAnalysis
         };
     }
 
-    // Future methods will be added here:
-    // public async sendEmail(params: ISendEmailParams): Promise<boolean> { ... }
-    // public async searchEmails(params: ISearchParams): Promise<IEmailSearchResult[]> { ... }
-    // public async getEmailContent(messageId: string): Promise<IEmailContent> { ... }
+    public async sendEmail(emailData: ISendEmailData, accessToken: string, fromEmail: string): Promise<boolean> {
+        try {
+            // Create the email content
+            const toList = emailData.to.join(', ');
+            const ccList = emailData.cc ? emailData.cc.join(', ') : '';
+
+            let emailContent = `From: ${fromEmail}\r\n`;
+            emailContent += `To: ${toList}\r\n`;
+            if (ccList) {
+                emailContent += `Cc: ${ccList}\r\n`;
+            }
+            emailContent += `Subject: ${emailData.subject}\r\n`;
+            emailContent += `Content-Type: text/plain; charset=utf-8\r\n\r\n`;
+            emailContent += emailData.content;
+
+            // Encode the email in base64url format (Gmail specific)
+            const encodedEmail = Buffer.from(emailContent)
+                .toString('base64')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            // Send the email using Gmail API
+            const response = await this.http.post(GoogleOauthUrls.SEND_EMAIL, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
+                data: {
+                    raw: encodedEmail
+                }
+            });
+
+            // Check response status
+            if (response.statusCode === 200) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.logger.error('Gmail API error:', errorMessage);
+                throw new Error(`Gmail API error: ${errorMessage}`);
+            }
+        } catch (error) {
+            this.logger.error('Error sending email via Gmail:', error);
+            throw error;
+        }
+    }
+
+    private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeQuery: string, language: Language): Promise<IEmailData[]> {
+        try {
+            // Get up to 450 recent emails with basic info
+            const emailsResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages?q=${encodeURIComponent(timeQuery)}&maxResults=${MessageConfig.MAX_RESULTS}`, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
+            });
+
+            if (emailsResponse.statusCode !== 200) {
+                throw new Error('Failed to fetch emails list');
+            }
+
+            const emailsData = JSON.parse(emailsResponse.content || '{}');
+            const messages = emailsData.messages || [];
+
+            // Fetch detailed info for each email (in batches to avoid rate limits)
+            const detailedEmails: IEmailData[] = [];
+            const batchSize = 50; // Process in smaller batches
+
+            for (let i = 0; i < Math.min(messages.length, 450); i += batchSize) {
+                const batch = messages.slice(i, i + batchSize);
+                const batchPromises = batch.map(async (message: any) => {
+                    try {
+                        const detailResponse = await this.http.get(`${ApiEndpoints.GOOGLE_API_BASE_URL}/messages/${message.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject`, {
+                            headers: HeaderBuilders.createJsonAuthHeaders(accessToken)
+                        });
+
+                        if (detailResponse.statusCode === 200) {
+                            const detailData = JSON.parse(detailResponse.content || '{}');
+                            const headers = detailData.payload?.headers || [];
+                            
+                            const fromHeader = headers.find((h: any) => h.name === 'From');
+                            const subjectHeader = headers.find((h: any) => h.name === 'Subject');
+                            
+                            return {
+                                sender: fromHeader?.value || 'Unknown',
+                                subject: subjectHeader?.value || 'No Subject',
+                                bodyPreview: detailData.snippet || '',
+                                isRead: !(detailData.labelIds || []).includes('UNREAD'),
+                                receivedDateTime: new Date(parseInt(detailData.internalDate)).toISOString()
+                            };
+                        }
+                    } catch (error) {
+                        this.logger.error('Failed to fetch email detail:', error);
+                    }
+                    return null;
+                });
+
+                const batchResults = await Promise.all(batchPromises);
+                detailedEmails.push(...batchResults.filter(email => email !== null) as IEmailData[]);
+                
+                // Add a small delay between batches to respect rate limits
+                if (i + batchSize < messages.length) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+
+            return detailedEmails;
+        } catch (error) {
+            this.logger.error('Failed to fetch detailed emails for LLM analysis:', error);
+            return [];
+        }
+    }
+
 }

@@ -117,5 +117,9 @@
 	"Gemini_API_Key_Label": "API-ключ Google Gemini",
 	"Gemini_API_Key_Description": "Ваш API-ключ Google AI Studio для доступа к моделям Gemini (требуется только при использовании провайдера Gemini)",
 	"Groq_API_Key_Label": "API-ключ Groq",
-	"Groq_API_Key_Description": "Ваш API-ключ Groq для доступа к моделям Llama (требуется только при использовании провайдера Groq)"
+	"Groq_API_Key_Description": "Ваш API-ключ Groq для доступа к моделям Llama (требуется только при использовании провайдера Groq)",
+	"Max_Recipients_Per_Email_Label": "Максимум получателей на письмо",
+	"Max_Recipients_Per_Email_Description": "Максимальное количество получателей разрешенное на письмо для всех пользователей (по умолчанию: 100)",
+	"Bulk_Email_Allowed_Users_Label": "Разрешенные пользователи для массовой рассылки",
+	"Bulk_Email_Allowed_Users_Description": "Список имен пользователей через запятую, которым разрешено использовать функции массовой рассылки (в дополнение к администраторам рабочего пространства). Пример: пользователь1, пользователь2, пользователь3"
 } 

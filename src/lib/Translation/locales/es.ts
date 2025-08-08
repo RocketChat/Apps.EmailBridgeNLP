@@ -20,7 +20,7 @@ export const es = {
     Outlook_OAuth_Redirect_URI_Description: "URI de redirección OAuth para Outlook - debe terminar con /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "conectar, estado, desconectar, ayuda",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Conectar y gestionar la integración de su cuenta de email con asistencia de IA.",
 
     // OAuth Pages
@@ -47,11 +47,52 @@ export const es = {
     Authentication_Required: "Autenticación requerida. Por favor conecte su cuenta de email.",
     Connection_Status_Connected: "La cuenta de email está conectada y lista para usar.",
     Connection_Status_Disconnected: "No hay cuenta de email conectada.",
-    Disconnect_Success: "Cuenta de email desconectada exitosamente.",
-    Disconnect_Failed: "No se pudo desconectar su cuenta de email.",
+    Disconnect_Success: "Cuenta de correo electrónico cerrada exitosamente.",
+    Disconnect_Failed: "Error al cerrar sesión de tu cuenta de correo electrónico.",
+
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Aplicación Email Assistant**",
+    Welcome_Description: "**¡Instalada y Lista para Conectar tu Email con IA!**",
+    Welcome_Text: "¡Bienvenido a **Email Assistant** en RocketChat!",
+    Welcome_Message: `
+        🚀 **Comienza en 3 Pasos Fáciles:**
+        
+        1️⃣ **Conecta tu Email**: Usa \`/email login\` para conectar Gmail o Outlook
+        2️⃣ **Configura Ajustes**: Usa \`/email config\` para establecer tus preferencias
+        3️⃣ **Usa la IA**: Envía comandos en lenguaje natural como \`/email send an email to @john.doe about the meeting...\`.
+        
+        📧 **Lo que Puedes Hacer:**
+        • **Gestión Inteligente de Email**: "enviar email a john@company.com sobre la reunión"
+        • **Resúmenes de Canal**: "resumir esta conversación y enviarla por email a manager@company.com"
+        • **Email Masivo**: "enviar email a #nombre-canal o #nombre-equipo" *(requiere permisos de admin o especiales)*
+        • **Estadísticas Rápidas**: Obtener estadísticas diarias de email e insights. Usa \`/email stats\`.
+        
+        📊 **Función de Estadísticas de Email:**
+        Obtén reportes diarios personalizados mostrando:
+        • Total de emails recibidos y enviados
+        • Principales remitentes y destinatarios
+        • Categorías de email (trabajo, personal, notificaciones)
+        
+        ⚙️ **Proveedores Soportados:**
+        • **Gmail**
+        • **Outlook**
+        
+        🌍 **Soporte Multi-idioma:**
+        Disponible en inglés, español, ruso, alemán, polaco y portugués
+        
+        🔒 **Seguridad de Email Masivo:**
+        Solo los administradores del workspace y usuarios especialmente autorizados pueden enviar emails masivos a canales/equipos. Esto previene spam y asegura un uso responsable del email.
+        
+        ¿Necesitas ayuda? ¡Escribe \`/email help\` en cualquier momento!
+        
+        ¡Gracias por elegir **Email Assistant** - Tu Asistente de Email con IA! 🤖
+        `,
+        
+    Login_Success_Notification: "**¡Inicio de sesión exitoso!**\n\nAhora estás conectado a **__provider__** como **__email__**.✅ ",
 
     // Handler messages
-    Already_Logged_In: "Ya está conectado con **__provider__** como **__email__**.\n\nSi desea cerrar sesión, use `/email logout`.",
+    Already_Logged_In: "Ya has iniciado sesión con **__provider__** como **__email__**.\n\nSi quieres cerrar sesión, usa `/email logout`.",
     Outlook_Coming_Soon: "**¡La autenticación de Outlook estará disponible pronto!**\n\nPor ahora, por favor use **Gmail** para autenticación de email.\n\n",
     Provider_Not_Implemented: "**La autenticación de __provider__ aún no está implementada.**\n\nActualmente solo **Gmail** está soportado para autenticación.\n\n",
     Connect_Account_Message: "**Conectar su cuenta de __provider__ a Rocket Chat**",
@@ -203,15 +244,27 @@ export const es = {
     Log_Btn_Fallback: "Error al crear notificación con botón de inicio de sesión, recurriendo a notificación de texto",
     Log_Fallback_Err: "Error al enviar notificación de texto de respaldo",
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ no es compatible para reportes.**\n\nPor favor, contacta a tu administrador para asistencia.",
-    Report_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar el reporte nuevamente.",
-    Report_Error: "❌ **Error al generar el reporte de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
-    Report_Header: "\n📊 **Reporte de Estadísticas de Correo(últimas 24 horas)**",
-    Report_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
-    Report_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
-    Report_Categories_Label: "Report Categories",
-    Report_Command: "usa `/email report` - Obtener informe diario de estadísticas de correo",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ no es compatible para estadísticas.**\n\nPor favor, contacta a tu administrador para asistencia.",
+    Stats_Not_Authenticated: "❌ **No estás autenticado con __provider__.**\n\nUsa `/email login` para iniciar sesión primero, luego intenta generar las estadísticas nuevamente.",
+    Stats_Error: "❌ **Error al generar las estadísticas de correo:**\n__error__\n\nPor favor, inténtalo de nuevo o contacta a tu administrador.",
+    Stats_Header: "\n📊 **Reporte de Estadísticas de Correo(__timeRange__)**",
+    Stats_Statistics: "**Recibido**: __receivedToday__ correos\n**Enviado**: __sentToday__ correos\n**No leídos**: __totalUnread__ correos",
+    Stats_Token_Expired: "❌ **Tu autenticación ha expirado.**\n\nUsa `/email login` para reconectar tu cuenta de __provider__ e intentarlo de nuevo.",
+    Stats_Categories_Label: "Categorías de Estadísticas",
+    Stats_Days_Invalid: "❌ **Parámetro de días inválido.**\n\nProporciona un número válido de días (1-15).",
+    Stats_Days_Range_Error: "❌ **Parámetro de días fuera de rango.**\n\nLas estadísticas solo se pueden generar para un máximo de 15 días.",
+    Stats_Time_Range_24_Hours: "últimas 24 horas",
+    Stats_Time_Range_Days: "últimos __days__ días",
+
+    // Email Categorization Preferences
+    Email_Categorization_Label: "Método de Categorización de Correos",
+    Email_Categorization_Description: "Elige cómo deben categorizarse los correos para las estadísticas",
+    Email_Categorization_Email_Provider: "API del Proveedor de Correo",
+    Email_Categorization_LLM: "Análisis LLM",
+
+    Stats_Command: "usa `/email stats <no. de días>` - Obtener informe de estadísticas de correo (máximo 15 días)",
+    Natural_Language_Examples: "usa `/email <tu consulta>` - Comandos en lenguaje natural con asistencia IA\nEjemplos:\n• \`/email enviar correo a @john.doe sobre la reunión de mañana\`\n• \`/email resumir este hilo y enviar a manager@company.com\`\n• \`/email generar estadísticas de los últimos 5 días\`\n• \`/email enviar correo a @all OR #canal-nombre OR #equipo-nombre\` *(requiere permisos de admin)*\n\n🔒 **Email Masivo**: Correos a canales/equipos requieren permisos de administrador del workspace o especiales para prevenir spam.",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -222,6 +275,11 @@ export const es = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration  
+    System_Prompt_Label: "Prompt del Sistema",
+    System_Prompt_Placeholder: "Personaliza el tono de tus emails (ej. [Eres John, un desarrollador de software en Rocket Chat. Eres muy ocupado y así lo son todos con quienes correspondes, por lo que haces tu mejor esfuerzo para mantener tus emails lo más cortos posible y concisos. Prefiere emails de una línea. Haz tu mejor esfuerzo para ser amable, y no seas tan informal que suene grosero....])",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Procesando: \"__query__\"...",
     LLM_User_Query_Display: "**Tu consulta es:** __query__",
@@ -241,7 +299,7 @@ export const es = {
     Tool_Send_Email: "Enviar Email",
     Tool_Extract_Attachment: "Extraer Adjuntos",
     Tool_Summarize_And_Send: "Resumir y Enviar Email",
-    Tool_Report: "Generar Reporte",
+    Tool_Stats: "Generar Estadísticas",
 
     // Send Email Modal
     Send_Email_Modal_Title: 'Enviar Correo',
@@ -255,10 +313,22 @@ export const es = {
     Send_Email_Content_Placeholder: 'Ingrese el contenido del correo',
     Send_Email_Send_Button: 'Enviar',
     Send_Email_Cancel_Button: 'Cancelar',
+    Send_Email_Test_Button: 'Enviar Correo de Prueba a Mí',
     Send_Email_Success: 'Correo enviado exitosamente ✅',
     Send_Email_Failed: 'Error al enviar correo: __error__',
-    Send_Email_Modal_Opened: 'Modal de composición de correo abierto',
+    Send_Email_Modal_Opened: 'Modal de envío de correo abierto',
     Send_Email_Error_No_From_Email: 'No se puede determinar la dirección de correo del remitente',
+
+    // Send Type dropdown
+    Send_Type_Label: 'Tipo de Envío',
+    Send_Type_Recipients: 'Enviar a destinatario(s)',
+    Send_Type_Test_Self: 'Enviar correo de prueba a mí mismo',
+    
+    // Test Email notifications
+    Test_Email_Success: 'Correo de prueba enviado a tu dirección ✅',
+    Test_Email_Success_With_Email: 'Correo de prueba enviado a: __userEmail__ ✅',
+    Test_Email_Failed: 'Error al enviar correo de prueba ❌',
+    Test_Email_No_User_Email: 'No se pudo obtener tu dirección de correo ❌',
 
     // Send Email Validation
     Send_Email_Validation_To_Required: "La dirección de correo del destinatario es obligatoria",
@@ -305,6 +375,7 @@ export const es = {
     LLM_Email_Subject_Label: "**Asunto:**",
     LLM_Email_Ready_Formatted: "Hola __name__, tu correo está listo para enviar",
     LLM_Summary_Email_Ready_Formatted: "Hola __name__, tu correo con resumen del canal: **__channelName__** está listo para enviar",
+    LLM_Channel_Email_Ready_Formatted: "Hola __name__, tu correo está listo para enviar",
 
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "Los datos del correo ya no están disponibles. Por favor, intenta tu solicitud nuevamente.",
@@ -355,4 +426,35 @@ export const es = {
     LLM_Config_Groq_Key_Required: "La clave de API de Groq es requerida para el proveedor seleccionado",
     LLM_Config_Invalid_Provider: "Proveedor LLM inválido seleccionado",
     LLM_API_Or_URL_Error: "Por favor verifique su LLM API o URL",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Máximo de Destinatarios por Correo",
+    Max_Recipients_Per_Email_Description: "Número máximo de destinatarios permitidos por correo para todos los usuarios (predeterminado: 100)",
+    Too_Many_Recipients_Error: "Demasiados destinatarios para este correo",
+    User_Max_Recipients_Label: "Mi Máximo de Destinatarios por Correo",
+    User_Max_Recipients_Description: "Su límite personal para destinatarios por correo (debe ser menor o igual al límite del workspace)",
+    Validation_Max_Recipients_Invalid: "El máximo de destinatarios debe ser un número válido mayor que 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "El máximo de destinatarios no puede exceder el límite del workspace de __limit__.",
+    Recipient_Limit_Exceeded: "**Límite de destinatarios excedido**: Esta solicitud tendría __emailCount__ destinatarios, pero su límite es __effectiveLimit__. Pida al administrador que aumente el límite o reduzca el número de destinatarios.",
+
+    // Channel/Team Email translations
+    Channel_Name_Required: "El nombre del canal es requerido",
+    Channel_Name_Required_For_Team_Email: "El nombre del canal es requerido para enviar correo al canal o equipo",
+    Failed_To_Retrieve_Channel_Members: "Error al obtener miembros del canal",
+    Failed_To_Get_Members: "Error al obtener miembros para __channelName__",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "🚫 **Acceso Denegado: Función de Email Masivo**\n\nSolo los administradores del espacio de trabajo y usuarios específicamente autorizados pueden enviar emails masivos.\n\n**Usuarios Autorizados:**\n• **Administradores del Espacio de Trabajo** - Acceso completo a todas las funciones\n• **Usuarios Aprobados** - Usuarios a los que específicamente los administradores han otorgado permisos\n\n**¿Qué puedes hacer?**\n• Contacta a tu administrador del espacio de trabajo para solicitar permisos de email masivo\n• Pide a un administrador que agregue tu nombre de usuario a la lista de usuarios permitidos\n\n¿Necesitas ayuda? Contacta a tu administrador del espacio de trabajo para obtener asistencia.",
+    Bulk_Email_Permission_Check_Error: "❌ **Error verificando permisos**\n\nHubo un error al verificar tus permisos para las funciones de email masivo. Por favor, inténtalo de nuevo o contacta a tu administrador si el problema persiste.",
+    
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Usuarios Permitidos para Email Masivo",
+    Bulk_Email_Allowed_Users_Description: "Lista de nombres de usuario separados por comas que tienen permitido usar las funciones de email masivo (además de los administradores del espacio de trabajo). Ejemplo: usuario1, usuario2, usuario3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Puedes usar marcadores de posición [name], [username] y [date] en este correo para personalizar el contenido para cada destinatario.",
+    Placeholder_Email_Success: "Se enviaron exitosamente __count__ correo(s) personalizado(s) a los destinatarios.",
+    Placeholder_Email_Partial_Success: "Se enviaron __success__ de __total__ correos personalizados. __failed__ fallaron.",
+    Placeholder_Email_Failed: "Error al enviar correos personalizados a todos los __count__ destinatarios.",
+    Placeholder_Processing_Enabled: "El procesamiento de marcadores de posición está habilitado para este correo.",
 };

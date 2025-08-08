@@ -1,3 +1,11 @@
+export interface IEmailData {
+    sender: string;
+    subject: string;
+    bodyPreview: string;
+    isRead: boolean;
+    receivedDateTime: string;
+}
+
 export interface ISendEmailData {
     to: string[];
     cc?: string[];

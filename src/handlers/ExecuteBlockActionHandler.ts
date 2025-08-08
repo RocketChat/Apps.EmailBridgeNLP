@@ -32,6 +32,9 @@ import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { handleError } from '../helper/errorHandler';
 import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
+import { CacheService } from '../services/CacheService';
+import { PlaceholderEmailService } from '../services/PlaceholderEmailService';
 
 export class ExecuteBlockActionHandler {
     private context: UIKitBlockInteractionContext;
@@ -307,16 +310,53 @@ export class ExecuteBlockActionHandler {
                 return;
             }
 
-            // Send email directly using ToolExecutorService
-            const toolExecutorService = new ToolExecutorService(
+            // Get user preferences for email provider and language
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+            if (!userEmail) {
+                await this.showMessage(
+                    user,
+                    room,
+                    'Unable to retrieve your email address',
+                    language
+                );
+                return;
+            }
+
+            // Check for email context to determine if placeholders should be processed
+            const cacheService = new CacheService(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                room.id
+            );
+            const emailContext = await cacheService.getEmailContext();
+
+            // Send email using PlaceholderEmailService (handles both placeholder and normal emails)
+            const placeholderEmailService = new PlaceholderEmailService(
                 this.app,
                 this.read,
-                this.modify,
                 this.http,
-                this.persistence
+                this.persistence,
+                this.app.getLogger()
             );
 
-            const result = await toolExecutorService.sendEmail(emailData, user);
+            const result = await placeholderEmailService.sendEmailWithPlaceholders(
+                emailData,
+                user,
+                emailProvider,
+                userEmail,
+                emailContext?.toolContext || 'button',
+                language,
+                room.id
+            );
 
             // Show result message
             await this.showMessage(
@@ -378,6 +418,15 @@ export class ExecuteBlockActionHandler {
             );
             await roomInteractionStorage.storeInteractionRoomId(room.id);
 
+            // Check for email context to determine if placeholders are enabled
+            const cacheService = new CacheService(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                room.id
+            );
+            const emailContext = await cacheService.getEmailContext();
+            const isPlaceholderEnabled = emailContext?.isPlaceholderEnabled || false;
+
             // Create and open modal
             const modal = await SendEmailModal({
                 app: this.app,
@@ -386,6 +435,7 @@ export class ExecuteBlockActionHandler {
                 language: language,
                 emailData,
                 context: 'edit',
+                isPlaceholderEnabled,
             });
 
             if (!modal) {
@@ -593,4 +643,28 @@ export class ExecuteBlockActionHandler {
         }
     }
 
+    private async getUserEmailFromAuth(userId: string): Promise<string | null> {
+        try {
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                userId,
+            );
+            const preference = await userPreferenceStorage.getUserPreference();
+            const provider = preference?.emailProvider || EmailProviders.GMAIL;
+
+            const userInfo = await EmailServiceFactory.getUserInfo(
+                provider,
+                userId,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+            return userInfo?.email || null;
+        } catch (error) {
+            this.app.getLogger().error('Error getting user email from auth:', error);
+            return null;
+        }
+    }
 }

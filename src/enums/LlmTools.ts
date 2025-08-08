@@ -1,6 +1,8 @@
 export enum LlmTools {
     SEND_EMAIL = 'send-email',
+    SEND_EMAIL_TO_CHANNEL_OR_TEAM = 'send-email-to-channel-or-team',
     SUMMARIZE_AND_SEND_EMAIL = 'summarize-and-send-email',
-    REPORT = 'report',
+    SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM = 'summarize-and-send-email-to-channel-or-team',
+    STATS = 'stats',
     EXTRACT_ATTACHMENT = 'extract-attachment',
 } 

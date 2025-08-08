@@ -20,7 +20,7 @@ export const en = {
     Outlook_OAuth_Redirect_URI_Description: "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/oauth-callback",
 
     // Commands
-    Email_Command_Params: "connect, status, disconnect, help, report",
+    Email_Command_Params: "login, logout, config, llm-config, help, stats",
     Email_Command_Description: "Connect and manage your email account integration with AI assistance.",
 
     // OAuth Pages
@@ -34,8 +34,8 @@ export const en = {
 
     // Action Labels
     Connect_Email_Action_Label: "Connect Email Account",
-    Check_Status_Action_Label: "Check Connection Status",
-    Disconnect_Email_Action_Label: "Disconnect Email",
+    Check_Status_Action_Label: "Check Logged In Status",
+    Disconnect_Email_Action_Label: "Logout from Email Account",
     Send_Email_Action_Label: "Send Email",
     View_Inbox_Action_Label: "View Inbox",
 
@@ -47,11 +47,53 @@ export const en = {
     Authentication_Required: "Authentication required. Please connect your email account.",
     Connection_Status_Connected: "Email account is connected and ready to use.",
     Connection_Status_Disconnected: "No email account is connected.",
-    Disconnect_Success: "Email account disconnected successfully.",
-    Disconnect_Failed: "Failed to disconnect your email account.",
+    Disconnect_Success: "Email account logged out successfully.",
+    Disconnect_Failed: "Failed to log out from your email account.",
+
+    // Login success notifications (webhook)
+    Login_Success_Notification: "\n**Login Successful!**\nYou are now connected to **__provider__** as **__email__** ✅",
+
+    // Welcome message content (onInstall)
+    Welcome_Title: "**Email Assistant**",
+    Welcome_Description: "**Installed and Ready to Connect to Your Email Directly from RocketChat!**",
+    Welcome_Text: "Welcome to **Email Assistant** in RocketChat!",
+    Welcome_Message: `
+
+        🚀 **Get Started in 3 Easy Steps:**
+
+        1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
+        2️⃣ **Configure Settings**: Use \`/email config\` and \`/email llm-config\` to set your preferences
+        3️⃣ **Start Using AI**: Send natural language commands like \`/email send an email to @john.doe about the meeting...\`.
+
+        📧 **What You Can Do:**
+        • **AI Powered Email Sending**: "send email to @John.doe about the meeting"
+        • **Conversation Summaries**: "summarize this thread/channel and email it to manager@company.com"
+        • **Bulk Email**: "send email to #channel-name or #team-name regarding meeting on tommorow morning 10PM" - only admin or users with special permissions can send bulk emails
+        • **Quick Stats**: Get email statistics with \`/email stats <no. of days> \` - choose between fast provider API or deep AI analysis
+
+        📊 **Email Statistics Feature:**
+        Get personalized email statistics report showing:
+        • Total emails received and sent
+        • Email categories (general, calendar, github, etc.)
+        • Get additional categories from LLM analysis
+
+        ⚙️ **Supported Providers:**
+        • Gmail
+        • Outlook
+
+        🌍 **Multi-Language Support:**
+        Available in English, Spanish, Russian, German, Polish, and Portuguese
+
+        🔒 **Bulk Email Security:**
+        Only workspace administrators and specially authorized users can send bulk emails to channels/teams. Ask your admin to add you to the allowed users list.
+
+        Need help? Type \`/email help\` anytime!
+
+        Thanks for choosing **Email Assistant** - Your AI powered Email Assistant! 🤖
+        `,
 
     // Handler messages
-    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to disconnect, use `/email logout`.",
+    Already_Logged_In: "You are already logged in with **__provider__** as **__email__**.\n\nIf you want to Logout, use `/email logout`.",
     Outlook_Coming_Soon: "**Outlook authentication will be available soon!**\n\nFor now, please use **Gmail** for email authentication.\n\n",
     Provider_Not_Implemented: "**__provider__ authentication is not yet implemented.**\n\nCurrently only **Gmail** is supported for authentication.\n\n",
     Connect_Account_Message: "**Connect your __provider__ account to Rocket Chat**",
@@ -71,7 +113,8 @@ export const en = {
     Login_Command: "use `/email login` - Login to your email account",
     Logout_Command: "use `/email logout` - Logout from your email account",
     Config_Command: "use `/email config` - Open user preferences and settings",
-    Report_Command: "use `/email report` - Get daily email statistics report",
+    Stats_Command: "use `/email stats <no. of days>` - Get email statistics for specified days (max limit: 15 days)",
+    Natural_Language_Examples: "use `/email <your query>` - Natural language commands with AI assistance\nExamples:\n• \`/email send an email to @john.doe about the meeting tomorrow\`\n• \`/email summarize this thread/channel for messages from last 3 days and send to manager@company.com\`\n• \`/email generate stats for last 5 days\`\n• \`/email send email to @all OR #channel-name OR #team-name about deadline extension\` (requires permissions)",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
     Login_Action_Text: "Login to __provider__",
@@ -201,14 +244,25 @@ export const en = {
     Log_Fallback_Err: "Failed to send fallback text notification",
 
 
-    // Report feature messages
-    Report_Provider_Not_Supported: "❌ **__provider__ is not supported for reports.**\n\nPlease contact your administrator for assistance.",
-    Report_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the report again.",
-    Report_Error: "❌ **Error generating email report:**\n__error__\n\nPlease try again or contact your administrator.",
-    Report_Header: "\n📊 **Email Statistics Report(last 24 hours)**",
-    Report_Statistics: "**Received**: __receivedToday__ emails (__receivedUnreadToday__ unread)\n**Sent**: __sentToday__ emails",
-    Report_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
-    Report_Categories_Label: "Report Categories",
+    // Stats feature messages
+    Stats_Provider_Not_Supported: "❌ **__provider__ is not supported for stats.**\n\nPlease contact your administrator for assistance.",
+    Stats_Not_Authenticated: "❌ **You are not authenticated with __provider__.**\n\nUse `/email login` to sign in first, then try generating the stats again.",
+    Stats_Error: "Error generating email stats: __error__\n\nPlease try again or contact your administrator.",
+    Stats_Header: "\n📊 **Email Statistics Report(__timeRange__)**",
+    Stats_Statistics: "**Received**: __receivedToday__ emails (__receivedUnreadToday__ unread)\n**Sent**: __sentToday__ emails",
+    Stats_Token_Expired: "❌ **Your authentication has expired.**\n\nUse `/email login` to reconnect your __provider__ account and try again.",
+    Stats_Categories_Label: "Stats Categories",
+    Stats_Days_Invalid: "Invalid days parameter. Please provide a valid number of days (1-15).❌",
+    Stats_Days_Range_Error: "Days parameter out of range. Stats can only be generated for a maximum of 15 days.❌",
+    Stats_Time_Range_24_Hours: "last 24 hours",
+    Stats_Time_Range_Days: "last __days__ days",
+
+    // Email Categorization Preferences
+    Email_Categorization_Label: "Email Categorization Method",
+    Email_Categorization_Description: "Choose how emails should be categorized for statistics report",
+    Email_Categorization_Email_Provider: "Email Provider API",
+    Email_Categorization_LLM: "LLM Analysis",
+    LLM_Analysis_Failed: "LLM analysis encountered an error",
 
     // Statistics Service Errors
     Statistics_Provider_Not_Supported: "Statistics for provider __provider__ are not supported.",
@@ -219,6 +273,11 @@ export const en = {
     // User Preference Modal
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
+
+    // System Prompt Configuration
+    System_Prompt_Label: "System Prompt",
+    System_Prompt_Placeholder: "Customize your email tone   e.g. [You're John, a Software Developer at Rocket Chat. You're very busy and so is everyone you correspond with, so you do your best to keep your emails to the point. Do your best to be kind, and don't be so informal that it comes across as rude....]",
+
     // Tool Calling Messages
     LLM_Processing_Query: "Processing: \"__query__\"...",
     LLM_User_Query_Display: "**Your query is:** __query__",
@@ -236,9 +295,10 @@ export const en = {
 
     // Tool Names (for user display)
     Tool_Send_Email: "Send Email",
+    Tool_Send_Email_To_Channel: "Send Email to Channel/Team",
     Tool_Extract_Attachment: "Extract Attachments",
     Tool_Summarize_And_Send: "Summarize & Send Email",
-    Tool_Report: "Generate Report",
+    Tool_Stats: "Generate Stats",
 
     // Send Email Modal
     Send_Email_Modal_Title: "Send Email",
@@ -252,10 +312,22 @@ export const en = {
     Send_Email_Content_Placeholder: "Enter email content",
     Send_Email_Send_Button: "Send",
     Send_Email_Cancel_Button: "Cancel",
-    Send_Email_Modal_Opened: "Email composition modal opened",
+    Send_Email_Test_Button: "Send Test Mail to Self",
+    Send_Email_Modal_Opened: "Send Email modal opened",
     Send_Email_Success: "Email sent successfully ✅",
     Send_Email_Failed: "Failed to send email: __error__",
     Send_Email_Error_No_From_Email: "Unable to determine sender email address",
+
+    // Send Type dropdown
+    Send_Type_Label: "Send Type",
+    Send_Type_Recipients: "Send to recipient(s)",
+    Send_Type_Test_Self: "Send a test mail to self",
+
+    // Test Email notifications
+    Test_Email_Success: "Test email sent to your email address ✅",
+    Test_Email_Success_With_Email: "Test email sent to: __userEmail__ ✅",
+    Test_Email_Failed: "Failed to send test email ❌",
+    Test_Email_No_User_Email: "Could not get your email address ❌",
 
     // Send Email Validation
     Send_Email_Validation_To_Required: "Recipient email address is required",
@@ -307,6 +379,7 @@ export const en = {
     LLM_Email_Subject_Label: "**Subject:**",
     LLM_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
     LLM_Summary_Email_Ready_Formatted: "Hey __name__, your email with summary from channel: **__channelName__** is ready to send",
+    LLM_Channel_Email_Ready_Formatted: "Hey __name__, your email is ready to send",
 
     // Error message details for MessageFormatter
     Error_Email_Data_Unavailable: "The URL/API key is not filled. Please contact your admin.",
@@ -357,4 +430,47 @@ export const en = {
     LLM_Config_Groq_Key_Required: "Please fill your Groq API key in the modal",
     LLM_Config_Invalid_Provider: "Invalid LLM provider selected",
     LLM_API_Or_URL_Error: "Please check your LLM API key or URL",
+
+    // Channel/Team Email translations
+    Channel_Not_Found: "Channel or team '**__channelName__**' not found. Please check the name and try again.",
+    Channel_Permission_Error: "Permission Error: __error__",
+    Channel_No_Emails_Found: "No email addresses found for members in '**__channelName__**'. __error__",
+    Channel_Name_Required: "Channel name is required",
+    Channel_Name_Required_For_Team_Email: "Channel name is required for sending email to channel or team",
+    Failed_To_Retrieve_Channel_Members: "Failed to retrieve channel members",
+    Failed_To_Get_Members: "Failed to get members for __channelName__",
+    Permission_View_C_Room: "Ask workspace admin to grant **view-c-room** permission to access public channels.",
+    Permission_View_Joined_Room: "Ask workspace admin to grant **view-joined-room** permission to access private groups.",
+    Permission_View_Full_User_Info: "Ask workspace admin to grant **view-full-other-user-info** permission to retrieve member email addresses.",
+    Channel_Fetch_Error: "An error occurred while fetching channel members: __error__",
+    Channel_Members_Fetch_Failed: "Failed to fetch members: __error__",
+    Channel_Room_Type_Not_Supported: "Room type '__roomType__' is not supported for email sending. Only channels and private groups are supported.",
+    Channel_Members_Rest_API_Failed: "Failed to fetch members via REST API: __error__",
+    Channel_Could_Not_Retrieve_Emails: "Could not retrieve email addresses for some members: __members__",
+    Recipient_Limit_Exceeded: "Found __emailCount__ recipients, but the workspace limit is __effectiveLimit__. Ask workspace admin to increase the maximum recipients per email limit.",
+    Recipient_Limit_Validation_Failed: "Failed to validate recipient limit. Please try again.",
+
+    // Bulk email permissions
+    Bulk_Email_Permission_Denied: "\n🚫 **Access Denied: Bulk Email Feature**\nOnly workspace administrators and specifically authorized users can send bulk emails.\n\nWhat can you do: Contact your workspace administrator to request bulk email permissions.",
+    Bulk_Email_Permission_Check_Error: "❌ **Error checking permissions**\n\nThere was an error verifying your permissions for bulk email features. Please try again or contact your administrator if the issue persists.",
+
+    // App settings for bulk email
+    Bulk_Email_Allowed_Users_Label: "Allowed Users for Bulk Email",
+    Bulk_Email_Allowed_Users_Description: "Comma-separated list of usernames that are allowed to use bulk email features (in addition to workspace administrators). Example: user1, user2, user3",
+
+    // Email Limits translations
+    Max_Recipients_Per_Email_Label: "Maximum Recipients Per Email",
+    Max_Recipients_Per_Email_Description: "Maximum number of recipients allowed per email for all users (default: 50)",
+    Too_Many_Recipients_Error: "Too many recipients for this email",
+    User_Max_Recipients_Label: "My Max Recipients Per Email",
+    User_Max_Recipients_Description: "Your personal limit for recipients per email (must be less than or equal to workspace limit)",
+    Validation_Max_Recipients_Invalid: "Max recipients must be a valid number greater than 0.",
+    Validation_Max_Recipients_Exceeds_Limit: "Max recipients cannot exceed the workspace limit of __limit__.",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "You can use [name], [username], and [date] placeholders in this email to personalize content for each recipient.",
+    Placeholder_Email_Success: "Successfully sent __count__ personalized email(s) to recipients.",
+    Placeholder_Email_Partial_Success: "Sent __success__ of __total__ personalized emails. __failed__ failed.",
+    Placeholder_Email_Failed: "Failed to send personalized emails to all __count__ recipients.",
+    Placeholder_Processing_Enabled: "Placeholder processing is enabled for this email.",
 };

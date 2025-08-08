@@ -9,13 +9,21 @@ export enum UserPreferenceModalEnum {
     EMAIL_PROVIDER_DROPDOWN_BLOCK_ID = 'provider-block',
     EMAIL_PROVIDER_DROPDOWN_ACTION_ID = 'provider-action',
     
-    // Report Categories input
-    REPORT_CATEGORIES_INPUT_BLOCK_ID = 'report-categories-block',
-    REPORT_CATEGORIES_INPUT_ACTION_ID = 'report-categories-action',
+    // Stats Categories input
+    STATS_CATEGORIES_INPUT_BLOCK_ID = 'stats-categories-block',
+    STATS_CATEGORIES_INPUT_ACTION_ID = 'stats-categories-action',
     
     NEW_CATEGORY_INPUT_BLOCK_ID = 'new-category-block',
     NEW_CATEGORY_INPUT_ACTION_ID = 'new-category-action',
     ADD_CATEGORY_ACTION_ID = 'add-category-action',
+    
+    // System Prompt input
+    SYSTEM_PROMPT_INPUT_BLOCK_ID = 'system-prompt-block',
+    SYSTEM_PROMPT_INPUT_ACTION_ID = 'system-prompt-action',
+    
+    // Email Categorization dropdown
+    EMAIL_CATEGORIZATION_DROPDOWN_BLOCK_ID = 'email-categorization-block',
+    EMAIL_CATEGORIZATION_DROPDOWN_ACTION_ID = 'email-categorization-action',
     
     // LLM Configuration
     LLM_USAGE_PREFERENCE_DROPDOWN_BLOCK_ID = 'llm-usage-preference-block',

@@ -17,7 +17,7 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { getUserPreferredLanguage } from '../helper/userPreference';
 import { t, Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
-import { IPreference } from '../definition/lib/IUserPreferences';
+import { IPreference, EmailCategorizationEnum, EmailCategorizationPreference } from '../definition/lib/IUserPreferences';
 import { sendNotification } from '../helper/notification';
 import { handleErrorAndGetMessage, handleError, handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
@@ -31,6 +31,8 @@ import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { PlaceholderEmailService } from '../services/PlaceholderEmailService';
+import { CacheService } from '../services/CacheService';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -47,7 +49,7 @@ export class ExecuteViewSubmitHandler {
     }
 
     public async handleActions(): Promise<IUIKitResponse> {
-        const { user, view } = this.context.getInteractionData();
+        const { user, view, triggerId } = this.context.getInteractionData();
 
         if (view.id.startsWith(UserPreferenceModalEnum.VIEW_ID)) {
             return await this.handleUserPreferenceSubmit(user, view);
@@ -58,7 +60,15 @@ export class ExecuteViewSubmitHandler {
         }
 
         if (view.id.startsWith(SendEmailModalEnum.VIEW_ID)) {
-            return await this.handleSendEmailSubmit(user, view);
+            // Check send type from modal state
+            const state = view.state || {};
+            const sendType = this.getFormValue(state, SendEmailModalEnum.SEND_TYPE_ACTION_ID) || 'send';
+
+            if (sendType === 'test') {
+                return await this.handleSendTestEmailToSelf(user, view);
+            } else {
+                return await this.handleSendEmailSubmit(user, view);
+            }
         }
 
         return this.context.getInteractionResponder().successResponse();
@@ -80,8 +90,10 @@ export class ExecuteViewSubmitHandler {
             // Parse form data
             const languageValue = this.getFormValue(view.state, UserPreferenceModalEnum.LANGUAGE_INPUT_DROPDOWN_ACTION_ID);
             const emailProviderValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_PROVIDER_DROPDOWN_ACTION_ID);
-            const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.REPORT_CATEGORIES_INPUT_ACTION_ID) || [];
+            const selectedCategories = this.getFormValue(view.state, UserPreferenceModalEnum.STATS_CATEGORIES_INPUT_ACTION_ID) || [];
             const newCategoriesRaw = this.getFormValue(view.state, UserPreferenceModalEnum.NEW_CATEGORY_INPUT_ACTION_ID) || "";
+            const systemPromptValue = this.getFormValue(view.state, UserPreferenceModalEnum.SYSTEM_PROMPT_INPUT_ACTION_ID) || "";
+            const emailCategorizationValue = this.getFormValue(view.state, UserPreferenceModalEnum.EMAIL_CATEGORIZATION_DROPDOWN_ACTION_ID) || EmailCategorizationEnum.EmailProvider;
 
             // Process and combine categories - store what user actually selected
             const newCategories = newCategoriesRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c);
@@ -117,7 +129,9 @@ export class ExecuteViewSubmitHandler {
                 userId: user.id,
                 language: languageValue,
                 emailProvider: emailProviderValue as EmailProviders,
-                reportCategories: [...new Set(combinedCategories as string[])],
+                statsCategories: [...new Set(combinedCategories as string[])],
+                systemPrompt: systemPromptValue.trim() || undefined,
+                emailCategorization: emailCategorizationValue as EmailCategorizationPreference,
             };
 
             // Update user preference
@@ -166,7 +180,9 @@ export class ExecuteViewSubmitHandler {
             const hasChanges = (
                 currentPreference.language !== languageValue ||
                 currentPreference.emailProvider !== emailProviderValue ||
-                JSON.stringify(currentPreference.reportCategories?.sort()) !== JSON.stringify(combinedCategories.sort())
+                JSON.stringify(currentPreference.statsCategories?.sort()) !== JSON.stringify(combinedCategories.sort()) ||
+                currentPreference.emailCategorization !== emailCategorizationValue ||
+                currentPreference.systemPrompt !== (systemPromptValue.trim() || undefined)
             );
 
             // Notify user about successful update with provider-specific handling
@@ -281,16 +297,53 @@ export class ExecuteViewSubmitHandler {
                 content: contentValue,
             };
 
-            // Send email using ToolExecutorService
-            const toolExecutorService = new ToolExecutorService(
+            // Check for email context to determine if placeholders should be processed
+            const cacheService = new CacheService(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                room?.id || ''
+            );
+            const emailContext = await cacheService.getEmailContext();
+            const shouldProcessPlaceholders = emailContext?.isPlaceholderEnabled || false;
+
+            // Get user preferences for email provider and language
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+            if (!userEmail) {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.SEND_EMAIL_FAILED, userLanguage, { error: "Unable to retrieve your email address" })
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Send email using PlaceholderEmailService (handles both placeholder and normal emails)
+            const placeholderEmailService = new PlaceholderEmailService(
                 this.app,
                 this.read,
-                this.modify,
                 this.http,
-                this.persistence
+                this.persistence,
+                this.app.getLogger()
             );
 
-            const result = await toolExecutorService.sendEmail(emailData, user);
+            const result = await placeholderEmailService.sendEmailWithPlaceholders(
+                emailData, 
+                user, 
+                emailProvider,
+                userEmail,
+                emailContext?.toolContext || 'manual',
+                userLanguage,
+                room?.id
+            );
 
             // Notify user about result
             if (room) {
@@ -329,7 +382,7 @@ export class ExecuteViewSubmitHandler {
             }
 
         } catch (error) {
-            const userLanguage = await getUserPreferredLanguage(
+            const errorUserLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
                 this.persistence,
                 user.id,
@@ -342,10 +395,113 @@ export class ExecuteViewSubmitHandler {
                     this.modify,
                     user,
                     room,
-                    userLanguage,
+                    errorUserLanguage,
                     'Send email submission',
                     error
                 );
+            }
+            return this.context.getInteractionResponder().errorResponse();
+        }
+    }
+
+    private async handleSendTestEmailToSelf(user: any, view: any): Promise<IUIKitResponse> {
+        try {
+            // Get user's preferred language
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Extract form values
+            const state = view.state || {};
+            const subject = this.getFormValue(state, SendEmailModalEnum.SUBJECT_ACTION_ID);
+            const content = this.getFormValue(state, SendEmailModalEnum.CONTENT_ACTION_ID);
+            const ccValue = this.getFormValue(state, SendEmailModalEnum.CC_ACTION_ID);
+
+            // Validate required fields
+            if (!subject || !content) {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+
+            if (!userEmail) {
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Parse CC emails if provided
+            const ccEmails = ccValue ? 
+                ccValue.split(',').map((email: string) => email.trim()).filter((email: string) => email) : 
+                undefined;
+
+            // Prepare email data
+            const emailData = {
+                to: [userEmail],
+                cc: ccEmails,
+                subject: subject,
+                content: content,
+            };
+
+            // Send email using ToolExecutorService
+            const toolExecutorService = new ToolExecutorService(
+                this.app,
+                this.read,
+                this.modify,
+                this.http,
+                this.persistence
+            );
+
+            const result = await toolExecutorService.sendEmail(emailData, user);
+
+            // Get room for notifications
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            const room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
+
+            // Show notifications using the same system as normal send
+            if (result.success) {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, { 
+                        message: t(Translations.TEST_EMAIL_SUCCESS_WITH_EMAIL, language, { userEmail }) 
+                    });
+                }
+                return this.context.getInteractionResponder().successResponse();
+            } else {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, { 
+                        message: t(Translations.SEND_EMAIL_FAILED, language, { error: result.message }) 
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+        } catch (error) {
+            // Get user language for error message
+            const language = await getUserPreferredLanguage(
+                this.read.getPersistenceReader(),
+                this.persistence,
+                user.id,
+            );
+
+            // Get room for error notification
+            const roomInteractionStorage = new RoomInteractionStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id,
+            );
+            const roomId = await roomInteractionStorage.getInteractionRoomId();
+            const room = roomId ? await this.read.getRoomReader().getById(roomId) : null;
+
+            if (room) {
+                await sendNotification(this.read, this.modify, user, room, { 
+                    message: t(Translations.TEST_EMAIL_FAILED, language) 
+                });
             }
             return this.context.getInteractionResponder().errorResponse();
         }
@@ -635,5 +791,31 @@ export class ExecuteViewSubmitHandler {
         }
 
         return null;
+    }
+
+    // Remove duplicate helper functions - use the ones from ExecuteBlockActionHandler or sendNotification helper
+    private async getUserEmailFromAuth(userId: string): Promise<string | null> {
+        try {
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                userId,
+            );
+            const preference = await userPreferenceStorage.getUserPreference();
+            const provider = preference?.emailProvider || EmailProviders.GMAIL;
+
+            const userInfo = await EmailServiceFactory.getUserInfo(
+                provider,
+                userId,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+            return userInfo?.email || null;
+        } catch (error) {
+            this.app.getLogger().error('Error getting user email from auth:', error);
+            return null;
+        }
     }
 }

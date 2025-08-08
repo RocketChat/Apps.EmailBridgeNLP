@@ -15,7 +15,7 @@
 	"Outlook_OAuth_Client_Secret_Description": "OAuth client secret for Microsoft authentication (Outlook only)",
 	"Outlook_OAuth_Redirect_URI_Label": "Outlook OAuth Redirect URI",
 	"Outlook_OAuth_Redirect_URI_Description": "OAuth redirect URI for Outlook - should end with /api/apps/public/[app-id]/outlook-oauth-callback",
-	"Email_Command_Params": "connect, status, disconnect, help",
+	"Email_Command_Params": "login, logout, config, llm-config, help, stats",
 	"Email_Command_Description": "Connect and manage your email account integration with AI assistance.",
 	"Authentication_Error_Title": "Authentication Error",
 	"Authentication_Success_Title": "Authentication Successful!",
@@ -117,5 +117,9 @@
 	"Gemini_API_Key_Label": "Google Gemini API Key",
 	"Gemini_API_Key_Description": "Your Google AI Studio API key for accessing Gemini models (required only when using Gemini provider)",
 	"Groq_API_Key_Label": "Groq API Key",
-	"Groq_API_Key_Description": "Your Groq API key for accessing Llama models (required only when using Groq provider)"
+	"Groq_API_Key_Description": "Your Groq API key for accessing Llama models (required only when using Groq provider)",
+	"Max_Recipients_Per_Email_Label": "Maximum Recipients per Email",
+	"Max_Recipients_Per_Email_Description": "Maximum number of recipients allowed per email for all users (default: 100)",
+	"Bulk_Email_Allowed_Users_Label": "Allowed Users for Bulk Email",
+	"Bulk_Email_Allowed_Users_Description": "Comma-separated list of usernames that are allowed to use bulk email features (in addition to workspace administrators). Example: user1, user2, user3"
 } 

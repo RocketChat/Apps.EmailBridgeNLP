@@ -1,4 +1,5 @@
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
+import { ILogger, IPersistenceRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import {
     IHttp,
@@ -6,10 +7,6 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import {
-    RocketChatAssociationModel,
-    RocketChatAssociationRecord,
-} from '@rocket.chat/apps-engine/definition/metadata';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
@@ -19,14 +16,21 @@ import { IToolCall } from '../definition/lib/ToolInterfaces';
 import { ISendEmailData, ISummarizeParams } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
 import { UsernameService } from '../services/UsernameService';
+import { ChannelMemberService } from '../services/ChannelMemberService';
+import { UserPermissionService } from '../services/UserPermissionService';
+import { sendNotification } from '../helper/notification';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
 import { MessageFormatter } from '../lib/MessageFormatter';
 import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
+import { CacheService, ICachedUserData } from '../services/CacheService';
 import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { getEffectiveLLMSettings } from '../config/SettingsManager';
-import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { MessageService } from '../services/MessageService';
+import { IEmailContextData } from '../definition/lib/ICache';
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -78,12 +82,15 @@ export class NLQueryHandler {
         // Store the original query for username extraction
         this.originalQuery = query;
 
+        // Replace @all with current channel name for bulk emailing
+        const processedQuery = this.replaceAtAllWithChannelName(query);
+
         try {
             // Send initial query message with AI thinking indicator
-            await this.sendQueryMessage(query, appUser);
+            await this.sendQueryMessage(processedQuery, appUser);
 
             // Process the query with LLM
-            const { toolCalls, error } = await this.processWithLLM(query);
+            const { toolCalls, error } = await this.processWithLLM(processedQuery);
 
             if (error) {
                 await this.sendUserFriendlyError(error, appUser);
@@ -141,7 +148,7 @@ export class NLQueryHandler {
                 this.read.getEnvironmentReader().getSettings(),
                 userPreference
             );
-            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
             const result = await llmService.processNaturalLanguageQuery(enhancedQuery);
 
             return {
@@ -180,7 +187,8 @@ export class NLQueryHandler {
             'authentication_error',
             'data_not_found',
             'network_error',
-            'system_error'
+            'system_error',
+            'data_processing_error'
         ];
 
         return !errorType || notifiableErrors.includes(errorType);
@@ -203,7 +211,10 @@ export class NLQueryHandler {
         }
 
         // Handle email tools with UI buttons
-        if (toolCall.function.name === LlmTools.SEND_EMAIL || toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL) {
+        if (toolCall.function.name === LlmTools.SEND_EMAIL || 
+            toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM ||
+            toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL ||
+            toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
             await this.handleEmailTools(toolCall, args, appUser);
         } else {
             // Use ToolExecutorService for other tools
@@ -213,6 +224,27 @@ export class NLQueryHandler {
 
     private async handleEmailTools(toolCall: IToolCall, args: any, appUser: IUser): Promise<void> {
         try {
+            // Check permissions for bulk email tools
+            if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM || 
+                toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+                
+                // Create permission service to check user roles
+                const permissionService = new UserPermissionService(
+                    this.read,
+                    this.app,
+                    this.sender,
+                    this.room
+                );
+
+                const permissionCheck = await permissionService.canUseBulkEmailTools();
+                
+                if (!permissionCheck.canUse) {
+                    // Send permission denied notification
+                    await this.sendPermissionDeniedNotification();
+                    return;
+                }
+            }
+
             let emailData: ISendEmailData;
 
             if (toolCall.function.name === LlmTools.SEND_EMAIL) {
@@ -231,6 +263,12 @@ export class NLQueryHandler {
                     toUsernames: [...new Set(toUsernames)], // Remove duplicate usernames
                     ccUsernames: [...new Set(ccUsernames)], // Remove duplicate usernames
                 };
+            } else if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+                // Handle channel/team email tool
+                emailData = await this.prepareChannelEmailData(args);
+            } else if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+                // Handle summarize and send to channel/team tool
+                emailData = await this.prepareSummarizeChannelEmailData(args);
             } else {
                 // Handle summarize-and-send-email tool
                 emailData = await this.prepareSummarizeEmailData(args);
@@ -238,10 +276,10 @@ export class NLQueryHandler {
 
 
 
-            // Store email data for button handlers
+            // Store email data and context for button handlers
             await this.storeEmailDataForButtons(emailData);
+            await this.storeEmailContext(toolCall.function.name);
 
-            // Create and send formatted response with button
             await this.sendEmailReadyMessage(emailData, toolCall, appUser);
         } catch (error) {
             this.app.getLogger().error('Error handling email tools:', error);
@@ -250,6 +288,123 @@ export class NLQueryHandler {
                 appUser,
                 'data_processing_error'
             );
+        }
+    }
+
+    private async sendPermissionDeniedNotification(): Promise<void> {
+        try {
+            const message = t(Translations.BULK_EMAIL_PERMISSION_DENIED, this.language);
+            
+            await sendNotification(
+                this.read,
+                this.modify,
+                this.sender,
+                this.room,
+                { message }
+            );
+        } catch (error) {
+            this.app.getLogger().error('Error sending permission denied notification:', error);
+            // Fallback to simple notification
+            try {
+                const fallbackMessage = t(Translations.BULK_EMAIL_PERMISSION_DENIED, this.language);
+                
+                await sendNotification(
+                    this.read,
+                    this.modify,
+                    this.sender,
+                    this.room,
+                    { message: fallbackMessage }
+                );
+            } catch (fallbackError) {
+                this.app.getLogger().error('Error sending fallback permission notification:', fallbackError);
+            }
+        }
+    }
+
+    private async prepareChannelEmailData(args: any): Promise<ISendEmailData> {
+        try {
+            const channelName = args.channel_name;
+            if (!channelName) {
+                throw new Error(t(Translations.CHANNEL_NAME_REQUIRED, this.language));
+            }
+
+            // Create channel member service
+            const channelMemberService = new ChannelMemberService(
+                this.read,
+                this.http,
+                this.app,
+                this.sender,
+                this.persis
+            );
+
+            // Get channel members
+            const result = await channelMemberService.getChannelMembers(channelName);
+
+            if (!result.success) {
+                if (result.permissionError) {
+                    throw new Error(t(Translations.CHANNEL_PERMISSION_ERROR, this.language, { error: result.permissionError }));
+                }
+                throw new Error(result.error || t(Translations.FAILED_TO_RETRIEVE_CHANNEL_MEMBERS, this.language));
+            }
+
+            // Get user preferences for limit validation
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            let userPreference;
+            try {
+                userPreference = await userPreferenceStorage.getUserPreference();
+            } catch (error) {
+                // Continue without user preferences if they don't exist
+                this.app.getLogger().debug('No user preferences found, using admin defaults');
+                userPreference = undefined;
+            }
+
+            // Validate recipient limit before proceeding
+            const validation = await channelMemberService.validateRecipientLimit(result.members, userPreference);
+            if (!validation.isValid) {
+                throw new Error(validation.errorMessage || 'Too many recipients');
+            }
+
+            // Extract emails from members
+            const memberEmails = result.members
+                .filter(member => member.email)
+                .map(member => member.email as string);
+
+            if (memberEmails.length === 0) {
+                throw new Error(`No email addresses found for members in ${result.channelName}. ${result.error || ''}`);
+            }
+
+            // Show channel name in response
+            const isChannel = channelName.includes('channel') || !channelName.includes('team');
+            const roomType = isChannel ? 'channel' : 'team';
+            
+            // Add informative message about channel/team
+            const originalContent = args.content || '';
+            const enhancedContent = `${originalContent}\n\n[This email was sent to all members of the ${roomType} #${result.channelName}]`;
+
+            // Determine where to put emails (to or cc)
+            const includeIn = args.include_in?.toLowerCase() || 'to';
+            
+            // Cache user data for placeholder processing
+            await this.cacheUserDataForChannel(result.members, 'send-email-to-channel-or-team');
+
+            const emailData: ISendEmailData = {
+                to: includeIn === 'to' ? memberEmails : [],
+                cc: includeIn === 'cc' ? memberEmails : undefined,
+                subject: args.subject || `Message from ${roomType} #${result.channelName}`,
+                content: enhancedContent,
+                toUsernames: includeIn === 'to' ? result.members.map(m => m.username) : [],
+                ccUsernames: includeIn === 'cc' ? result.members.map(m => m.username) : [],
+            };
+
+            return emailData;
+
+        } catch (error) {
+            this.app.getLogger().error('prepareChannelEmailData error:', error);
+            throw error;
         }
     }
 
@@ -271,7 +426,6 @@ export class NLQueryHandler {
             }
 
             // Create services for summarization
-            const { MessageService } = await import('../services/MessageService');
             const messageService = new MessageService();
 
             // Get user preference for LLM settings
@@ -287,7 +441,7 @@ export class NLQueryHandler {
                 this.read.getEnvironmentReader().getSettings(),
                 userPreference
             );
-            const llmService = new LLMService(this.http, llmSettings, this.app, this.language);
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
 
             // Retrieve messages from the current room or thread
             const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
@@ -300,7 +454,7 @@ export class NLQueryHandler {
             const formattedMessages = messageService.formatMessagesForSummary(messages);
 
             // Generate summary using LLM
-            const channelName = this.room.displayName || 'Channel';
+            const channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
             const summaryContent = await llmService.generateSummary(formattedMessages, channelName);
 
             if (!summaryContent || summaryContent === "Failed to generate summary due to an error.") {
@@ -341,6 +495,128 @@ export class NLQueryHandler {
         }
     }
 
+    private async prepareSummarizeChannelEmailData(args: any): Promise<ISendEmailData> {
+        try {
+            // First, prepare the summary data (similar to prepareSummarizeEmailData)
+            const summarizeParams: ISummarizeParams = {
+                start_date: args.start_date,
+                end_date: args.end_date,
+                people: args.people,
+                format: args.format,
+            };
+
+            // Calculate days if date range is provided
+            if (args.start_date && args.end_date) {
+                const startDate = new Date(args.start_date);
+                const endDate = new Date(args.end_date);
+                const timeDiff = endDate.getTime() - startDate.getTime();
+                summarizeParams.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            }
+
+            // Create services for summarization
+            const messageService = new MessageService();
+
+            // Get user preference for LLM settings
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+
+            // Get effective LLM settings (user preference over admin settings)
+            const llmSettings = await getEffectiveLLMSettings(
+                this.read.getEnvironmentReader().getSettings(),
+                userPreference
+            );
+            const llmService = new LLMService(this.http, llmSettings, this.app, this.language, userPreference);
+
+            // Retrieve messages from the current room or thread
+            const messages = await messageService.getMessages(this.room, this.read, this.sender, summarizeParams, this.threadId);
+
+            if (messages.length === 0) {
+                throw new Error(t(Translations.NO_MESSAGES_TO_SUMMARIZE, this.language));
+            }
+
+            // Format messages for summarization
+            const formattedMessages = messageService.formatMessagesForSummary(messages);
+
+            // Generate summary using LLM
+            const channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
+            const summaryContent = await llmService.generateSummary(formattedMessages, channelName);
+
+            if (!summaryContent || summaryContent === "Failed to generate summary due to an error.") {
+                throw new Error(t(Translations.SUMMARY_GENERATION_FAILED, this.language));
+            }
+
+            // Format email using EmailFormats utility
+            const emailResult = EmailFormats.formatSummaryEmail(
+                channelName,
+                summaryContent,
+                messages.length,
+                args,
+                summarizeParams
+            );
+
+            // Now get channel members (similar to prepareChannelEmailData)
+            const channelMemberService = new ChannelMemberService(
+                this.read,
+                this.http,
+                this.app,
+                this.sender,
+                this.persis
+            );
+
+            const targetChannelName = args.channel_name;
+            if (!targetChannelName) {
+                throw new Error(t(Translations.CHANNEL_NAME_REQUIRED_FOR_TEAM_EMAIL, this.language));
+            }
+
+            const result = await channelMemberService.getChannelMembers(targetChannelName);
+
+            if (!result.success) {
+                throw new Error(result.error || t(Translations.FAILED_TO_GET_MEMBERS, this.language, { channelName: targetChannelName }));
+            }
+
+            // Extract emails from members
+            const memberEmails = result.members
+                .filter(member => member.email)
+                .map(member => member.email as string);
+
+            if (memberEmails.length === 0) {
+                throw new Error(`No email addresses found for members in ${result.channelName}. ${result.error || ''}`);
+            }
+
+            // Show channel name in response
+            const isChannel = targetChannelName.includes('channel') || !targetChannelName.includes('team');
+            const roomType = isChannel ? 'channel' : 'team';
+            
+            // Add informative message about channel/team to the summary content
+            const enhancedContent = `${emailResult.content}\n\n[This summary email was sent to all members of the ${roomType} #${result.channelName}]`;
+
+            // Cache user data for placeholder processing  
+            await this.cacheUserDataForChannel(result.members, 'summarize-and-send-email-to-channel-or-team');
+
+            // Determine where to put emails (to or cc)
+            const includeIn = args.include_in?.toLowerCase() || 'to';
+            
+            const emailData: ISendEmailData = {
+                to: includeIn === 'to' ? memberEmails : [],
+                cc: includeIn === 'cc' ? memberEmails : undefined,
+                subject: emailResult.subject,
+                content: enhancedContent,
+                toUsernames: includeIn === 'to' ? result.members.map(m => m.username) : [],
+                ccUsernames: includeIn === 'cc' ? result.members.map(m => m.username) : [],
+            };
+
+            return emailData;
+
+        } catch (error) {
+            this.app.getLogger().error('Error preparing summarize channel email data:', error);
+            throw error;
+        }
+    }
+
     private async storeEmailDataForButtons(emailData: ISendEmailData): Promise<void> {
         const roomInteractionStorage = new RoomInteractionStorage(
             this.persis,
@@ -359,6 +635,23 @@ export class NLQueryHandler {
         await roomInteractionStorage.storeInteractionRoomId(this.room.id);
     }
 
+    private async storeEmailContext(toolContext: string): Promise<void> {
+        const cacheService = new CacheService(
+            this.persis,
+            this.read.getPersistenceReader(),
+            this.room.id
+        );
+
+        const contextData: IEmailContextData = {
+            toolContext,
+            isPlaceholderEnabled: CacheService.isPlaceholderEnabledContext(toolContext),
+            originalQuery: this.originalQuery,
+            timestamp: new Date()
+        };
+
+        await cacheService.storeEmailContext(contextData);
+    }
+
     private async sendEmailReadyMessage(emailData: ISendEmailData, toolCall: IToolCall, appUser: IUser): Promise<void> {
         const messageBuilder = this.modify
             .getCreator()
@@ -370,16 +663,43 @@ export class NLQueryHandler {
         const block = this.modify.getCreator().getBlockBuilder();
 
         // Use MessageFormatter for consistent formatting
-        const channelName = toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL
-            ? this.room.displayName || 'Channel'
-            : undefined;
+        let channelName: string | undefined;
+        let isChannelEmail = false;
+        let isSummaryEmail = false;
+        
+        if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL) {
+            channelName = this.room.displayName || this.room.slugifiedName || 'Channel';
+            isSummaryEmail = true;
+        } else if (toolCall.function.name === LlmTools.SUMMARIZE_AND_SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+            // Extract channel name from tool arguments for summary + channel email
+            try {
+                const args = JSON.parse(toolCall.function.arguments);
+                channelName = args.channel_name || 'Unknown Channel';
+            } catch (error) {
+                channelName = 'Unknown Channel';
+            }
+            isChannelEmail = true;
+            isSummaryEmail = true;
+        } else if (toolCall.function.name === LlmTools.SEND_EMAIL_TO_CHANNEL_OR_TEAM) {
+            // Extract channel name from tool arguments for regular channel email
+            try {
+                const args = JSON.parse(toolCall.function.arguments);
+                channelName = args.channel_name || 'Unknown Channel';
+            } catch (error) {
+                channelName = 'Unknown Channel';
+            }
+            isChannelEmail = true;
+            isSummaryEmail = false;
+        }
 
         const formattedMessage = await MessageFormatter.formatEmailReadyMessage(
             this.sender.name || this.sender.username,
             emailData,
             this.language,
             this.read,
-            channelName
+            channelName,
+            isChannelEmail,
+            isSummaryEmail
         );
 
         block.addSectionBlock({
@@ -397,6 +717,7 @@ export class NLQueryHandler {
         });
 
         messageBuilder.setBlocks(block.getBlocks());
+        
         await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
     }
 
@@ -439,4 +760,77 @@ export class NLQueryHandler {
             );
         }
     }
+
+    private replaceAtAllWithChannelName(query: string): string {
+        // Replace @all with #current-channel-name for bulk emailing
+        const channelName = this.room.displayName || this.room.slugifiedName || 'general';
+        
+        // Use regex to replace @all (case insensitive) with the channel name
+        const processedQuery = query.replace(/@all\b/gi, `#${channelName}`);
+        
+        // Log the replacement for debugging
+        if (processedQuery !== query) {
+            this.app.getLogger().debug(`Replaced @all with #${channelName} in query: ${query} -> ${processedQuery}`);
+        }
+        
+        return processedQuery;
+    }
+
+    private async cacheUserDataForChannel(members: any[], toolContext: string): Promise<void> {
+        try {
+            // First, get detailed user information including emails for each member
+            const usersWithEmails = await this.fetchUsersWithEmails(members);
+            
+            // Create cache data
+            const cachedUsers: ICachedUserData[] = usersWithEmails.map(member => ({
+                email: member.email,
+                name: member.name || member.username,
+                username: member.username,
+                avatarUrl: member.avatarUrl
+            }));
+
+            // Cache the data
+            const cacheService = new CacheService(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.room.id,
+                this.app.getLogger()
+            );
+
+            await cacheService.cacheUserData(cachedUsers, toolContext);
+
+        } catch (error) {
+            // Silently handle cache errors - not critical for email functionality
+        }
+    }
+
+    private async fetchUsersWithEmails(members: any[]): Promise<any[]> {
+        const usersWithEmails: any[] = [];
+
+        for (const member of members) {
+            try {
+                // Get full user details by username to get email
+                const fullUser = await this.read.getUserReader().getByUsername(member.username);
+                if (fullUser && fullUser.emails && fullUser.emails.length > 0) {
+                    const primaryEmail = fullUser.emails.find(e => e.address) || fullUser.emails[0];
+                    if (primaryEmail) {
+                        usersWithEmails.push({
+                            ...member,
+                            email: primaryEmail.address,
+                            name: fullUser.name || member.name || member.username,
+                            avatarUrl: member.avatarUrl // Keep existing avatar URL if available
+                        });
+                    }
+                }
+            } catch (error) {
+                this.app.getLogger().debug(`Could not fetch email for user ${member.username}:`, error);
+            }
+        }
+
+        return usersWithEmails;
+    }
+
+
+
+
 }

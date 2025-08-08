@@ -95,8 +95,8 @@ export class CommandUtility implements ICommandUtility {
             case CommandParam.CONFIG:
                 await handler.Config();
                 break;
-            case CommandParam.REPORT:
-                await handler.Report();
+            case CommandParam.STATS:
+                await handler.Stats();
                 break;
             default: {
                 const query = this.params.join(' ');
@@ -107,6 +107,18 @@ export class CommandUtility implements ICommandUtility {
     }
 
     private async handleMultipleParams(handler: Handler): Promise<void> {
+        const command = this.params[0].toLowerCase();
+        
+        if (command === CommandParam.STATS && this.params.length === 2) {
+            const daysParam = this.params[1];
+            const days = parseInt(daysParam, 10);
+            
+            if (!isNaN(days)) {
+                await handler.Stats(days);
+                return;
+            }
+        }
+        
         const query = this.params.join(' ');
         await handler.ProcessNaturalLanguageQuery(query);
     }

@@ -5,22 +5,26 @@ import { t, Language } from '../../lib/Translation/translation';
 import { getProviderDisplayName } from '../../enums/ProviderDisplayNames';
 import { EmailProviders } from '../../enums/EmailProviders';
 import { Translations } from '../../constants/Translations';
-import { ApiEndpoints, HeaderBuilders } from '../../constants/AuthConstants';
+import { ApiEndpoints, HeaderBuilders, MessageConfig, MicrosoftOauthUrls } from '../../constants/constants';
+import { LLMEmailAnalysisService } from '../LLMAnalysisService';
+import { IEmailData, ISendEmailData } from '../../definition/lib/IEmailUtils';
+import { IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 export class OutlookService {
     private oauthService: IOAuthService;
     private http: IHttp;
     private logger: ILogger;
+    private persistence?: IPersistence;
+    private read?: IRead;
 
-    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger) {
+    constructor(oauthService: IOAuthService, http: IHttp, logger: ILogger, persistence?: IPersistence, read?: IRead) {
         this.oauthService = oauthService;
         this.http = http;
         this.logger = logger;
+        this.persistence = persistence;
+        this.read = read;
     }
 
-    /**
-     * Get Outlook email statistics for the specified time period
-     */
     public async getEmailStatistics(params: IEmailStatsParams, userInfo: any, language: Language = Language.en): Promise<IEmailStatistics> {
         const accessToken = await this.oauthService.getValidAccessToken(params.userId);
         
@@ -54,7 +58,7 @@ export class OutlookService {
         if (receivedResponse.statusCode === 401 || unreadResponse.statusCode === 401 || 
             sentResponse.statusCode === 401 || totalResponse.statusCode === 401) {
             const providerName = getProviderDisplayName(EmailProviders.OUTLOOK);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
 
         const receivedData = JSON.parse(receivedResponse.content || '{}');
@@ -68,8 +72,10 @@ export class OutlookService {
         const totalEmails = totalData['@odata.count'] || 0;
         const readEmails = Math.max(0, totalEmails - unreadEmails);
 
-        const categoryStats: { [category: string]: { total: number, unread: number } } = {};
-        if (params.categories && params.categories.length > 0) {
+        let categoryStats: { [category: string]: { total: number, unread: number } } = {};
+        
+        // Only do email provider categorization if LLM categorization is NOT selected
+        if (!params.useLLMCategorization && params.categories && params.categories.length > 0) {
             for (const category of params.categories) {
                 const categoryFilter = `contains(subject, '${category}') or contains(body, '${category}')`;
                 
@@ -91,6 +97,38 @@ export class OutlookService {
             }
         }
 
+        // Create user-friendly time range description
+        const days = Math.floor(params.hoursBack / 24);
+        const timeRangeDescription = days === 1 ? 
+            t(Translations.STATS_TIME_RANGE_24_HOURS, language) : 
+            t(Translations.STATS_TIME_RANGE_DAYS, language, { days: days.toString() });
+
+        // Enhanced LLM analysis if requested
+        let enhancedAnalysis;
+        if (params.useLLMCategorization && this.persistence && this.read) {
+            try {
+                // Fetch detailed email data for LLM analysis (limit 450 emails)
+                const detailedEmails = await this.fetchDetailedEmailsForLLMAnalysis(accessToken, timeFilter, language);
+                
+                if (detailedEmails.length > 0) {
+                    const llmAnalysisService = new LLMEmailAnalysisService(this.http, this.persistence, this.read, this.logger);
+                    enhancedAnalysis = await llmAnalysisService.analyzeEmails(detailedEmails, params, language);
+                    
+                    // Replace provider categories with LLM categories
+                    categoryStats = {};
+                    if (enhancedAnalysis.userCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.userCategories);
+                    }
+                    if (enhancedAnalysis.additionalCategories) {
+                        Object.assign(categoryStats, enhancedAnalysis.additionalCategories);
+                    }
+                }
+            } catch (error) {
+                this.logger.error('LLM email analysis failed for Outlook:', error);
+                // Continue with regular stats if LLM analysis fails
+            }
+        }
+
         return {
             totalEmails,
             unreadEmails,
@@ -99,14 +137,96 @@ export class OutlookService {
             receivedUnreadToday: unreadEmails,
             sentToday,
             categoryStats,
-            timeRange: `Last ${params.hoursBack} hours`,
+            timeRange: timeRangeDescription,
             emailAddress: userInfo.email,
-            provider: 'Outlook'
+            provider: EmailProviders.OUTLOOK,
+            enhancedAnalysis
         };
     }
 
-    // Future methods will be added here:
-    // public async sendEmail(params: ISendEmailParams): Promise<boolean> { ... }
-    // public async searchEmails(params: ISearchParams): Promise<IEmailSearchResult[]> { ... }
-    // public async getEmailContent(messageId: string): Promise<IEmailContent> { ... }
+    public async sendEmail(emailData: ISendEmailData, accessToken: string, fromEmail: string): Promise<boolean> {
+        try {
+            // Create the email payload for Outlook API
+            const emailPayload: any = {
+                message: {
+                    subject: emailData.subject,
+                    body: {
+                        contentType: 'Text',
+                        content: emailData.content
+                    },
+                    toRecipients: emailData.to.map(email => ({
+                        emailAddress: {
+                            address: email
+                        }
+                    }))
+                }
+            };
+
+            // Only add ccRecipients if there are CC recipients
+            if (emailData.cc && emailData.cc.length > 0) {
+                emailPayload.message.ccRecipients = emailData.cc.map(email => ({
+                    emailAddress: {
+                        address: email
+                    }
+                }));
+            }
+
+            // Send the email using Outlook API
+            const response = await this.http.post(MicrosoftOauthUrls.SEND_EMAIL, {
+                headers: HeaderBuilders.createJsonAuthHeaders(accessToken),
+                data: emailPayload
+            });
+
+            // Check response status
+            if (response.statusCode === 202) {
+                return true;
+            } else {
+                // Log detailed error information
+                let errorMessage = `HTTP ${response.statusCode}`;
+                try {
+                    const errorData = JSON.parse(response.content || '{}');
+                    errorMessage += ` - ${errorData.error?.message || errorData.error || response.content}`;
+                } catch {
+                    errorMessage += ` - ${response.content || 'No error details'}`;
+                }
+                this.logger.error('Outlook API error:', errorMessage);
+                throw new Error(`Outlook API error: ${errorMessage}`);
+            }
+        } catch (error) {
+            this.logger.error('Error sending email via Outlook:', error);
+            throw error;
+        }
+    }
+
+    private async fetchDetailedEmailsForLLMAnalysis(accessToken: string, timeFilter: string, language: Language): Promise<IEmailData[]> {
+        try {
+            // Get up to 450 recent emails with detailed info from inbox
+            const emailsResponse = await this.http.get(`${ApiEndpoints.OUTLOOK_API_BASE_URL}/mailFolders/inbox/messages?$filter=${encodeURIComponent(timeFilter)}&$top=${MessageConfig.MAX_RESULTS}&$select=from,subject,bodyPreview,isRead,receivedDateTime`, {
+                headers: HeaderBuilders.createOutlookJsonHeaders(accessToken)
+            });
+
+            if (emailsResponse.statusCode !== 200) {
+                throw new Error('Failed to fetch emails list');
+            }
+
+            const emailsData = JSON.parse(emailsResponse.content || '{}');
+            const messages = emailsData.value || [];
+
+            // Convert Outlook messages to IEmailData format
+            const detailedEmails: IEmailData[] = messages.map((message: any) => ({
+                sender: message.from?.emailAddress?.address || 'Unknown',
+                subject: message.subject || 'No Subject',
+                bodyPreview: message.bodyPreview || '',
+                isRead: message.isRead || false,
+                receivedDateTime: message.receivedDateTime || new Date().toISOString()
+            }));
+
+            this.logger.info(`Fetched ${detailedEmails.length} emails for LLM analysis from Outlook`);
+            return detailedEmails;
+
+        } catch (error) {
+            this.logger.error('Failed to fetch detailed emails from Outlook for LLM analysis:', error);
+            return [];
+        }
+    }
 }

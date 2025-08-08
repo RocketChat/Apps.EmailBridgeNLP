@@ -168,15 +168,15 @@ export class EmailServiceFactory {
             userInfo = await oauthService.getUserInfo(params.userId);
         } catch (error) {
             const providerName = getProviderDisplayName(provider);
-            throw new Error(t(Translations.REPORT_TOKEN_EXPIRED, language, { provider: providerName }));
+            throw new Error(t(Translations.STATS_TOKEN_EXPIRED, language, { provider: providerName }));
         }
         
         switch (provider) {
             case EmailProviders.GMAIL:
-                const gmailService = new GmailService(oauthService, http, logger);
+                const gmailService = new GmailService(oauthService, http, logger, persistence, read);
                 return await gmailService.getEmailStatistics(params, userInfo, language);
             case EmailProviders.OUTLOOK:
-                const outlookService = new OutlookService(oauthService, http, logger);
+                const outlookService = new OutlookService(oauthService, http, logger, persistence, read);
                 return await outlookService.getEmailStatistics(params, userInfo, language);
             default:
                 throw new Error(t(Translations.STATISTICS_NOT_IMPLEMENTED, language, { provider }));

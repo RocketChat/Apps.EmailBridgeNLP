@@ -50,14 +50,36 @@ export function handleLLMErrorAndGetMessage(
 ): string {
     app.getLogger().error(`${context} error:`, error);
 
+    // Check if this is a recipient limit error (should be shown directly to user)
+    const errorMessage = error.message?.toLowerCase() || '';
+    if (errorMessage.includes('recipients') && (errorMessage.includes('limit') || errorMessage.includes('maximum'))) {
+        return error.message; // Return the original limit error message
+    }
+
+    // Check if this is a channel/permission error (should be shown directly to user)
+    if (errorMessage.includes('permission') || errorMessage.includes('channel') || errorMessage.includes('team')) {
+        return error.message; // Return the original error message
+    }
+
+    // Check if this is a summary-related error (should be shown directly to user)
+    if (errorMessage.includes('summarize') || errorMessage.includes('summary') || errorMessage.includes('messages found') || 
+        errorMessage.includes('no messages') || errorMessage.includes('failed to generate summary')) {
+        return error.message; // Return the original error message
+    }
+
+    // Check if this is a timeout or network error that shouldn't be attributed to API key
+    if (errorMessage.includes('timeout') || errorMessage.includes('econnreset') || errorMessage.includes('enotfound')) {
+        return 'Network connection issue. Please try again.';
+    }
+
     // Get status code from HTTP response
     const statusCode = error.statusCode || error.response?.status || error.status;
     
     if (statusCode) {
         return `${statusCode} error`;
     }
-
-    return t(Translations.LLM_API_OR_URL_ERROR, language || Language.en);
+    
+    return t(Translations.LLM_API_OR_URL_ERROR, language);
 }
 
 function categorizeError(error: Error, language: Language): string {
@@ -103,8 +125,8 @@ function categorizeError(error: Error, language: Language): string {
         return t(Translations.ERROR_PREPARING_LOGOUT, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
     }
 
-    if (errorMessage.includes('report') || error.message?.includes('Report')) {
-        return t(Translations.REPORT_ERROR, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
+    if (errorMessage.includes('stats') || error.message?.includes('Stats')) {
+        return t(Translations.STATS_ERROR, language, { error: t(Translations.ERROR_PLEASE_TRY_AGAIN, language) });
     }
 
     if (errorMessage.includes('config') || error.message?.includes('Config')) {

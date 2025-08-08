@@ -117,5 +117,9 @@
 	"Gemini_API_Key_Label": "Clave API de Google Gemini",
 	"Gemini_API_Key_Description": "Tu clave API de Google AI Studio para acceder a modelos Gemini (requerido solo al usar el proveedor Gemini)",
 	"Groq_API_Key_Label": "Clave API de Groq",
-	"Groq_API_Key_Description": "Tu clave API de Groq para acceder a modelos Llama (requerido solo al usar el proveedor Groq)"
+	"Groq_API_Key_Description": "Tu clave API de Groq para acceder a modelos Llama (requerido solo al usar el proveedor Groq)",
+	"Max_Recipients_Per_Email_Label": "Máximo de Destinatarios por Correo",
+	"Max_Recipients_Per_Email_Description": "Número máximo de destinatarios permitidos por correo para todos los usuarios (predeterminado: 100)",
+	"Bulk_Email_Allowed_Users_Label": "Usuarios Permitidos para Email Masivo",
+	"Bulk_Email_Allowed_Users_Description": "Lista de nombres de usuario separados por comas que tienen permitido usar las funciones de email masivo (además de los administradores del espacio de trabajo). Ejemplo: usuario1, usuario2, usuario3"
 } 

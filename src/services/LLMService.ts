@@ -1,24 +1,28 @@
 import { IHttp, IHttpRequest } from '@rocket.chat/apps-engine/definition/accessors';
-import { LlmConfig, LlmApiUrls, LlmModels, ContentTypes, HttpHeaders } from '../constants/AuthConstants';
-import { Translations } from '../constants/Translations';
-import { LlmPrompts } from '../constants/prompts';
-import { IToolCall, ILLMResponse } from '../definition/lib/ToolInterfaces';
-import { LlmTools } from '../enums/LlmTools';
 import { ILLMSettings } from '../definition/lib/ILLMSettings';
-import { handleErrorAndGetMessage, handleLLMErrorAndGetMessage } from '../helper/errorHandler';
-import { t, Language } from '../lib/Translation/translation';
+import { LlmPrompts } from '../constants/prompts';
+import { ILLMResponse, IToolCall } from '../definition/lib/ToolInterfaces';
+import { LlmTools } from '../enums/LlmTools';
+import { Language, t } from '../lib/Translation/translation';
+import { Translations } from '../constants/Translations';
 import { LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { IPreference } from '../definition/lib/IUserPreferences';
+import { HttpHeaders, ContentTypes, LlmModels, LlmApiUrls, TemplatePlaceholders } from '../constants/constants';
+import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 
 export class LLMService {
     private readonly llmSettings: ILLMSettings;
+    private readonly userPreference?: IPreference;
 
     constructor(
         private readonly http: IHttp, 
         llmSettings: ILLMSettings,
         private readonly app: any,
-        private readonly language: Language
+        private readonly language: Language,
+        userPreference?: IPreference
     ) {
         this.llmSettings = llmSettings;
+        this.userPreference = userPreference;
     }
 
     private generateDateReplacements(): Record<string, string> {
@@ -54,17 +58,27 @@ export class LLMService {
             systemPromptWithDates = systemPromptWithDates.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), date);
         }
         
+        // Add user's custom system prompt if provided
+        let finalSystemPrompt = systemPromptWithDates;
+        if (this.userPreference?.systemPrompt?.trim()) {
+            const userPreferencesSection = LlmPrompts.USER_PREFERENCES_PROMPT.replace(
+                '{USER_SYSTEM_PROMPT}', 
+                this.userPreference.systemPrompt.trim()
+            );
+            finalSystemPrompt = `${systemPromptWithDates}${userPreferencesSection}`;
+        }
+        
         // Route to appropriate provider based on settings
         switch (this.llmSettings.provider) {
             case LLMProviderEnum.OpenAI:
-                return await this.processWithOpenAI(systemPromptWithDates, query);
+                return await this.processWithOpenAI(finalSystemPrompt, query);
             case LLMProviderEnum.Gemini:
-                return await this.processWithGemini(systemPromptWithDates, query);
+                return await this.processWithGemini(finalSystemPrompt, query);
             case LLMProviderEnum.Groq:
-                return await this.processWithGroq(systemPromptWithDates, query);
+                return await this.processWithGroq(finalSystemPrompt, query);
             case LLMProviderEnum.SelfHosted:
             default:
-                return await this.processWithSelfHosted(systemPromptWithDates, query);
+                return await this.processWithSelfHosted(finalSystemPrompt, query);
         }
     }
 
@@ -347,8 +361,8 @@ export class LLMService {
 
     public async generateSummary(messages: string, channelName: string): Promise<string> {
         const prompt = LlmPrompts.SUMMARIZE_PROMPT
-            .replace('__channelName__', channelName)
-            .replace('__messages__', messages);
+            .replace(TemplatePlaceholders.CHANNEL_NAME, channelName)
+            .replace(TemplatePlaceholders.MESSAGES, messages);
 
         try {
             let response;

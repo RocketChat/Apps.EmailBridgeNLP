@@ -51,6 +51,15 @@ export const Translations = {
     DISCONNECT_SUCCESS: 'Disconnect_Success',
     DISCONNECT_FAILED: 'Disconnect_Failed',
 
+    // Login success notifications (webhook)
+    LOGIN_SUCCESS_NOTIFICATION: 'Login_Success_Notification',
+
+    // Welcome message content (onInstall)
+    WELCOME_TITLE: 'Welcome_Title',
+    WELCOME_DESCRIPTION: 'Welcome_Description',
+    WELCOME_TEXT: 'Welcome_Text',
+    WELCOME_MESSAGE: 'Welcome_Message',
+
     // Handler Messages
     ALREADY_LOGGED_IN: 'Already_Logged_In',
     OUTLOOK_COMING_SOON: 'Outlook_Coming_Soon',
@@ -236,15 +245,27 @@ export const Translations = {
     DEV_HTTPS_TO_HTTP_CONVERSION: 'Development mode: Converting HTTPS redirect URI to HTTP for localhost',
     DEV_OUTLOOK_TOKEN_EXCHANGE_FAILED: 'Outlook OAuth token exchange failed',
 
-    // Report Feature Messages
-    REPORT_COMMAND: 'Report_Command',
-    REPORT_PROVIDER_NOT_SUPPORTED: 'Report_Provider_Not_Supported',
-    REPORT_NOT_AUTHENTICATED: 'Report_Not_Authenticated',
-    REPORT_ERROR: 'Report_Error',
-    REPORT_HEADER: 'Report_Header',
-    REPORT_STATISTICS: 'Report_Statistics',
-    REPORT_TOKEN_EXPIRED: 'Report_Token_Expired',
-    REPORT_CATEGORIES_LABEL: 'Report_Categories_Label',
+    // Stats Feature Messages
+    STATS_COMMAND: 'Stats_Command',
+    NATURAL_LANGUAGE_EXAMPLES: 'Natural_Language_Examples',
+    STATS_PROVIDER_NOT_SUPPORTED: 'Stats_Provider_Not_Supported',
+    STATS_NOT_AUTHENTICATED: 'Stats_Not_Authenticated',
+    STATS_ERROR: 'Stats_Error',
+    STATS_HEADER: 'Stats_Header',
+    STATS_STATISTICS: 'Stats_Statistics',
+    STATS_TOKEN_EXPIRED: 'Stats_Token_Expired',
+    STATS_CATEGORIES_LABEL: 'Stats_Categories_Label',
+    STATS_DAYS_INVALID: 'Stats_Days_Invalid',
+    STATS_DAYS_RANGE_ERROR: 'Stats_Days_Range_Error',
+    STATS_TIME_RANGE_24_HOURS: 'Stats_Time_Range_24_Hours',
+    STATS_TIME_RANGE_DAYS: 'Stats_Time_Range_Days',
+    
+    // Email Categorization Preferences
+    EMAIL_CATEGORIZATION_LABEL: 'Email_Categorization_Label',
+    EMAIL_CATEGORIZATION_DESCRIPTION: 'Email_Categorization_Description',
+    EMAIL_CATEGORIZATION_EMAIL_PROVIDER: 'Email_Categorization_Email_Provider',
+    EMAIL_CATEGORIZATION_LLM: 'Email_Categorization_LLM',
+    LLM_ANALYSIS_FAILED: 'LLM_Analysis_Failed',
 
     // Statistics Service Errors
     STATISTICS_PROVIDER_NOT_SUPPORTED: 'Statistics_Provider_Not_Supported',
@@ -255,6 +276,11 @@ export const Translations = {
     // User Preference Modal
     NEW_CATEGORY_LABEL: 'New_Category_Label',
     NEW_CATEGORIES_PLACEHOLDER: 'New_Categories_Placeholder',
+    
+    // System Prompt Configuration
+    SYSTEM_PROMPT_LABEL: 'System_Prompt_Label',
+    SYSTEM_PROMPT_PLACEHOLDER: 'System_Prompt_Placeholder',
+    
     // Tool Calling Messages
     LLM_PROCESSING_QUERY: 'LLM_Processing_Query',
     LLM_USER_QUERY_DISPLAY: 'LLM_User_Query_Display',
@@ -272,9 +298,10 @@ export const Translations = {
 
     // Tool Names (for user display)
     TOOL_SEND_EMAIL: 'Tool_Send_Email',
+    TOOL_SEND_EMAIL_TO_CHANNEL: 'Tool_Send_Email_To_Channel',
     TOOL_EXTRACT_ATTACHMENT: 'Tool_Extract_Attachment',
     TOOL_SUMMARIZE_AND_SEND: 'Tool_Summarize_And_Send',
-    TOOL_REPORT: 'Tool_Report',
+    TOOL_STATS: 'Tool_Stats',
 
     // Send Email Modal
     SEND_EMAIL_MODAL_TITLE: 'Send_Email_Modal_Title',
@@ -288,12 +315,60 @@ export const Translations = {
     SEND_EMAIL_CONTENT_PLACEHOLDER: 'Send_Email_Content_Placeholder',
     SEND_EMAIL_SEND_BUTTON: 'Send_Email_Send_Button',
     SEND_EMAIL_CANCEL_BUTTON: 'Send_Email_Cancel_Button',
+    SEND_EMAIL_TEST_BUTTON: 'Send_Email_Test_Button',
     SEND_EMAIL_MODAL_OPENED: 'Send_Email_Modal_Opened',
+    
+    // Send Type dropdown
+    SEND_TYPE_LABEL: 'Send_Type_Label',
+    SEND_TYPE_RECIPIENTS: 'Send_Type_Recipients',
+    SEND_TYPE_TEST_SELF: 'Send_Type_Test_Self',
+    
+    // Test Email notifications
+    TEST_EMAIL_SUCCESS: 'Test_Email_Success',
+    TEST_EMAIL_SUCCESS_WITH_EMAIL: 'Test_Email_Success_With_Email',
+    TEST_EMAIL_FAILED: 'Test_Email_Failed',
+    TEST_EMAIL_NO_USER_EMAIL: 'Test_Email_No_User_Email',
 
     // Send Email Button translations
     EMAIL_READY_TO_SEND: 'Email_Ready_To_Send',
     EMAIL_SEND_BUTTON: 'Email_Send_Button',
+
+    // Channel/Team Email translations
+    CHANNEL_NOT_FOUND: 'Channel_Not_Found',
+    CHANNEL_PERMISSION_ERROR: 'Channel_Permission_Error',
+    CHANNEL_NO_EMAILS_FOUND: 'Channel_No_Emails_Found',
+    CHANNEL_NAME_REQUIRED: 'Channel_Name_Required',
+    CHANNEL_NAME_REQUIRED_FOR_TEAM_EMAIL: 'Channel_Name_Required_For_Team_Email',
+    FAILED_TO_RETRIEVE_CHANNEL_MEMBERS: 'Failed_To_Retrieve_Channel_Members',
+    FAILED_TO_GET_MEMBERS: 'Failed_To_Get_Members',
+    PERMISSION_VIEW_C_ROOM: 'Permission_View_C_Room',
+    PERMISSION_VIEW_JOINED_ROOM: 'Permission_View_Joined_Room',
+    PERMISSION_VIEW_FULL_USER_INFO: 'Permission_View_Full_User_Info',
     EMAIL_EDIT_AND_SEND_BUTTON: 'Email_Edit_And_Send_Button',
+    CHANNEL_FETCH_ERROR: 'Channel_Fetch_Error',
+    CHANNEL_MEMBERS_FETCH_FAILED: 'Channel_Members_Fetch_Failed',
+    CHANNEL_ROOM_TYPE_NOT_SUPPORTED: 'Channel_Room_Type_Not_Supported',
+    CHANNEL_MEMBERS_REST_API_FAILED: 'Channel_Members_Rest_API_Failed',
+    CHANNEL_COULD_NOT_RETRIEVE_EMAILS: 'Channel_Could_Not_Retrieve_Emails',
+    RECIPIENT_LIMIT_EXCEEDED: 'Recipient_Limit_Exceeded',
+    RECIPIENT_LIMIT_VALIDATION_FAILED: 'Recipient_Limit_Validation_Failed',
+
+    // Bulk email permissions
+    BULK_EMAIL_PERMISSION_DENIED: 'Bulk_Email_Permission_Denied',
+    BULK_EMAIL_PERMISSION_CHECK_ERROR: 'Bulk_Email_Permission_Check_Error',
+    
+    // App settings for bulk email
+    BULK_EMAIL_ALLOWED_USERS_LABEL: 'Bulk_Email_Allowed_Users_Label',
+    BULK_EMAIL_ALLOWED_USERS_DESCRIPTION: 'Bulk_Email_Allowed_Users_Description',
+    
+    // Email Limits translations
+    MAX_RECIPIENTS_PER_EMAIL_LABEL: 'Max_Recipients_Per_Email_Label',
+    MAX_RECIPIENTS_PER_EMAIL_DESCRIPTION: 'Max_Recipients_Per_Email_Description',
+    TOO_MANY_RECIPIENTS_ERROR: 'Too_Many_Recipients_Error',
+    USER_MAX_RECIPIENTS_LABEL: 'User_Max_Recipients_Label',
+    USER_MAX_RECIPIENTS_DESCRIPTION: 'User_Max_Recipients_Description',
+    VALIDATION_MAX_RECIPIENTS_INVALID: 'Validation_Max_Recipients_Invalid',
+    VALIDATION_MAX_RECIPIENTS_EXCEEDS_LIMIT: 'Validation_Max_Recipients_Exceeds_Limit',
 
     // Send Email Status translations
     SEND_EMAIL_SUCCESS: 'Send_Email_Success',
@@ -331,6 +406,7 @@ export const Translations = {
     LLM_EMAIL_SUBJECT_LABEL: 'LLM_Email_Subject_Label',
     LLM_EMAIL_READY_FORMATTED: 'LLM_Email_Ready_Formatted',
     LLM_SUMMARY_EMAIL_READY_FORMATTED: 'LLM_Summary_Email_Ready_Formatted',
+    LLM_CHANNEL_EMAIL_READY_FORMATTED: 'LLM_Channel_Email_Ready_Formatted',
 
     // Error message details for MessageFormatter
     ERROR_EMAIL_DATA_UNAVAILABLE: 'Error_Email_Data_Unavailable',
@@ -379,4 +455,11 @@ export const Translations = {
     LLM_CONFIG_GEMINI_KEY_REQUIRED: 'LLM_Config_Gemini_Key_Required',
     LLM_CONFIG_GROQ_KEY_REQUIRED: 'LLM_Config_Groq_Key_Required',
     LLM_CONFIG_INVALID_PROVIDER: 'LLM_Config_Invalid_Provider',
+    
+    // Placeholder Email Features
+    PLACEHOLDER_EMAIL_HINT: 'Placeholder_Email_Hint',
+    PLACEHOLDER_EMAIL_SUCCESS: 'Placeholder_Email_Success',
+    PLACEHOLDER_EMAIL_PARTIAL_SUCCESS: 'Placeholder_Email_Partial_Success',
+    PLACEHOLDER_EMAIL_FAILED: 'Placeholder_Email_Failed',
+    PLACEHOLDER_PROCESSING_ENABLED: 'Placeholder_Processing_Enabled',
 } as const;

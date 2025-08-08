@@ -122,7 +122,7 @@ export const LlmApiUrls = {
 export const LlmModels = {
     OPENAI: 'gpt-4o-mini',
     GEMINI: 'gemini-2.0-flash-exp', 
-    GROQ: 'llama3-70b-8192',
+    GROQ: 'llama-3.3-70b-versatile',
 } as const;
 
 // LLM Configuration
@@ -134,7 +134,8 @@ export const LlmConfig = {
 
 // Message Retrieval Configuration
 export const MessageConfig = {
-    MAX_MESSAGES_RETRIEVAL: 100, 
+    MAX_MESSAGES_RETRIEVAL: 100,
+    MAX_RESULTS: 150,
 } as const; 
 
 // Avatar Configuration
@@ -148,4 +149,12 @@ export const AvatarConfig = {
 export const AvatarUtils = {
     buildAvatarUrl: (username: string, format: string = AvatarConfig.DEFAULT_FORMAT, size: number = AvatarConfig.DEFAULT_SIZE) => 
         `${AvatarConfig.ENDPOINT_PATH}/${username}?format=${format}&size=${size}`,
+} as const;
+
+// Template Placeholders
+export const TemplatePlaceholders = {
+    CHANNEL_NAME: '__channelName__',
+    MESSAGES: '__messages__',
+    USER_CATEGORIES: '__userCategories__',
+    EMAIL_DATA: '__emailData__',
 } as const;

@@ -7,7 +7,7 @@ import {
     IPersistenceRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { IUserPreferenceStorage } from '../definition/lib/IUserPreferences';
-import { IPreference } from '../definition/lib/IUserPreferences';
+import { IPreference, EmailCategorizationEnum } from '../definition/lib/IUserPreferences';
 import { Language } from '../lib/Translation/translation';
 import { EmailProviders } from '../enums/EmailProviders';
 
@@ -28,17 +28,19 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
         const currentPreference = await this.getUserPreference();
 
         // Store categories as selected by user (no forced defaults)
-        const userSelectedCategories = preference.reportCategories 
-            ? preference.reportCategories.map(c => c.toLowerCase())
-            : currentPreference.reportCategories;
+                const userSelectedCategories = preference.statsCategories
+            ? preference.statsCategories.map(c => c.toLowerCase())
+            : currentPreference.statsCategories;
 
         const updatedPreference: IPreference = {
             userId: this.userId,
             language: preference.language || currentPreference.language,
             emailProvider: preference.emailProvider || currentPreference.emailProvider,
-            reportCategories: userSelectedCategories,
+            statsCategories: userSelectedCategories,
             showProviderWarning: preference.showProviderWarning || currentPreference.showProviderWarning,
             llmConfiguration: preference.llmConfiguration || currentPreference.llmConfiguration,
+            systemPrompt: preference.systemPrompt !== undefined ? preference.systemPrompt : currentPreference.systemPrompt,
+            emailCategorization: preference.emailCategorization !== undefined ? preference.emailCategorization : currentPreference.emailCategorization,
         };
 
         const association = new RocketChatAssociationRecord(
@@ -68,7 +70,8 @@ export class UserPreferenceStorage implements IUserPreferenceStorage {
                 userId: this.userId,
                 language: Language.en,
                 emailProvider: EmailProviders.GMAIL,
-                reportCategories: ['github', 'calendar', 'social'],
+                statsCategories: ['github', 'calendar', 'social'],
+                emailCategorization: EmailCategorizationEnum.EmailProvider, // Default to Email Provider
             };
             return preference;
         }

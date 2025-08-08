@@ -13,7 +13,8 @@ import { SendEmailModalEnum } from '../enums/modals/SendEmailModal';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
-import { AvatarUtils } from '../constants/AuthConstants';
+import { AvatarUtils } from '../constants/constants';
+import { PlaceholderUtils } from '../utils/PlaceholderUtils';
 
 // Helper function to create avatar elements using usernames
 async function createAvatarElementsFromUsernames(
@@ -117,6 +118,7 @@ export async function SendEmailModal({
     language,
     emailData,
     context = 'default',
+    isPlaceholderEnabled = false,
 }: {
     app: EmailBridgeNlpApp;
     modify: IModify;
@@ -124,6 +126,7 @@ export async function SendEmailModal({
     language: Language;
     emailData?: ISendEmailData;
     context?: string;
+    isPlaceholderEnabled?: boolean;
 }): Promise<IUIKitSurfaceViewParam> {
     const viewId = `${SendEmailModalEnum.VIEW_ID}-${context}`;
     const { elementBuilder, blockBuilder } = app.getUtils();
@@ -240,6 +243,50 @@ export async function SendEmailModal({
         blockBuilder.createInputBlock({
             text: t(Translations.SEND_EMAIL_CONTENT_LABEL, language),
             element: contentElement,
+            optional: false,
+        }),
+    );
+
+    // Add placeholder hint if placeholders are enabled
+    if (isPlaceholderEnabled) {
+        blocks.push(
+            blockBuilder.createContextBlock({
+                contextElements: [
+                    `💡 ${t(Translations.PLACEHOLDER_EMAIL_HINT, language)}`
+                ]
+            })
+        );
+    }
+
+    blocks.push(blockBuilder.createDividerBlock());
+
+    // Send Type dropdown
+    const sendTypeOptions = [
+        {
+            text: t(Translations.SEND_TYPE_RECIPIENTS, language),
+            value: 'send',
+        },
+        {
+            text: t(Translations.SEND_TYPE_TEST_SELF, language),
+            value: 'test',
+        },
+    ];
+    const sendTypeDropdownOptions = elementBuilder.createDropDownOptions(sendTypeOptions);
+    const sendTypeElement = elementBuilder.addDropDown(
+        {
+            placeholder: t(Translations.SEND_TYPE_LABEL, language),
+            options: sendTypeDropdownOptions,
+            initialValue: 'send',
+        },
+        {
+            blockId: SendEmailModalEnum.SEND_TYPE_BLOCK_ID,
+            actionId: SendEmailModalEnum.SEND_TYPE_ACTION_ID,
+        },
+    );
+    blocks.push(
+        blockBuilder.createInputBlock({
+            text: t(Translations.SEND_TYPE_LABEL, language),
+            element: sendTypeElement,
             optional: false,
         }),
     );

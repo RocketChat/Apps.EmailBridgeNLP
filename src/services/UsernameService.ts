@@ -32,8 +32,6 @@ export class UsernameService {
         }
     }
 
-
-
     public async getUsersByUsernames(usernames: string[]): Promise<IUserLookupResult> {
         const foundUsers: IUserWithEmail[] = [];
         const notFoundUsers: string[] = [];

@@ -14,10 +14,18 @@ export enum SendEmailModalEnum {
     CONTENT_BLOCK_ID = 'send-email-content-block',
     CONTENT_ACTION_ID = 'send-email-content-action',
     
+    // Send Type dropdown
+    SEND_TYPE_BLOCK_ID = 'send-email-type-block',
+    SEND_TYPE_ACTION_ID = 'send-email-type-action',
+    
     // Actions
     SEND_ACTION_ID = 'send-email-send-action',
     SEND_BLOCK_ID = 'send-email-send-block',
     
     CANCEL_ACTION_ID = 'send-email-cancel-action',
     CANCEL_BLOCK_ID = 'send-email-cancel-block',
+    
+    // Test Email Actions
+    TEST_EMAIL_ACTION_ID = 'send-email-test-action',
+    TEST_EMAIL_BLOCK_ID = 'send-email-test-block',
 } 
