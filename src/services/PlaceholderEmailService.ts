@@ -4,7 +4,7 @@ import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { EmailProviders } from '../enums/EmailProviders';
 import { Language } from '../lib/Translation/translation';
 import { PlaceholderUtils } from '../utils/PlaceholderUtils';
-import { IRecipientInfo, IPlaceholderDetection, IPlaceholderEmailResult } from '../definition/lib/IPlaceholderInterfaces';
+import { IRecipientInfo, IPlaceholderDetection, IPlaceholderEmailResult } from '../definition/lib/IPlaceholder';
 import { EmailServiceFactory } from './auth/EmailServiceFactory';
 import { PlaceholderStatus } from '../enums/EmailPlaceholders';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';

@@ -1,6 +1,6 @@
 import { IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { EmailPlaceholders, PlaceholderStatus } from '../enums/EmailPlaceholders';
-import { IRecipientInfo, IPlaceholderDetection } from '../definition/lib/IPlaceholderInterfaces';
+import { IRecipientInfo, IPlaceholderDetection } from '../definition/lib/IPlaceholder';
 
 export class PlaceholderUtils {
 

@@ -29,7 +29,7 @@ import { CacheService, ICachedUserData } from '../services/CacheService';
 import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { getEffectiveLLMSettings } from '../config/SettingsManager';
 import { MessageService } from '../services/MessageService';
-import { IEmailContextData } from '../definition/lib/ICacheInterfaces';
+import { IEmailContextData } from '../definition/lib/ICache';
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 
 export class NLQueryHandler {

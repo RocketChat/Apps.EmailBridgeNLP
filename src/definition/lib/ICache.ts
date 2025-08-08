@@ -1,7 +1,3 @@
-/**
- * Interface definitions for cache-related functionality
- */
-
 export interface ICachedUserData {
     email: string;
     name: string;

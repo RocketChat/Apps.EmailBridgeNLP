@@ -9,7 +9,7 @@ import {
     IEmailContextData, 
     ICacheCleanupSchedule,
     ICacheServiceOptions 
-} from '../definition/lib/ICacheInterfaces';
+} from '../definition/lib/ICache';
 
 export class CacheService {
     private readonly defaultTTLMinutes: number;
@@ -238,4 +238,4 @@ export class CacheService {
     }
 }
 
-export { ICachedUserData, IUserCacheData, IEmailContextData } from '../definition/lib/ICacheInterfaces';
+export { ICachedUserData, IUserCacheData, IEmailContextData } from '../definition/lib/ICache';
