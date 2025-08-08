@@ -438,4 +438,11 @@ export const pl = {
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Dozwoleni użytkownicy dla masowych e-maili",
     Bulk_Email_Allowed_Users_Description: "Lista nazw użytkowników oddzielonych przecinkami, którzy mogą używać funkcji masowych e-maili (oprócz administratorów obszaru roboczego). Przykład: użytkownik1, użytkownik2, użytkownik3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Możesz używać symboli zastępczych [name], [username] i [date] w tym e-mailu, aby personalizować treść dla każdego odbiorcy.",
+    Placeholder_Email_Success: "Pomyślnie wysłano __count__ spersonalizowany(e) e-mail(e) do odbiorców.",
+    Placeholder_Email_Partial_Success: "Wysłano __success__ z __total__ spersonalizowanych e-maili. __failed__ nie powiodło się.",
+    Placeholder_Email_Failed: "Nie udało się wysłać spersonalizowanych e-maili do wszystkich __count__ odbiorców.",
+    Placeholder_Processing_Enabled: "Przetwarzanie symboli zastępczych jest włączone dla tego e-maila.",
 };

@@ -34,6 +34,7 @@ import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { LlmTools } from '../enums/LlmTools';
 import { NLQueryHandler } from './NLQuery';
 import { EmailFormats } from '../lib/formats/EmailFormats';
+import { CacheService } from '../services/CacheService';
 
 export class Handler implements IHandler {
     public app: EmailBridgeNlpApp;
@@ -557,6 +558,15 @@ export class Handler implements IHandler {
 
             await roomInteractionStorage.storeInteractionRoomId(this.room.id);
 
+            // Check if placeholder processing should be enabled for this email
+            const cacheService = new CacheService(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.room.id
+            );
+            const emailContext = await cacheService.getEmailContext();
+            const isPlaceholderEnabled = emailContext?.isPlaceholderEnabled || false;
+
             const modal = await SendEmailModal({
                 app: this.app,
                 modify: this.modify,
@@ -564,6 +574,7 @@ export class Handler implements IHandler {
                 language: this.language,
                 emailData,
                 context: 'llm',
+                isPlaceholderEnabled,
             });
 
             if (!modal) {

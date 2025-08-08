@@ -51,7 +51,7 @@ export const en = {
     Disconnect_Failed: "Failed to log out from your email account.",
 
     // Login success notifications (webhook)
-    Login_Success_Notification: "\n**Login Successful!**\n\nYou are now connected to **__provider__** as **__email__** ✅",
+    Login_Success_Notification: "\n**Login Successful!**\nYou are now connected to **__provider__** as **__email__** ✅",
 
     // Welcome message content (onInstall)
     Welcome_Title: "**Email Assistant**",
@@ -60,35 +60,35 @@ export const en = {
     Welcome_Message: `
 
         🚀 **Get Started in 3 Easy Steps:**
-        
+
         1️⃣ **Connect Your Email**: Use \`/email login\` to connect Gmail or Outlook
         2️⃣ **Configure Settings**: Use \`/email config\` and \`/email llm-config\` to set your preferences
         3️⃣ **Start Using AI**: Send natural language commands like \`/email send an email to @john.doe about the meeting...\`.
-        
+
         📧 **What You Can Do:**
-        • **Smart Email Management**: "send email to @John.doe about the meeting"
-        • **Channel Summaries**: "summarize this thread/channel and email it to manager@company.com"
-        • **Bulk Email**: "send email to #channel-name or #team-name regarding meeting on tommorow morning 10PM" *(only admin or users with special permissions can send bulk emails)*
+        • **AI Powered Email Sending**: "send email to @John.doe about the meeting"
+        • **Conversation Summaries**: "summarize this thread/channel and email it to manager@company.com"
+        • **Bulk Email**: "send email to #channel-name or #team-name regarding meeting on tommorow morning 10PM" - only admin or users with special permissions can send bulk emails
         • **Quick Stats**: Get email statistics with \`/email stats <no. of days> \` - choose between fast provider API or deep AI analysis
-        
+
         📊 **Email Statistics Feature:**
         Get personalized email statistics report showing:
         • Total emails received and sent
         • Email categories (general, calendar, github, etc.)
         • Get additional categories from LLM analysis
-        
+
         ⚙️ **Supported Providers:**
-        • **Gmail** 
-        • **Outlook**
+        • Gmail
+        • Outlook
 
         🌍 **Multi-Language Support:**
         Available in English, Spanish, Russian, German, Polish, and Portuguese
-        
+
         🔒 **Bulk Email Security:**
         Only workspace administrators and specially authorized users can send bulk emails to channels/teams. Ask your admin to add you to the allowed users list.
-        
+
         Need help? Type \`/email help\` anytime!
-        
+
         Thanks for choosing **Email Assistant** - Your AI powered Email Assistant! 🤖
         `,
 
@@ -114,7 +114,7 @@ export const en = {
     Logout_Command: "use `/email logout` - Logout from your email account",
     Config_Command: "use `/email config` - Open user preferences and settings",
     Stats_Command: "use `/email stats <no. of days>` - Get email statistics for specified days (max limit: 15 days)",
-    Natural_Language_Examples: "use `/email <your query>` - Natural language commands with AI assistance\nExamples:\n• \`/email send an email to @john.doe about the meeting tomorrow\`\n• \`/email summarize this thread and send to manager@company.com\`\n• \`/email generate stats for last 5 days\`\n• \`/email send email to @all OR #channel-name OR #team-name\` *(requires permissions)",
+    Natural_Language_Examples: "use `/email <your query>` - Natural language commands with AI assistance\nExamples:\n• \`/email send an email to @john.doe about the meeting tomorrow\`\n• \`/email summarize this thread/channel for messages from last 3 days and send to manager@company.com\`\n• \`/email generate stats for last 5 days\`\n• \`/email send email to @all OR #channel-name OR #team-name about deadline extension\` (requires permissions)",
     Default_Greeting: "Hey __name__! I'm Email Bot 👋. I can help you all your email needs.",
     Use_Help_Command: "Use `/email help` to learn about all available features and commands.",
     Login_Action_Text: "Login to __provider__",
@@ -274,7 +274,7 @@ export const en = {
     New_Category_Label: "New Category",
     New_Categories_Placeholder: "Add new categories, comma-separated...",
 
-    // System Prompt Configuration  
+    // System Prompt Configuration
     System_Prompt_Label: "System Prompt",
     System_Prompt_Placeholder: "Customize your email tone   e.g. [You're John, a Software Developer at Rocket Chat. You're very busy and so is everyone you correspond with, so you do your best to keep your emails to the point. Do your best to be kind, and don't be so informal that it comes across as rude....]",
 
@@ -322,7 +322,7 @@ export const en = {
     Send_Type_Label: "Send Type",
     Send_Type_Recipients: "Send to recipient(s)",
     Send_Type_Test_Self: "Send a test mail to self",
-    
+
     // Test Email notifications
     Test_Email_Success: "Test email sent to your email address ✅",
     Test_Email_Success_With_Email: "Test email sent to: __userEmail__ ✅",
@@ -453,11 +453,11 @@ export const en = {
     // Bulk email permissions
     Bulk_Email_Permission_Denied: "\n🚫 **Access Denied: Bulk Email Feature**\nOnly workspace administrators and specifically authorized users can send bulk emails.\n\nWhat can you do: Contact your workspace administrator to request bulk email permissions.",
     Bulk_Email_Permission_Check_Error: "❌ **Error checking permissions**\n\nThere was an error verifying your permissions for bulk email features. Please try again or contact your administrator if the issue persists.",
-    
+
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Allowed Users for Bulk Email",
     Bulk_Email_Allowed_Users_Description: "Comma-separated list of usernames that are allowed to use bulk email features (in addition to workspace administrators). Example: user1, user2, user3",
-    
+
     // Email Limits translations
     Max_Recipients_Per_Email_Label: "Maximum Recipients Per Email",
     Max_Recipients_Per_Email_Description: "Maximum number of recipients allowed per email for all users (default: 50)",
@@ -466,4 +466,11 @@ export const en = {
     User_Max_Recipients_Description: "Your personal limit for recipients per email (must be less than or equal to workspace limit)",
     Validation_Max_Recipients_Invalid: "Max recipients must be a valid number greater than 0.",
     Validation_Max_Recipients_Exceeds_Limit: "Max recipients cannot exceed the workspace limit of __limit__.",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "You can use [name], [username], and [date] placeholders in this email to personalize content for each recipient.",
+    Placeholder_Email_Success: "Successfully sent __count__ personalized email(s) to recipients.",
+    Placeholder_Email_Partial_Success: "Sent __success__ of __total__ personalized emails. __failed__ failed.",
+    Placeholder_Email_Failed: "Failed to send personalized emails to all __count__ recipients.",
+    Placeholder_Processing_Enabled: "Placeholder processing is enabled for this email.",
 };

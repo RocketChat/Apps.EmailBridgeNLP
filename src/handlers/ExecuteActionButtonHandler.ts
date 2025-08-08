@@ -23,6 +23,11 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { SendEmailModal } from '../modal/SendEmailModal';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { MessageFormatter } from '../lib/MessageFormatter';
+import { PlaceholderEmailService } from '../services/PlaceholderEmailService';
+import { UserPreferenceStorage } from '../storage/UserPreferenceStorage';
+import { CacheService } from '../services/CacheService';
+import { EmailServiceFactory } from '../services/auth/EmailServiceFactory';
+import { EmailProviders } from '../enums/EmailProviders';
 
 export class ExecuteActionButtonHandler {
     private context: UIKitActionButtonInteractionContext;
@@ -82,16 +87,53 @@ export class ExecuteActionButtonHandler {
                 return;
             }
 
-            // Send email directly using ToolExecutorService
-            const toolExecutorService = new ToolExecutorService(
+            // Get user preferences for email provider and language
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+            if (!userEmail) {
+                await this.showMessage(
+                    user,
+                    room,
+                    'Unable to retrieve your email address',
+                    language
+                );
+                return;
+            }
+
+            // Check for email context to determine if placeholders should be processed
+            const cacheService = new CacheService(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                room.id
+            );
+            const emailContext = await cacheService.getEmailContext();
+
+            // Send email using PlaceholderEmailService (handles both placeholder and normal emails)
+            const placeholderEmailService = new PlaceholderEmailService(
                 this.app,
                 this.read,
-                this.modify,
                 this.http,
-                this.persistence
+                this.persistence,
+                this.app.getLogger()
             );
 
-            const result = await toolExecutorService.sendEmail(emailData, user);
+            const result = await placeholderEmailService.sendEmailWithPlaceholders(
+                emailData,
+                user,
+                emailProvider,
+                userEmail,
+                emailContext?.toolContext || 'button',
+                language,
+                room.id
+            );
 
             // Show result message
             await this.showMessage(
@@ -225,6 +267,31 @@ export class ExecuteActionButtonHandler {
             await this.read.getNotifier().notifyUser(user, messageBuilder.getMessage());
         } catch (error) {
             this.app.getLogger().error('Error showing message:', error);
+        }
+    }
+
+    private async getUserEmailFromAuth(userId: string): Promise<string | null> {
+        try {
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                userId,
+            );
+            const preference = await userPreferenceStorage.getUserPreference();
+            const provider = preference?.emailProvider || EmailProviders.GMAIL;
+
+            const userInfo = await EmailServiceFactory.getUserInfo(
+                provider,
+                userId,
+                this.http,
+                this.persistence,
+                this.read,
+                this.app.getLogger()
+            );
+            return userInfo?.email || null;
+        } catch (error) {
+            this.app.getLogger().error('Error getting user email from auth:', error);
+            return null;
         }
     }
 } 

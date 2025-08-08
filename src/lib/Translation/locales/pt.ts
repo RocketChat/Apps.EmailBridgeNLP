@@ -443,4 +443,11 @@ export const pt = {
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Usuários Permitidos para Email em Massa",
     Bulk_Email_Allowed_Users_Description: "Lista de nomes de usuário separados por vírgula que podem usar recursos de email em massa (além dos administradores do espaço de trabalho). Exemplo: usuario1, usuario2, usuario3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Você pode usar espaços reservados [name], [username] e [date] neste email para personalizar o conteúdo para cada destinatário.",
+    Placeholder_Email_Success: "Enviado com sucesso __count__ email(s) personalizado(s) para os destinatários.",
+    Placeholder_Email_Partial_Success: "Enviados __success__ de __total__ emails personalizados. __failed__ falharam.",
+    Placeholder_Email_Failed: "Falha ao enviar emails personalizados para todos os __count__ destinatários.",
+    Placeholder_Processing_Enabled: "O processamento de espaços reservados está habilitado para este email.",
 };

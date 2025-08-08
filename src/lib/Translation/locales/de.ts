@@ -448,4 +448,11 @@ export const de = {
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Erlaubte Benutzer für Massen-E-Mail",
     Bulk_Email_Allowed_Users_Description: "Kommagetrennte Liste von Benutzernamen, die Massen-E-Mail-Funktionen verwenden dürfen (zusätzlich zu Arbeitsbereich-Administratoren). Beispiel: benutzer1, benutzer2, benutzer3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Sie können [name], [username] und [date] Platzhalter in dieser E-Mail verwenden, um Inhalte für jeden Empfänger zu personalisieren.",
+    Placeholder_Email_Success: "Erfolgreich __count__ personalisierte E-Mail(s) an Empfänger gesendet.",
+    Placeholder_Email_Partial_Success: "__success__ von __total__ personalisierten E-Mails gesendet. __failed__ fehlgeschlagen.",
+    Placeholder_Email_Failed: "Fehler beim Senden personalisierter E-Mails an alle __count__ Empfänger.",
+    Placeholder_Processing_Enabled: "Platzhalter-Verarbeitung ist für diese E-Mail aktiviert.",
 };

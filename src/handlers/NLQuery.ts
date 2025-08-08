@@ -1,4 +1,5 @@
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
+import { ILogger, IPersistenceRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IRoom } from '@rocket.chat/apps-engine/definition/rooms';
 import {
     IHttp,
@@ -6,10 +7,6 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import {
-    RocketChatAssociationModel,
-    RocketChatAssociationRecord,
-} from '@rocket.chat/apps-engine/definition/metadata';
 import { EmailBridgeNlpApp } from '../../EmailBridgeNlpApp';
 import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
@@ -28,9 +25,12 @@ import { RoomInteractionStorage } from '../storage/RoomInteractionStorage';
 import { ButtonStyle } from '@rocket.chat/apps-engine/definition/uikit';
 import { ActionIds } from '../enums/ActionIds';
 import { EmailFormats } from '../lib/formats/EmailFormats';
+import { CacheService, ICachedUserData } from '../services/CacheService';
 import { handleLLMErrorAndGetMessage } from '../helper/errorHandler';
 import { getEffectiveLLMSettings } from '../config/SettingsManager';
 import { MessageService } from '../services/MessageService';
+import { IEmailContextData } from '../definition/lib/ICacheInterfaces';
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 
 export class NLQueryHandler {
     private originalQuery: string = '';
@@ -276,10 +276,10 @@ export class NLQueryHandler {
 
 
 
-            // Store email data for button handlers
+            // Store email data and context for button handlers
             await this.storeEmailDataForButtons(emailData);
+            await this.storeEmailContext(toolCall.function.name);
 
-            // Create and send formatted response with button
             await this.sendEmailReadyMessage(emailData, toolCall, appUser);
         } catch (error) {
             this.app.getLogger().error('Error handling email tools:', error);
@@ -388,6 +388,9 @@ export class NLQueryHandler {
             // Determine where to put emails (to or cc)
             const includeIn = args.include_in?.toLowerCase() || 'to';
             
+            // Cache user data for placeholder processing
+            await this.cacheUserDataForChannel(result.members, 'send-email-to-channel-or-team');
+
             const emailData: ISendEmailData = {
                 to: includeIn === 'to' ? memberEmails : [],
                 cc: includeIn === 'cc' ? memberEmails : undefined,
@@ -591,6 +594,9 @@ export class NLQueryHandler {
             // Add informative message about channel/team to the summary content
             const enhancedContent = `${emailResult.content}\n\n[This summary email was sent to all members of the ${roomType} #${result.channelName}]`;
 
+            // Cache user data for placeholder processing  
+            await this.cacheUserDataForChannel(result.members, 'summarize-and-send-email-to-channel-or-team');
+
             // Determine where to put emails (to or cc)
             const includeIn = args.include_in?.toLowerCase() || 'to';
             
@@ -627,6 +633,23 @@ export class NLQueryHandler {
         // Store email data with proper structure for retrieval
         await this.persis.updateByAssociation(association, { emailData }, true);
         await roomInteractionStorage.storeInteractionRoomId(this.room.id);
+    }
+
+    private async storeEmailContext(toolContext: string): Promise<void> {
+        const cacheService = new CacheService(
+            this.persis,
+            this.read.getPersistenceReader(),
+            this.room.id
+        );
+
+        const contextData: IEmailContextData = {
+            toolContext,
+            isPlaceholderEnabled: CacheService.isPlaceholderEnabledContext(toolContext),
+            originalQuery: this.originalQuery,
+            timestamp: new Date()
+        };
+
+        await cacheService.storeEmailContext(contextData);
     }
 
     private async sendEmailReadyMessage(emailData: ISendEmailData, toolCall: IToolCall, appUser: IUser): Promise<void> {
@@ -694,6 +717,7 @@ export class NLQueryHandler {
         });
 
         messageBuilder.setBlocks(block.getBlocks());
+        
         await this.read.getNotifier().notifyUser(this.sender, messageBuilder.getMessage());
     }
 
@@ -751,4 +775,62 @@ export class NLQueryHandler {
         
         return processedQuery;
     }
+
+    private async cacheUserDataForChannel(members: any[], toolContext: string): Promise<void> {
+        try {
+            // First, get detailed user information including emails for each member
+            const usersWithEmails = await this.fetchUsersWithEmails(members);
+            
+            // Create cache data
+            const cachedUsers: ICachedUserData[] = usersWithEmails.map(member => ({
+                email: member.email,
+                name: member.name || member.username,
+                username: member.username,
+                avatarUrl: member.avatarUrl
+            }));
+
+            // Cache the data
+            const cacheService = new CacheService(
+                this.persis,
+                this.read.getPersistenceReader(),
+                this.room.id,
+                this.app.getLogger()
+            );
+
+            await cacheService.cacheUserData(cachedUsers, toolContext);
+
+        } catch (error) {
+            // Silently handle cache errors - not critical for email functionality
+        }
+    }
+
+    private async fetchUsersWithEmails(members: any[]): Promise<any[]> {
+        const usersWithEmails: any[] = [];
+
+        for (const member of members) {
+            try {
+                // Get full user details by username to get email
+                const fullUser = await this.read.getUserReader().getByUsername(member.username);
+                if (fullUser && fullUser.emails && fullUser.emails.length > 0) {
+                    const primaryEmail = fullUser.emails.find(e => e.address) || fullUser.emails[0];
+                    if (primaryEmail) {
+                        usersWithEmails.push({
+                            ...member,
+                            email: primaryEmail.address,
+                            name: fullUser.name || member.name || member.username,
+                            avatarUrl: member.avatarUrl // Keep existing avatar URL if available
+                        });
+                    }
+                }
+            } catch (error) {
+                this.app.getLogger().debug(`Could not fetch email for user ${member.username}:`, error);
+            }
+        }
+
+        return usersWithEmails;
+    }
+
+
+
+
 }

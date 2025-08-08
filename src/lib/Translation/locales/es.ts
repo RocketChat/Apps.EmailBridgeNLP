@@ -450,4 +450,11 @@ export const es = {
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Usuarios Permitidos para Email Masivo",
     Bulk_Email_Allowed_Users_Description: "Lista de nombres de usuario separados por comas que tienen permitido usar las funciones de email masivo (además de los administradores del espacio de trabajo). Ejemplo: usuario1, usuario2, usuario3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Puedes usar marcadores de posición [name], [username] y [date] en este correo para personalizar el contenido para cada destinatario.",
+    Placeholder_Email_Success: "Se enviaron exitosamente __count__ correo(s) personalizado(s) a los destinatarios.",
+    Placeholder_Email_Partial_Success: "Se enviaron __success__ de __total__ correos personalizados. __failed__ fallaron.",
+    Placeholder_Email_Failed: "Error al enviar correos personalizados a todos los __count__ destinatarios.",
+    Placeholder_Processing_Enabled: "El procesamiento de marcadores de posición está habilitado para este correo.",
 };

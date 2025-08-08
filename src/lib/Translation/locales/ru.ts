@@ -443,4 +443,11 @@ export const ru = {
     // App settings for bulk email
     Bulk_Email_Allowed_Users_Label: "Разрешенные пользователи для массовой рассылки",
     Bulk_Email_Allowed_Users_Description: "Список имен пользователей через запятую, которым разрешено использовать функции массовой рассылки (в дополнение к администраторам рабочего пространства). Пример: пользователь1, пользователь2, пользователь3",
+
+    // Placeholder Email Features
+    Placeholder_Email_Hint: "Вы можете использовать заполнители [name], [username] и [date] в этом письме для персонализации содержимого для каждого получателя.",
+    Placeholder_Email_Success: "Успешно отправлено __count__ персонализированных писем получателям.",
+    Placeholder_Email_Partial_Success: "Отправлено __success__ из __total__ персонализированных писем. __failed__ не удалось.",
+    Placeholder_Email_Failed: "Не удалось отправить персонализированные письма всем __count__ получателям.",
+    Placeholder_Processing_Enabled: "Обработка заполнителей включена для этого письма.",
 };

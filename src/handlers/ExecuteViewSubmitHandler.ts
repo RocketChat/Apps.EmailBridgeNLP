@@ -31,6 +31,8 @@ import { ToolExecutorService } from '../services/ToolExecutorService';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { getProviderDisplayName } from '../enums/ProviderDisplayNames';
 import { LLMUsagePreferenceEnum, LLMProviderEnum } from '../definition/lib/IUserPreferences';
+import { PlaceholderEmailService } from '../services/PlaceholderEmailService';
+import { CacheService } from '../services/CacheService';
 
 export class ExecuteViewSubmitHandler {
     private context: UIKitViewSubmitInteractionContext;
@@ -295,16 +297,53 @@ export class ExecuteViewSubmitHandler {
                 content: contentValue,
             };
 
-            // Send email using ToolExecutorService
-            const toolExecutorService = new ToolExecutorService(
+            // Check for email context to determine if placeholders should be processed
+            const cacheService = new CacheService(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                room?.id || ''
+            );
+            const emailContext = await cacheService.getEmailContext();
+            const shouldProcessPlaceholders = emailContext?.isPlaceholderEnabled || false;
+
+            // Get user preferences for email provider and language
+            const userPreferenceStorage = new UserPreferenceStorage(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                user.id
+            );
+            const userPreference = await userPreferenceStorage.getUserPreference();
+            const emailProvider = userPreference.emailProvider;
+
+            // Get user's email address
+            const userEmail = await this.getUserEmailFromAuth(user.id);
+            if (!userEmail) {
+                if (room) {
+                    await sendNotification(this.read, this.modify, user, room, {
+                        message: t(Translations.SEND_EMAIL_FAILED, userLanguage, { error: "Unable to retrieve your email address" })
+                    });
+                }
+                return this.context.getInteractionResponder().errorResponse();
+            }
+
+            // Send email using PlaceholderEmailService (handles both placeholder and normal emails)
+            const placeholderEmailService = new PlaceholderEmailService(
                 this.app,
                 this.read,
-                this.modify,
                 this.http,
-                this.persistence
+                this.persistence,
+                this.app.getLogger()
             );
 
-            const result = await toolExecutorService.sendEmail(emailData, user);
+            const result = await placeholderEmailService.sendEmailWithPlaceholders(
+                emailData, 
+                user, 
+                emailProvider,
+                userEmail,
+                emailContext?.toolContext || 'manual',
+                userLanguage,
+                room?.id
+            );
 
             // Notify user about result
             if (room) {
@@ -343,7 +382,7 @@ export class ExecuteViewSubmitHandler {
             }
 
         } catch (error) {
-            const userLanguage = await getUserPreferredLanguage(
+            const errorUserLanguage = await getUserPreferredLanguage(
                 this.read.getPersistenceReader(),
                 this.persistence,
                 user.id,
@@ -356,7 +395,7 @@ export class ExecuteViewSubmitHandler {
                     this.modify,
                     user,
                     room,
-                    userLanguage,
+                    errorUserLanguage,
                     'Send email submission',
                     error
                 );

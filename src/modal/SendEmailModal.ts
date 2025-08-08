@@ -14,6 +14,7 @@ import { t, Language } from '../lib/Translation/translation';
 import { Translations } from '../constants/Translations';
 import { ISendEmailData } from '../definition/lib/IEmailUtils';
 import { AvatarUtils } from '../constants/constants';
+import { PlaceholderUtils } from '../utils/PlaceholderUtils';
 
 // Helper function to create avatar elements using usernames
 async function createAvatarElementsFromUsernames(
@@ -117,6 +118,7 @@ export async function SendEmailModal({
     language,
     emailData,
     context = 'default',
+    isPlaceholderEnabled = false,
 }: {
     app: EmailBridgeNlpApp;
     modify: IModify;
@@ -124,6 +126,7 @@ export async function SendEmailModal({
     language: Language;
     emailData?: ISendEmailData;
     context?: string;
+    isPlaceholderEnabled?: boolean;
 }): Promise<IUIKitSurfaceViewParam> {
     const viewId = `${SendEmailModalEnum.VIEW_ID}-${context}`;
     const { elementBuilder, blockBuilder } = app.getUtils();
@@ -243,6 +246,17 @@ export async function SendEmailModal({
             optional: false,
         }),
     );
+
+    // Add placeholder hint if placeholders are enabled
+    if (isPlaceholderEnabled) {
+        blocks.push(
+            blockBuilder.createContextBlock({
+                contextElements: [
+                    `💡 ${t(Translations.PLACEHOLDER_EMAIL_HINT, language)}`
+                ]
+            })
+        );
+    }
 
     blocks.push(blockBuilder.createDividerBlock());
 

@@ -455,4 +455,11 @@ export const Translations = {
     LLM_CONFIG_GEMINI_KEY_REQUIRED: 'LLM_Config_Gemini_Key_Required',
     LLM_CONFIG_GROQ_KEY_REQUIRED: 'LLM_Config_Groq_Key_Required',
     LLM_CONFIG_INVALID_PROVIDER: 'LLM_Config_Invalid_Provider',
+    
+    // Placeholder Email Features
+    PLACEHOLDER_EMAIL_HINT: 'Placeholder_Email_Hint',
+    PLACEHOLDER_EMAIL_SUCCESS: 'Placeholder_Email_Success',
+    PLACEHOLDER_EMAIL_PARTIAL_SUCCESS: 'Placeholder_Email_Partial_Success',
+    PLACEHOLDER_EMAIL_FAILED: 'Placeholder_Email_Failed',
+    PLACEHOLDER_PROCESSING_ENABLED: 'Placeholder_Processing_Enabled',
 } as const;
