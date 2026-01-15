@@ -75,6 +75,8 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         return {
             status: 400,
             headers: {
+                "Content-Security-Policy":
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
                 [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: oauthErrorHtml(errorMessage)
@@ -88,6 +90,8 @@ export class GoogleOAuthEndpoint implements IApiEndpoint {
         return {
             status: 200,
             headers: {
+                "Content-Security-Policy":
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
                 [HttpHeaders.CONTENT_TYPE]: ContentTypes.TEXT_HTML,
             },
             content: oauthSuccessHtml(email)
