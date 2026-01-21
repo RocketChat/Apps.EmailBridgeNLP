@@ -130,7 +130,7 @@ export class OAuthHtmlTemplates {
         </div>
         ` : ''}
         
-        <button class="close-button" onclick="window.close()">Close Window</button>
+        <button class="close-button" onclick="window.opener=null; window.open('', '_self'); window.close();">Close Window</button>
     </div>
 </body>
 </html>`;
@@ -246,7 +246,7 @@ export class OAuthHtmlTemplates {
         <p>You can now use EmailBridge NLP features in Rocket.Chat!</p>
         <p>You can safely close this window and return to Rocket.Chat.</p>
         
-        <button class="close-button" onclick="window.close()">Close Window</button>
+        <button class="close-button" onclick="window.opener=null; window.open('', '_self'); window.close();">Close Window</button>
     </div>
 </body>
 </html>`;
@@ -355,7 +355,7 @@ export const oauthErrorHtml = (errorMessage: string): string => {
         <p><strong>${errorMessage}</strong></p>
         ${localhostTroubleshooting}
         <p>Please try again or contact your administrator.</p>
-        <button class="close-button" onclick="window.close()">Close Window</button>
+        <button class="close-button" onclick="window.opener=null; window.open('', '_self'); window.close();">Close Window</button>
     </div>
 </body>
 </html>`
@@ -431,7 +431,7 @@ export const oauthSuccessHtml = (email: string, provider: string = 'Gmail'): str
         <div class="email">${email}</div>
         <p>You can now use EmailBridge NLP features in Rocket.Chat!</p>
         <p>You can safely close this window and return to Rocket.Chat.</p>
-        <button class="close-button" onclick="window.close()">Close Window</button>
+        <button class="close-button" onclick="window.opener=null; window.open('', '_self'); window.close();">Close Window</button>
     </div>
 </body>
 </html>`; 

@@ -73,6 +73,7 @@ export const Translations = {
     HELPER_GREETING: 'Helper_Greeting',
     AVAILABLE_COMMANDS: 'Available_Commands',
     HELP_COMMAND: 'Help_Command',
+    LLM_HELP_COMMAND: 'LLM_Help_Command',
     LOGIN_COMMAND: 'Login_Command',
     LOGOUT_COMMAND: 'Logout_Command',
     CONFIG_COMMAND: 'Config_Command',

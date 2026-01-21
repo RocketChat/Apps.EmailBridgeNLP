@@ -68,6 +68,7 @@ export const pl = {
     Helper_Greeting: "Cześć __name__! Jestem Email Bot 👋. Oto kilka szybkich wskazówek na początek!",
     Available_Commands: "",
     Help_Command: "użyj `/email help` - Pokaż tę wiadomość pomocy",
+    LLM_Help_Command: "użyj `/email [query]` - Poproś asystenta AI o zarządzanie Twoimi e-mailami",
     Login_Command: "użyj `/email login` - Zaloguj się na swoje konto e-mail",
     Logout_Command: "użyj `/email logout` - Wyloguj się z konta e-mail",
     Config_Command: "użyj `/email config` - Otwórz preferencje użytkownika i ustawienia",
